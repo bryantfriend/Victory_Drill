@@ -1,5 +1,6 @@
 import { TARGET_LANGUAGES, getCategoryItems, learningContent } from './content.js';
 import { LANGUAGES, getCategoryLabel, getUIText } from './i18n.js';
+import { RecognitionManager } from './recognition.js';
 import { VoiceManager } from './voice.js';
 import { Timer } from './timer.js';
 import { UIManager } from './ui.js';
@@ -20,6 +21,7 @@ class App {
         this.practiceSourceList = null;
         this.isPaused = false;
         this.isFlipped = false;
+        this.speechFeedback = null;
 
         this.russianAlphabetVariations = [
             "Следующая буква {n}. Она дает звук {s}.",
@@ -64,6 +66,7 @@ class App {
         };
 
         this.voice = new VoiceManager();
+        this.recognition = new RecognitionManager((payload) => this.handleRecognitionUpdate(payload));
         this.timer = new Timer(
             (time, isAlert) => this.ui.updateTimer(time, isAlert),
             () => this.endGame()
@@ -85,7 +88,8 @@ class App {
             onPracticeDifficult: () => this.startDifficultPractice()
             ,
             onTogglePronunciation: () => this.togglePronunciation(),
-            onToggleMeanings: () => this.toggleMeanings()
+            onToggleMeanings: () => this.toggleMeanings(),
+            onRecord: () => this.toggleRecording()
         });
 
         this.init();
@@ -222,6 +226,19 @@ class App {
             meaningToggleHint: getUIText(language, 'meaningToggleHint'),
             categoryGroupTopics: getUIText(language, 'categoryGroupTopics'),
             categoryGroupSounds: getUIText(language, 'categoryGroupSounds'),
+            speechFeedback: getUIText(language, 'speechFeedback'),
+            speechHeard: getUIText(language, 'speechHeard'),
+            speechIdle: getUIText(language, 'speechIdle'),
+            speechListening: getUIText(language, 'speechListening'),
+            speechProcessing: getUIText(language, 'speechProcessing'),
+            speechUnsupported: getUIText(language, 'speechUnsupported'),
+            speechPermissionDenied: getUIText(language, 'speechPermissionDenied'),
+            speechTryAgain: getUIText(language, 'speechTryAgain'),
+            speechGreat: getUIText(language, 'speechGreat'),
+            speechClose: getUIText(language, 'speechClose'),
+            speechNoSpeech: getUIText(language, 'speechNoSpeech'),
+            speechRecord: getUIText(language, 'speechRecord'),
+            speechStop: getUIText(language, 'speechStop'),
             on: getUIText(language, 'on'),
             off: getUIText(language, 'off')
         });
@@ -237,9 +254,12 @@ class App {
 
     setTargetLanguage(language) {
         this.targetLanguage = language;
-        this.voice.setLanguage(learningContent[language]?.speechLang || 'ru-RU');
+        const speechLang = learningContent[language]?.speechLang || 'ru-RU';
+        this.voice.setLanguage(speechLang);
+        this.recognition.setLanguage(speechLang);
         this.ui.setTargetLanguage(language);
         this.ui.updateTargetLanguageButtons(language);
+        this.resetSpeechFeedback();
         this.currentCategory = null;
         this.currentList = [];
         this.difficultItems = [];
@@ -337,6 +357,7 @@ class App {
         this.currentIndex = 0;
         this.isPaused = false;
         this.isFlipped = false;
+        this.resetSpeechFeedback();
         if (!preserveDifficult) {
             this.difficultItems = [];
         }
@@ -393,6 +414,7 @@ class App {
     nextItem() {
         if (this.isPaused) return;
 
+        this.resetSpeechFeedback();
         this.currentIndex++;
         if (this.currentIndex >= this.currentList.length) {
             this.currentIndex = 0;
@@ -412,6 +434,7 @@ class App {
     prevItem() {
         if (this.isPaused || this.currentIndex === 0) return;
 
+        this.resetSpeechFeedback();
         this.currentIndex--;
 
         const prevItem = this.currentList[this.currentIndex];
@@ -425,6 +448,11 @@ class App {
     repeatItem() {
         if (this.isPaused) return;
         this.voice.speak(this.getText(this.currentList[this.currentIndex]));
+    }
+
+    toggleRecording() {
+        if (this.isPaused || !this.currentList.length) return;
+        this.recognition.start(this.getSpeechTargetText(this.getCurrentItem()));
     }
 
     getCurrentItem() {
@@ -473,6 +501,9 @@ class App {
     togglePause() {
         this.isPaused = !this.isPaused;
         if (this.isPaused) {
+            this.recognition.stop();
+        }
+        if (this.isPaused) {
             this.timer.stop();
         } else {
             this.timer.start(this.timer.seconds);
@@ -481,14 +512,104 @@ class App {
     }
 
     endGame() {
+        this.recognition.stop();
         this.ui.updateDifficultSummary(this.difficultItems.length);
         this.ui.showScreen('end');
     }
 
     exitToMenu() {
+        this.recognition.stop();
+        this.resetSpeechFeedback();
         this.timer.stop();
         this.practiceSourceList = null;
         this.ui.showScreen('start');
+    }
+
+    getSpeechTargetText(item) {
+        if (!item) return '';
+        if (typeof item === 'string') return item;
+        return item.t || item.w || item.l || '';
+    }
+
+    normalizeForSpeechCompare(text) {
+        const raw = (text || '').toString().trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        if (this.targetLanguage === 'zh') {
+            return raw.replace(/[^\p{Script=Han}\p{Number}]+/gu, '');
+        }
+
+        return raw
+            .replace(/['’]/g, '')
+            .replace(/[^\p{L}\p{Number}\s]+/gu, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+    }
+
+    isSpeechMatch(expectedText, heardText) {
+        const expected = this.normalizeForSpeechCompare(expectedText);
+        const heard = this.normalizeForSpeechCompare(heardText);
+
+        if (!expected || !heard) return false;
+        if (expected === heard) return true;
+
+        if (this.targetLanguage === 'zh') {
+            return expected.includes(heard) || heard.includes(expected);
+        }
+
+        const expectedWords = expected.split(' ').filter(Boolean);
+        const heardWords = heard.split(' ').filter(Boolean);
+
+        if (expectedWords.length <= 1 || heardWords.length <= 1) {
+            return expected.includes(heard) || heard.includes(expected);
+        }
+
+        let matches = 0;
+        expectedWords.forEach(word => {
+            if (heardWords.includes(word)) {
+                matches += 1;
+            }
+        });
+
+        return matches / expectedWords.length >= 0.7;
+    }
+
+    buildSpeechFeedback(state, transcript = '', expectedText = '') {
+        const isMatch = state === 'result' && this.isSpeechMatch(expectedText, transcript);
+        const isClose = state === 'result' && !isMatch && transcript;
+        const statusMap = {
+            idle: this.ui.text.speechIdle || 'Tap the mic and say the card.',
+            listening: this.ui.text.speechListening || 'Listening...',
+            processing: this.ui.text.speechProcessing || 'Checking what I heard...',
+            unsupported: this.ui.text.speechUnsupported || 'Speech recognition is not available in this browser.',
+            'permission-denied': this.ui.text.speechPermissionDenied || 'Microphone permission was blocked.',
+            error: this.ui.text.speechTryAgain || 'Try again.',
+            'no-speech': this.ui.text.speechNoSpeech || 'I did not hear anything. Try again.',
+            result: isMatch
+                ? (this.ui.text.speechGreat || 'Great pronunciation!')
+                : (this.ui.text.speechClose || 'Close. Compare what I heard and try again.')
+        };
+
+        return {
+            visible: state !== 'idle',
+            status: statusMap[state] || statusMap.error,
+            transcript: transcript || '',
+            tone: isMatch ? 'success' : (isClose ? 'warning' : state),
+            badge: isMatch
+                ? (this.ui.text.speechGreat || 'Great pronunciation!')
+                : (isClose ? (this.ui.text.speechTryAgain || 'Try again') : '')
+        };
+    }
+
+    handleRecognitionUpdate({ state, transcript = '', expectedText = '' }) {
+        this.speechFeedback = this.buildSpeechFeedback(state, transcript, expectedText);
+        this.ui.updateRecordButton(this.recognition.isListening, this.recognition.supported);
+        this.ui.updateSpeechFeedback(this.speechFeedback);
+    }
+
+    resetSpeechFeedback() {
+        this.recognition.stop();
+        this.speechFeedback = this.buildSpeechFeedback('idle');
+        this.ui.updateRecordButton(false, this.recognition.supported);
+        this.ui.updateSpeechFeedback(this.speechFeedback);
     }
 
     shuffle(array) {

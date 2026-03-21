@@ -36,6 +36,13 @@ export class UIManager {
         this.scoreDisplay = document.getElementById('score-display');
         this.finalScore = document.getElementById('final-score');
         this.difficultSummary = document.getElementById('difficult-summary');
+        this.speechFeedback = document.getElementById('speech-feedback');
+        this.speechFeedbackLabel = document.getElementById('speech-feedback-label');
+        this.speechFeedbackStatus = document.getElementById('speech-feedback-status');
+        this.speechFeedbackBadge = document.getElementById('speech-feedback-badge');
+        this.speechFeedbackHeardWrap = document.getElementById('speech-feedback-heard-wrap');
+        this.speechFeedbackHeardLabel = document.getElementById('speech-feedback-heard-label');
+        this.speechFeedbackHeard = document.getElementById('speech-feedback-heard');
 
         this.card = document.getElementById('drill-card');
         this.cardFront = document.getElementById('card-front');
@@ -45,6 +52,7 @@ export class UIManager {
         // Buttons
         this.prevBtn = document.getElementById('prev-btn');
         this.markDifficultBtn = document.getElementById('mark-difficult-btn');
+        this.recordBtn = document.getElementById('record-btn');
         this.playBtn = document.getElementById('play-btn');
         this.nextBtn = document.getElementById('next-btn');
         this.practiceDifficultBtn = document.getElementById('practice-difficult-btn');
@@ -53,6 +61,7 @@ export class UIManager {
         this.card.onclick = () => this.callbacks.onNextItem();
         this.prevBtn.onclick = (e) => { e.stopPropagation(); this.callbacks.onPrevItem(); };
         this.markDifficultBtn.onclick = (e) => { e.stopPropagation(); this.callbacks.onToggleDifficult(); };
+        this.recordBtn.onclick = (e) => { e.stopPropagation(); this.callbacks.onRecord(); };
         this.playBtn.onclick = (e) => { e.stopPropagation(); this.callbacks.onRepeatItem(); };
         this.nextBtn.onclick = (e) => { e.stopPropagation(); this.callbacks.onNextItem(); };
         this.practiceDifficultBtn.onclick = () => this.callbacks.onPracticeDifficult();
@@ -88,11 +97,14 @@ export class UIManager {
         document.getElementById('end-title').innerText = text.excellent;
         document.getElementById('read-count-label').innerText = text.readCount;
         document.getElementById('words-label').innerText = text.wordsLabel;
+        this.speechFeedbackLabel.innerText = text.speechFeedback || 'Speech check';
+        this.speechFeedbackHeardLabel.innerText = text.speechHeard || 'What I heard';
         document.getElementById('menu-btn').innerText = text.menu;
         document.getElementById('replay-btn').innerText = text.replay;
         this.practiceDifficultBtn.innerText = text.difficult;
         this.updatePronunciationToggle(this.showPronunciation);
         this.updateMeaningToggle(this.showMeanings);
+        this.updateRecordButton(false, true);
     }
 
     setTargetLanguage(language) {
@@ -178,6 +190,63 @@ export class UIManager {
         const iconName = isMarked ? 'bookmark-check' : 'bookmark-plus';
         this.markDifficultBtn.innerHTML = `<i data-lucide="${iconName}" class="w-6 h-6"></i>`;
         if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    updateRecordButton(isListening, isSupported) {
+        this.recordBtn.classList.toggle('bg-sky-100', !isListening && isSupported);
+        this.recordBtn.classList.toggle('hover:bg-sky-200', !isListening && isSupported);
+        this.recordBtn.classList.toggle('text-sky-700', !isListening && isSupported);
+        this.recordBtn.classList.toggle('border-sky-300', !isListening && isSupported);
+        this.recordBtn.classList.toggle('bg-rose-500', isListening);
+        this.recordBtn.classList.toggle('hover:bg-rose-600', isListening);
+        this.recordBtn.classList.toggle('text-white', isListening);
+        this.recordBtn.classList.toggle('border-rose-700', isListening);
+        this.recordBtn.classList.toggle('bg-slate-200', !isSupported);
+        this.recordBtn.classList.toggle('text-slate-400', !isSupported);
+        this.recordBtn.classList.toggle('border-slate-300', !isSupported);
+        this.recordBtn.disabled = !isSupported;
+        this.recordBtn.title = isListening
+            ? (this.text.speechStop || 'Stop recording')
+            : (this.text.speechRecord || 'Record your voice');
+        this.recordBtn.style.setProperty('--shadow-color', isListening ? '#9f1239' : (isSupported ? '#38bdf8' : '#94a3b8'));
+        this.recordBtn.innerHTML = `<i data-lucide="${isListening ? 'mic-off' : 'mic'}" class="w-6 h-6"></i>`;
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    updateSpeechFeedback(feedback) {
+        if (!feedback?.visible) {
+            this.speechFeedback.classList.add('hidden');
+            this.speechFeedbackBadge.classList.add('hidden');
+            this.speechFeedbackHeardWrap.classList.add('hidden');
+            return;
+        }
+
+        this.speechFeedback.classList.remove('hidden');
+        this.speechFeedbackStatus.innerText = feedback.status || '';
+        this.speechFeedbackHeard.innerText = feedback.transcript || '';
+        this.speechFeedbackHeardWrap.classList.toggle('hidden', !feedback.transcript);
+
+        const toneMap = {
+            success: ['bg-emerald-50', 'border-emerald-200', 'text-emerald-800'],
+            warning: ['bg-amber-50', 'border-amber-200', 'text-amber-800'],
+            listening: ['bg-sky-50', 'border-sky-200', 'text-sky-800'],
+            processing: ['bg-violet-50', 'border-violet-200', 'text-violet-800'],
+            unsupported: ['bg-slate-50', 'border-slate-200', 'text-slate-700'],
+            'permission-denied': ['bg-rose-50', 'border-rose-200', 'text-rose-800'],
+            'no-speech': ['bg-amber-50', 'border-amber-200', 'text-amber-800'],
+            error: ['bg-rose-50', 'border-rose-200', 'text-rose-800']
+        };
+        const [bgClass, borderClass, textClass] = toneMap[feedback.tone] || toneMap.error;
+
+        this.speechFeedback.className = `mt-5 rounded-2xl border px-4 py-3 text-left shadow-sm ${bgClass} ${borderClass}`;
+
+        if (feedback.badge) {
+            this.speechFeedbackBadge.innerText = feedback.badge;
+            this.speechFeedbackBadge.className = `rounded-full px-3 py-1 text-xs font-black uppercase tracking-wide ${bgClass} ${textClass}`;
+            this.speechFeedbackBadge.classList.remove('hidden');
+        } else {
+            this.speechFeedbackBadge.classList.add('hidden');
+        }
     }
 
     updatePauseUI(isPaused) {
