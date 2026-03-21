@@ -28,6 +28,7 @@ export class VoiceManager {
         this.synth = window.speechSynthesis;
         this.voices = [];
         this.currentLang = 'ru-RU';
+        this.currentSpeechLang = 'ru-RU';
         this.currentVoice = null;
 
         this._initVoices();
@@ -38,7 +39,9 @@ export class VoiceManager {
 
     _initVoices() {
         this.voices = this.synth.getVoices();
-        this.currentVoice = this._findVoice(this.currentLang);
+        const selection = this._findVoiceSelection(this.currentLang);
+        this.currentVoice = selection.voice;
+        this.currentSpeechLang = selection.lang;
     }
 
     _getVoiceConfig(lang) {
@@ -89,8 +92,10 @@ export class VoiceManager {
         return score;
     }
 
-    _findVoice(lang) {
-        if (!this.voices.length) return null;
+    _findVoiceSelection(lang) {
+        if (!this.voices.length) {
+            return { voice: null, lang };
+        }
 
         const config = this._getVoiceConfig(lang);
         const ranked = this.voices
@@ -99,11 +104,36 @@ export class VoiceManager {
             .sort((a, b) => b.score - a.score);
 
         if (ranked.length) {
-            return ranked[0].voice;
+            return {
+                voice: ranked[0].voice,
+                lang: ranked[0].voice.lang || lang
+            };
         }
 
         const base = lang.split('-')[0].toLowerCase();
-        return this.voices.find(voice => voice.lang?.toLowerCase().startsWith(base)) || null;
+        const baseVoice = this.voices.find(voice => voice.lang?.toLowerCase().startsWith(base));
+        if (baseVoice) {
+            return {
+                voice: baseVoice,
+                lang: baseVoice.lang || lang
+            };
+        }
+
+        for (const candidate of config.fallbackLangs) {
+            const fallbackVoice = this.voices.find(voice => this._langMatches(voice.lang, candidate));
+            if (fallbackVoice) {
+                return {
+                    voice: fallbackVoice,
+                    lang: fallbackVoice.lang || candidate
+                };
+            }
+        }
+
+        const defaultVoice = this.voices.find(voice => voice.default) || this.voices[0] || null;
+        return {
+            voice: defaultVoice,
+            lang: defaultVoice?.lang || lang
+        };
     }
 
     _getSpeechRate(lang) {
@@ -120,7 +150,9 @@ export class VoiceManager {
 
     setLanguage(lang) {
         this.currentLang = lang;
-        this.currentVoice = this._findVoice(lang);
+        const selection = this._findVoiceSelection(lang);
+        this.currentVoice = selection.voice;
+        this.currentSpeechLang = selection.lang;
     }
 
     speak(text, rate = null) {
@@ -129,12 +161,12 @@ export class VoiceManager {
         this.synth.cancel();
 
         const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = this.currentLang;
+        utterance.lang = this.currentSpeechLang || this.currentLang;
         utterance.rate = rate ?? this._getSpeechRate(this.currentLang);
 
         if (this.currentVoice) {
             utterance.voice = this.currentVoice;
-            utterance.lang = this.currentVoice.lang || this.currentLang;
+            utterance.lang = this.currentVoice.lang || this.currentSpeechLang || this.currentLang;
         }
 
         this.synth.speak(utterance);
