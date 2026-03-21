@@ -193,6 +193,8 @@ export class UIManager {
     }
 
     updateRecordButton(isListening, isSupported) {
+        this.recordBtn.classList.toggle('is-listening', isListening);
+        this.recordBtn.classList.toggle('is-disabled', !isSupported);
         this.recordBtn.classList.toggle('bg-sky-100', !isListening && isSupported);
         this.recordBtn.classList.toggle('hover:bg-sky-200', !isListening && isSupported);
         this.recordBtn.classList.toggle('text-sky-700', !isListening && isSupported);
@@ -218,31 +220,38 @@ export class UIManager {
             this.speechFeedback.classList.add('hidden');
             this.speechFeedbackBadge.classList.add('hidden');
             this.speechFeedbackHeardWrap.classList.add('hidden');
+            this.speechFeedback.dataset.tone = '';
             return;
         }
 
         this.speechFeedback.classList.remove('hidden');
+        this.speechFeedback.dataset.tone = feedback.tone || 'default';
         this.speechFeedbackStatus.innerText = feedback.status || '';
         this.speechFeedbackHeard.innerText = feedback.transcript || '';
         this.speechFeedbackHeardWrap.classList.toggle('hidden', !feedback.transcript);
 
         const toneMap = {
-            success: ['bg-emerald-50', 'border-emerald-200', 'text-emerald-800'],
-            warning: ['bg-amber-50', 'border-amber-200', 'text-amber-800'],
-            listening: ['bg-sky-50', 'border-sky-200', 'text-sky-800'],
-            processing: ['bg-violet-50', 'border-violet-200', 'text-violet-800'],
-            unsupported: ['bg-slate-50', 'border-slate-200', 'text-slate-700'],
-            'permission-denied': ['bg-rose-50', 'border-rose-200', 'text-rose-800'],
-            'no-speech': ['bg-amber-50', 'border-amber-200', 'text-amber-800'],
-            error: ['bg-rose-50', 'border-rose-200', 'text-rose-800']
+            success: ['rgba(236, 253, 245, 0.98)', 'rgba(110, 231, 183, 0.9)', '#047857'],
+            warning: ['rgba(255, 251, 235, 0.98)', 'rgba(253, 230, 138, 0.95)', '#b45309'],
+            listening: ['rgba(240, 249, 255, 0.98)', 'rgba(125, 211, 252, 0.95)', '#0369a1'],
+            processing: ['rgba(245, 243, 255, 0.98)', 'rgba(196, 181, 253, 0.95)', '#6d28d9'],
+            unsupported: ['rgba(248, 250, 252, 0.98)', 'rgba(203, 213, 225, 0.95)', '#475569'],
+            'permission-denied': ['rgba(255, 241, 242, 0.98)', 'rgba(253, 164, 175, 0.95)', '#be123c'],
+            'no-speech': ['rgba(255, 251, 235, 0.98)', 'rgba(253, 230, 138, 0.95)', '#b45309'],
+            error: ['rgba(255, 241, 242, 0.98)', 'rgba(253, 164, 175, 0.95)', '#be123c']
         };
-        const [bgClass, borderClass, textClass] = toneMap[feedback.tone] || toneMap.error;
-
-        this.speechFeedback.className = `mt-5 rounded-2xl border px-4 py-3 text-left shadow-sm ${bgClass} ${borderClass}`;
+        const [panelBg, borderColor, accentColor] = toneMap[feedback.tone] || toneMap.error;
+        this.speechFeedback.style.background = `linear-gradient(145deg, rgba(255,255,255,0.96), ${panelBg})`;
+        this.speechFeedback.style.borderColor = borderColor;
+        this.speechFeedbackLabel.style.color = accentColor;
+        this.speechFeedbackStatus.style.color = feedback.tone === 'unsupported' ? '#334155' : '#0f172a';
+        this.speechFeedbackHeardWrap.style.borderColor = borderColor;
 
         if (feedback.badge) {
             this.speechFeedbackBadge.innerText = feedback.badge;
-            this.speechFeedbackBadge.className = `rounded-full px-3 py-1 text-xs font-black uppercase tracking-wide ${bgClass} ${textClass}`;
+            this.speechFeedbackBadge.style.background = panelBg;
+            this.speechFeedbackBadge.style.color = accentColor;
+            this.speechFeedbackBadge.style.border = `1px solid ${borderColor}`;
             this.speechFeedbackBadge.classList.remove('hidden');
         } else {
             this.speechFeedbackBadge.classList.add('hidden');
