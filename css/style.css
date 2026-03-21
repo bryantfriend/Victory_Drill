@@ -1,0 +1,132 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap');
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    touch-action: manipulation;
+}
+
+#app-container {
+    pointer-events: none;
+}
+
+#splash-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    overflow: hidden;
+    background: #000;
+}
+
+#splash-screen.hidden {
+    display: none;
+}
+
+#splash-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #000;
+    pointer-events: none;
+}
+
+#splash-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1002;
+}
+
+#start-splash {
+    position: relative;
+    z-index: 1003;
+}
+
+#skip-splash {
+    z-index: 1003;
+}
+
+/* 3D Button Styles */
+.btn-3d {
+    transition: all 0.1s ease-in-out;
+    box-shadow: 0 4px 0 var(--shadow-color);
+    border-bottom-width: 4px;
+}
+
+.btn-3d:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 var(--shadow-color);
+}
+
+.btn-3d.selected {
+    transform: translateY(2px);
+    box-shadow: 0 0 0 transparent;
+    border-bottom-width: 0px;
+    border-top-width: 4px;
+    border-color: rgba(0, 0, 0, 0.1);
+    background-color: #4338ca;
+    /* Indigo 700 */
+    color: white;
+}
+
+/* Card Flipping Styles */
+.perspective-1000 {
+    perspective: 1000px;
+}
+
+.card {
+    transform-style: preserve-3d;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card.is-flipped {
+    transform: rotateY(180deg);
+}
+
+/* Fix for hover bug: Move hover scaling to a wrapper or use :not(.is-flipped) */
+/* Or better, use a scale that doesn't overwrite the rotation */
+.card:hover {
+    transform: scale(1.02);
+}
+
+.card.is-flipped:hover {
+    transform: rotateY(180deg) scale(1.02);
+}
+
+.card-face {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+.card-face-back {
+    transform: rotateY(180deg);
+}
+
+/* Scrollbar Style */
+.scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+    background: #e2e8f0;
+    border-radius: 10px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: #cbd5e1;
+}
+
+.nav-link.active {
+    background-color: white;
+    color: #4338ca;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+/* Navigation Button Tweaks */
+#play-btn i {
+    filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.1));
+}

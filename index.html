@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Русская Победа</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body class="bg-indigo-50 text-slate-800 flex items-center justify-center min-h-screen p-4 select-none">
+
+    <!-- Splash Screen -->
+    <div id="splash-screen"
+        class="fixed inset-0 z-[100] bg-black flex items-center justify-center transition-opacity duration-1000">
+        <video id="splash-video" class="w-full h-full object-contain" muted playsinline>
+            <source src="assets/OquWay_Logo_Animation_Generation.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <div id="splash-overlay"
+            class="absolute inset-0 bg-black/55 flex flex-col items-center justify-center gap-4 z-[101] px-6 text-center">
+            <h2 class="text-white text-3xl md:text-4xl font-black tracking-tight">Language Victory</h2>
+            <p class="text-white/80 text-sm md:text-base max-w-sm">Tap to begin and play the intro.</p>
+            <button id="start-splash"
+                class="btn-3d bg-white hover:bg-slate-100 text-slate-900 font-bold py-3 px-8 rounded-xl text-lg border-b-4 border-slate-300"
+                style="--shadow-color: #cbd5e1;">
+                Start
+            </button>
+        </div>
+        <button id="skip-splash"
+            class="absolute bottom-10 right-10 text-white/50 hover:text-white text-sm font-bold uppercase tracking-widest transition-colors z-[101]">
+            Пропустить
+        </button>
+    </div>
+
+    <div id="app-container"
+        class="w-full max-w-lg mx-auto text-center relative opacity-0 transition-opacity duration-1000">
+
+        <!-- Start Screen -->
+        <div id="start-screen" class="space-y-6 pb-8">
+            <div class="flex justify-center items-center gap-3">
+                <i data-lucide="book-open" class="text-indigo-600 w-12 h-12"></i>
+                <h1 id="app-title" class="text-4xl md:text-5xl font-black text-indigo-800">Русская Победа</h1>
+            </div>
+
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-indigo-100">
+                <p id="language-prompt" class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-3">Выберите родной язык:</p>
+                <div id="language-list" class="grid grid-cols-2 md:grid-cols-5 gap-2">
+                    <!-- Language buttons will be inserted here by JavaScript -->
+                </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-indigo-100">
+                <p id="target-language-prompt" class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-3">Выберите язык для практики:</p>
+                <div id="target-language-list" class="grid grid-cols-2 md:grid-cols-5 gap-2">
+                    <!-- Target language buttons will be inserted here by JavaScript -->
+                </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-indigo-100">
+                <div class="flex items-center justify-between gap-4">
+                    <div class="text-left">
+                        <p id="pronunciation-toggle-label" class="text-sm font-bold text-slate-500 uppercase tracking-wide">Show pronunciation help</p>
+                        <p id="pronunciation-toggle-hint" class="text-sm text-slate-400 mt-1">Display sound tips on each card</p>
+                    </div>
+                    <button id="pronunciation-toggle-btn"
+                        class="btn-3d bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-4 rounded-xl text-sm border-b-4 border-emerald-700"
+                        style="--shadow-color: #047857;">
+                        On
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-indigo-100">
+                <div class="flex items-center justify-between gap-4">
+                    <div class="text-left">
+                        <p id="meaning-toggle-label" class="text-sm font-bold text-slate-500 uppercase tracking-wide">Show meanings</p>
+                        <p id="meaning-toggle-hint" class="text-sm text-slate-400 mt-1">Display translations on each card</p>
+                    </div>
+                    <button id="meaning-toggle-btn"
+                        class="btn-3d bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-xl text-sm border-b-4 border-indigo-700"
+                        style="--shadow-color: #4338ca;">
+                        On
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mode Selection -->
+            <nav class="flex bg-slate-200 p-1 rounded-2xl w-full">
+                <button id="mode-letters"
+                    class="mode-btn btn-3d active flex-1 px-4 py-2 rounded-xl text-sm font-bold transition selected"
+                    style="--shadow-color: #94a3b8;">Буквы</button>
+                <button id="mode-words"
+                    class="mode-btn btn-3d flex-1 px-4 py-2 rounded-xl text-sm font-bold transition bg-slate-100 text-slate-600"
+                    style="--shadow-color: #94a3b8;">Слова</button>
+                <button id="mode-phrases"
+                    class="mode-btn btn-3d flex-1 px-4 py-2 rounded-xl text-sm font-bold transition bg-slate-100 text-slate-600"
+                    style="--shadow-color: #94a3b8;">Фразы</button>
+            </nav>
+
+            <!-- Timer Settings -->
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-indigo-100">
+                <p id="timer-label" class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-3">Таймер</p>
+                <div class="grid grid-cols-3 gap-3">
+                    <button id="time-60"
+                        class="time-btn btn-3d bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-bold py-2 px-2 rounded-lg text-sm border-indigo-300 selected"
+                        style="--shadow-color: #a5b4fc;">
+                        1 Мин
+                    </button>
+                    <button id="time-120"
+                        class="time-btn btn-3d bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-bold py-2 px-2 rounded-lg text-sm border-indigo-300"
+                        style="--shadow-color: #a5b4fc;">
+                        2 Мин
+                    </button>
+                    <button id="time-free"
+                        class="time-btn btn-3d bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-bold py-2 px-2 rounded-lg text-sm border-indigo-300"
+                        style="--shadow-color: #a5b4fc;">
+                        Свободно
+                    </button>
+                </div>
+            </div>
+
+            <p id="category-prompt" class="text-lg text-slate-600">Выберите категорию:</p>
+            <div id="category-list" class="grid grid-cols-2 gap-3 h-80 overflow-y-auto pr-2 scrollbar-thin">
+                <!-- Category buttons will be inserted here by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="hidden relative">
+            <!-- Header Controls -->
+            <div class="flex justify-between items-center mb-6">
+                <button id="exit-game"
+                    class="p-2 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-700 transition-colors">
+                    <i data-lucide="arrow-left" class="w-6 h-6"></i>
+                </button>
+
+                <!-- Timer & Score -->
+                <div class="flex gap-4 text-xl font-bold">
+                    <div
+                        class="bg-white rounded-lg px-4 py-2 shadow-sm border border-slate-100 flex items-center gap-2">
+                        <i data-lucide="clock" class="w-5 h-5 text-indigo-500"></i>
+                        <span id="time-display" class="text-indigo-600 tabular-nums">1:00</span>
+                    </div>
+                    <div
+                        class="bg-white rounded-lg px-4 py-2 shadow-sm border border-slate-100 flex items-center gap-2">
+                        <i data-lucide="star" class="w-5 h-5 text-yellow-500"></i>
+                        <span id="score-display" class="text-emerald-600 tabular-nums">0</span>
+                    </div>
+                </div>
+
+                <button id="toggle-pause"
+                    class="p-2 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-700 transition-colors">
+                    <i id="pause-icon" data-lucide="pause" class="w-6 h-6"></i>
+                </button>
+            </div>
+
+            <!-- Card Area -->
+            <div class="perspective-1000 flex items-center justify-center relative z-0" style="height: 40vh;">
+                <div id="drill-card" class="card relative w-full h-72 cursor-pointer">
+                    <div id="card-front"
+                        class="card-face absolute inset-0 flex flex-col items-center justify-center bg-white rounded-3xl shadow-2xl text-6xl md:text-7xl font-black text-indigo-800 select-none p-4 break-all border-4 border-white">
+                        <!-- Front text -->
+                    </div>
+                    <div id="card-back"
+                        class="card-face card-face-back absolute inset-0 flex flex-col items-center justify-center bg-white rounded-3xl shadow-2xl text-6xl md:text-7xl font-black text-indigo-800 select-none p-4 break-all border-4 border-white">
+                        <!-- Back text or Next word -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Controls -->
+            <div class="flex justify-center items-center gap-6 mt-8">
+                <button id="prev-btn"
+                    class="btn-3d w-14 h-14 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-full flex items-center justify-center border-b-4 border-slate-300"
+                    style="--shadow-color: #cbd5e1;">
+                    <i data-lucide="skip-back" class="w-6 h-6"></i>
+                </button>
+                <button id="mark-difficult-btn"
+                    class="btn-3d w-14 h-14 bg-amber-100 hover:bg-amber-200 text-amber-700 rounded-full flex items-center justify-center border-b-4 border-amber-300"
+                    style="--shadow-color: #f59e0b;">
+                    <i id="difficult-icon" data-lucide="bookmark-plus" class="w-6 h-6"></i>
+                </button>
+                <button id="play-btn"
+                    class="btn-3d w-20 h-20 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full flex items-center justify-center border-b-6 border-indigo-800"
+                    style="--shadow-color: #3730a3;">
+                    <i data-lucide="play" class="w-10 h-10 fill-current"></i>
+                </button>
+                <button id="next-btn"
+                    class="btn-3d w-14 h-14 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-full flex items-center justify-center border-b-4 border-slate-300"
+                    style="--shadow-color: #cbd5e1;">
+                    <i data-lucide="skip-forward" class="w-6 h-6"></i>
+                </button>
+            </div>
+
+            <p id="tap-hint" class="text-slate-400 mt-6 text-sm font-medium">Нажми на карточку или кнопки</p>
+
+            <!-- Pause Overlay -->
+            <div id="pause-overlay"
+                class="hidden absolute inset-0 z-50 bg-white/90 backdrop-blur-sm rounded-3xl flex flex-col items-center justify-center">
+                <h2 id="pause-title" class="text-4xl font-black text-indigo-800 mb-2">Пауза</h2>
+                <button id="resume-game"
+                    class="btn-3d bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-8 rounded-xl text-xl mt-4"
+                    style="--shadow-color: #059669;">
+                    Продолжить
+                </button>
+                <button id="quit-game" class="text-slate-500 font-semibold mt-6 hover:text-red-500">
+                    Выход
+                </button>
+            </div>
+        </div>
+
+        <!-- End Screen -->
+        <div id="end-screen" class="hidden space-y-6">
+            <div class="bg-white p-8 rounded-3xl shadow-2xl border-4 border-yellow-100">
+                <h2 id="end-title" class="text-3xl font-bold text-yellow-500">Молодец!</h2>
+                <p id="read-count-label" class="text-xl mt-4 text-slate-600">Прочитано</p>
+                <div class="text-9xl font-black text-indigo-600 my-6 scale-110 transform transition-transform"
+                    id="final-score">0</div>
+                <p id="words-label" class="text-xl mb-8 text-slate-600">слов!</p>
+                <p id="difficult-summary" class="text-base font-semibold text-amber-600 mb-6 hidden">Сложных карточек: 0</p>
+
+                <div class="grid grid-cols-3 gap-4">
+                    <button id="menu-btn"
+                        class="w-full btn-3d bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3 px-4 rounded-xl text-lg border-b-4 border-slate-300"
+                        style="--shadow-color: #cbd5e1;">Меню</button>
+                    <button id="practice-difficult-btn"
+                        class="w-full btn-3d bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-4 rounded-xl text-sm md:text-base border-b-6 border-amber-700 hidden"
+                        style="--shadow-color: #b45309;">Сложные</button>
+                    <button id="replay-btn"
+                        class="w-full btn-3d bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl text-lg border-b-6 border-indigo-800"
+                        style="--shadow-color: #3730a3;">Играть снова</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script type="module" src="js/app.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,45 @@
+Original prompt: Ok, let's skip that bug for now. Please update each language so that it has plenty of categories for both words and phrases for the students to practice.
+
+- Created progress tracking file for continued curriculum expansion work.
+- Plan:
+- Add shared category labels for new word and phrase groups.
+- Expand English categories.
+- Expand Kyrgyz categories.
+- Expand Chinese categories.
+- Expand French categories.
+- Run syntax and content-count verification.
+
+- Added shared labels for family, food, travel, help, and travel/food phrase categories.
+- Expanded English to 6 word categories and 6 phrase categories.
+- Expanded Kyrgyz to 6 word categories and 6 phrase categories.
+- Expanded Chinese to 6 word categories and 6 phrase categories.
+- Expanded French to 6 word categories and 6 phrase categories.
+- Verified `js/content.js` syntax with `node --check`.
+- Verified category counts:
+- ru: letters 1, words 26, phrases 10
+- en: letters 2, words 6, phrases 6
+- ky: letters 2, words 6, phrases 6
+- zh: letters 2, words 6, phrases 6
+- fr: letters 2, words 6, phrases 6
+
+- Added explicit pronunciation notes to all remaining English items.
+- Added explicit pronunciation notes to all remaining Kyrgyz items.
+- Added explicit pronunciation notes to all remaining French items.
+- Verified pronunciation coverage:
+- en: 85/85
+- ky: 83/83
+- fr: 83/83
+- Added a start-screen pronunciation-help toggle.
+- Styled pronunciation guidance as a dedicated sound-tip panel on cards instead of a plain meta pill.
+- Verified syntax for `js/app.js`, `js/ui.js`, and `js/i18n.js`.
+- Added a start-screen meanings toggle for translation support.
+- Meaning and pronunciation support can now be controlled independently for beginner vs immersion practice.
+- Expanded English with colors, body, action, shopping, weather, and daily routine content.
+- Expanded Kyrgyz with colors, body, action, shopping, weather, and daily routine content.
+- Expanded Chinese with colors, body, action, shopping, weather, and daily routine content.
+- Expanded French with colors, body, action, shopping, weather, and daily routine content.
+- Updated non-Russian content counts:
+- en: letters 2, words 9, phrases 9
+- ky: letters 2, words 9, phrases 9
+- zh: letters 2, words 9, phrases 9
+- fr: letters 2, words 9, phrases 9
