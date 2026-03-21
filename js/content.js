@@ -47,6 +47,8 @@ Object.assign(starterLabel, {
     familyWords: { en: 'Family Words', zh: '家庭词汇', ky: 'Үй-бүлө сөздөрү', ru: 'Слова о семье', fr: 'Mots de la famille' },
     foodWords: { en: 'Food and Drink', zh: '食物和饮料', ky: 'Тамак жана суусундук', ru: 'Еда и напитки', fr: 'Nourriture et boissons' },
     travelWords: { en: 'Travel Words', zh: '出行词汇', ky: 'Жол сөздөрү', ru: 'Слова о поездках', fr: 'Mots de voyage' },
+    shoppingWords: { en: 'Shopping Words', zh: '购物词汇', ky: 'Соода сөздөрү', ru: 'Слова для покупок', fr: 'Mots pour les achats' },
+    dailyWords: { en: 'Daily Routine Words', zh: '日常生活词汇', ky: 'Күнүмдүк сөздөр', ru: 'Слова о распорядке дня', fr: 'Mots du quotidien' },
     colorsWords: { en: 'Colors', zh: '颜色词汇', ky: 'Түс сөздөрү', ru: 'Слова о цветах', fr: 'Mots des couleurs' },
     bodyWords: { en: 'Body Words', zh: '身体词汇', ky: 'Дене сөздөрү', ru: 'Слова о теле', fr: 'Mots du corps' },
     actionWords: { en: 'Action Words', zh: '动作词汇', ky: 'Аракет сөздөрү', ru: 'Слова о действиях', fr: 'Mots d action' },
@@ -58,14 +60,193 @@ Object.assign(starterLabel, {
     dailyPhrases: { en: 'Daily Routine', zh: '日常短语', ky: 'Күнүмдүк фразалар', ru: 'Ежедневные фразы', fr: 'Phrases du quotidien' }
 });
 
+const soundLabel = {
+    longEWords: { en: 'Long E Words', zh: '长EE音词汇', ky: 'Узун EE сөздөрү', ru: 'Слова с долгим И', fr: 'Mots avec le son i long' },
+    rSoundWords: { en: 'R Sound Words', zh: 'R音词汇', ky: 'Р тыбыштуу сөздөр', ru: 'Слова со звуком Р', fr: 'Mots avec le son R' },
+    longEPhrases: { en: 'Long E Phrases', zh: '长EE音短语', ky: 'Узун EE фразалары', ru: 'Фразы с долгим И', fr: 'Phrases avec le son i long' },
+    rSoundPhrases: { en: 'R Sound Phrases', zh: 'R音短语', ky: 'Р тыбыштуу фразалар', ru: 'Фразы со звуком Р', fr: 'Phrases avec le son R' },
+    roundedVowelWords: { en: 'Rounded Vowel Words', zh: '圆唇元音词汇', ky: 'Жумуру үндүү сөздөр', ru: 'Слова с округлыми гласными', fr: 'Mots a voyelles arrondies' },
+    roundedVowelPhrases: { en: 'Rounded Vowel Phrases', zh: '圆唇元音短语', ky: 'Жумуру үндүү фразалар', ru: 'Фразы с округлыми гласными', fr: 'Phrases a voyelles arrondies' },
+    zhShWords: { en: 'Zh and Sh Words', zh: 'zh/sh词汇', ky: 'zh/sh сөздөр', ru: 'Слова с zh и sh', fr: 'Mots zh et sh' },
+    zhShPhrases: { en: 'Zh and Sh Phrases', zh: 'zh/sh短语', ky: 'zh/sh фразалар', ru: 'Фразы с zh и sh', fr: 'Phrases zh et sh' },
+    thirdToneWords: { en: 'Third Tone Words', zh: '第三声词汇', ky: 'Үчүнчү тон сөздөрү', ru: 'Слова с третьим тоном', fr: 'Mots au troisieme ton' },
+    thirdTonePhrases: { en: 'Third Tone Phrases', zh: '第三声短语', ky: 'Үчүнчү тон фразалары', ru: 'Фразы с третьим тоном', fr: 'Phrases au troisieme ton' },
+    nasalWords: { en: 'Nasal Sound Words', zh: '鼻音词汇', ky: 'Мурун үндүү сөздөр', ru: 'Слова с носовыми звуками', fr: 'Mots aux sons nasaux' },
+    nasalPhrases: { en: 'Nasal Sound Phrases', zh: '鼻音短语', ky: 'Мурун үндүү фразалар', ru: 'Фразы с носовыми звуками', fr: 'Phrases aux sons nasaux' }
+};
+
 const russianContent = {
     speechLang: 'ru-RU',
     modes: {
         letters: [
             category('Русский Алфавит', null, alphabetData.map(item => ({ ...item, kind: 'letter' })))
         ],
-        words: Object.entries(wordsData).map(([key, items]) => category(key, null, items)),
-        phrases: Object.entries(phrasesData).map(([key, items]) => category(key, null, items.map(item => ({ t: item, kind: 'phrase' }))))
+        words: [
+            category('russian-family-words', starterLabel.familyWords, [
+                word('мама', meanings('mother', '妈妈', 'апа', 'мама', 'maman'), { stress: 'ма́ма', syllables: ['ма', 'ма'], sound: 'м' }),
+                word('папа', meanings('father', '爸爸', 'ата', 'папа', 'papa'), { stress: 'па́па', syllables: ['па', 'па'], sound: 'п' }),
+                word('брат', meanings('brother', '兄弟', 'ага; ини', 'брат', 'frere'), { stress: 'брат', syllables: ['брат'], sound: 'бр' }),
+                word('сестра', meanings('sister', '姐妹', 'эжe; карындаш', 'сестра', 'soeur'), { stress: 'сестра́', syllables: ['се', 'стра'], sound: 'с' }),
+                word('бабушка', meanings('grandmother', '奶奶；外婆', 'чоң эне', 'бабушка', 'grand-mere'), { stress: 'ба́бушка', syllables: ['ба', 'буш', 'ка'], sound: 'б' }),
+                word('дедушка', meanings('grandfather', '爷爷；外公', 'чоң ата', 'дедушка', 'grand-pere'), { stress: 'де́душка', syllables: ['де', 'душ', 'ка'], sound: 'д' })
+            ]),
+            category('russian-food-words', starterLabel.foodWords, [
+                word('хлеб', meanings('bread', '面包', 'нан', 'хлеб', 'pain'), { stress: 'хлеб', syllables: ['хлеб'], sound: 'х' }),
+                word('молоко', meanings('milk', '牛奶', 'сүт', 'молоко', 'lait'), { stress: 'молоко́', syllables: ['мо', 'ло', 'ко'], sound: 'м' }),
+                word('вода', meanings('water', '水', 'суу', 'вода', 'eau'), { stress: 'вода́', syllables: ['во', 'да'], sound: 'в' }),
+                word('суп', meanings('soup', '汤', 'шорпо', 'суп', 'soupe'), { stress: 'суп', syllables: ['суп'], sound: 'с' }),
+                word('чай', meanings('tea', '茶', 'чай', 'чай', 'the'), { stress: 'чай', syllables: ['чай'], sound: 'ч' }),
+                word('яблоко', meanings('apple', '苹果', 'алма', 'яблоко', 'pomme'), { stress: 'я́блоко', syllables: ['яб', 'ло', 'ко'], sound: 'я' })
+            ]),
+            category('russian-classroom-words', starterLabel.classroomWords, [
+                word('книга', meanings('book', '书', 'китеп', 'книга', 'livre'), { stress: 'кни́га', syllables: ['кни', 'га'], sound: 'кн' }),
+                word('ручка', meanings('pen', '笔', 'калем', 'ручка', 'stylo'), { stress: 'ру́чка', syllables: ['руч', 'ка'], sound: 'р' }),
+                word('тетрадь', meanings('notebook', '本子', 'дептер', 'тетрадь', 'cahier'), { stress: 'тетра́дь', syllables: ['те', 'традь'], sound: 'т' }),
+                word('учитель', meanings('teacher', '老师', 'мугалим', 'учитель', 'professeur'), { stress: 'учи́тель', syllables: ['у', 'чи', 'тель'], sound: 'ч' }),
+                word('ученик', meanings('student', '学生', 'окуучу', 'ученик', 'eleve'), { stress: 'учени́к', syllables: ['у', 'че', 'ник'], sound: 'ч' }),
+                word('доска', meanings('board', '黑板', 'такта', 'доска', 'tableau'), { stress: 'доска́', syllables: ['до', 'ска'], sound: 'д' })
+            ]),
+            category('russian-colors-words', starterLabel.colorsWords, [
+                word('красный', meanings('red', '红色', 'кызыл', 'красный', 'rouge'), { stress: 'кра́сный', syllables: ['кра', 'сный'], sound: 'кр' }),
+                word('синий', meanings('blue', '蓝色', 'көк', 'синий', 'bleu'), { stress: 'си́ний', syllables: ['си', 'ний'], sound: 'с' }),
+                word('зелёный', meanings('green', '绿色', 'жашыл', 'зелёный', 'vert'), { stress: 'зелёный', syllables: ['зе', 'лё', 'ный'], sound: 'з' }),
+                word('белый', meanings('white', '白色', 'ак', 'белый', 'blanc'), { stress: 'бе́лый', syllables: ['бе', 'лый'], sound: 'б' }),
+                word('чёрный', meanings('black', '黑色', 'кара', 'чёрный', 'noir'), { stress: 'чёрный', syllables: ['чёр', 'ный'], sound: 'ч' }),
+                word('жёлтый', meanings('yellow', '黄色', 'сары', 'жёлтый', 'jaune'), { stress: 'жёлтый', syllables: ['жёл', 'тый'], sound: 'ж' })
+            ]),
+            category('russian-body-words', starterLabel.bodyWords, [
+                word('голова', meanings('head', '头', 'баш', 'голова', 'tete'), { stress: 'голова́', syllables: ['го', 'ло', 'ва'], sound: 'г' }),
+                word('рука', meanings('hand', '手', 'кол', 'рука', 'main'), { stress: 'рука́', syllables: ['ру', 'ка'], sound: 'р' }),
+                word('нога', meanings('leg', '腿', 'бут', 'нога', 'jambe'), { stress: 'нога́', syllables: ['но', 'га'], sound: 'н' }),
+                word('глаз', meanings('eye', '眼睛', 'көз', 'глаз', 'oeil'), { stress: 'глаз', syllables: ['глаз'], sound: 'гл' }),
+                word('ухо', meanings('ear', '耳朵', 'кулак', 'ухо', 'oreille'), { stress: 'у́хо', syllables: ['у', 'хо'], sound: 'у' }),
+                word('рот', meanings('mouth', '嘴', 'ооз', 'рот', 'bouche'), { stress: 'рот', syllables: ['рот'], sound: 'р' })
+            ]),
+            category('russian-action-words', starterLabel.actionWords, [
+                word('читать', meanings('to read', '读', 'окуу', 'читать', 'lire'), { stress: 'чита́ть', syllables: ['чи', 'тать'], sound: 'ч' }),
+                word('писать', meanings('to write', '写', 'жазуу', 'писать', 'ecrire'), { stress: 'писа́ть', syllables: ['пи', 'сать'], sound: 'п' }),
+                word('говорить', meanings('to speak', '说', 'сүйлөө', 'говорить', 'parler'), { stress: 'говори́ть', syllables: ['го', 'во', 'рить'], sound: 'г' }),
+                word('слушать', meanings('to listen', '听', 'угуу', 'слушать', 'ecouter'), { stress: 'слу́шать', syllables: ['слу', 'шать'], sound: 'сл' }),
+                word('идти', meanings('to go', '走', 'баруу', 'идти', 'aller'), { stress: 'идти́', syllables: ['ид', 'ти'], sound: 'и' }),
+                word('бежать', meanings('to run', '跑', 'чуркоо', 'бежать', 'courir'), { stress: 'бежа́ть', syllables: ['бе', 'жать'], sound: 'б' })
+            ]),
+            category('russian-travel-words', starterLabel.travelWords, [
+                word('автобус', meanings('bus', '公交车', 'автобус', 'автобус', 'bus'), { stress: 'авто́бус', syllables: ['ав', 'то', 'бус'], sound: 'а' }),
+                word('поезд', meanings('train', '火车', 'поезд', 'поезд', 'train'), { stress: 'по́езд', syllables: ['по', 'езд'], sound: 'п' }),
+                word('билет', meanings('ticket', '票', 'билет', 'билет', 'billet'), { stress: 'биле́т', syllables: ['би', 'лет'], sound: 'б' }),
+                word('вокзал', meanings('station', '车站', 'бекет', 'вокзал', 'gare'), { stress: 'вокза́л', syllables: ['вок', 'зал'], sound: 'в' }),
+                word('улица', meanings('street', '街道', 'көчө', 'улица', 'rue'), { stress: 'у́лица', syllables: ['у', 'ли', 'ца'], sound: 'у' }),
+                word('машина', meanings('car', '汽车', 'унаа', 'машина', 'voiture'), { stress: 'маши́на', syllables: ['ма', 'ши', 'на'], sound: 'м' })
+            ]),
+            category('russian-shopping-words', starterLabel.shoppingWords, [
+                word('магазин', meanings('shop', '商店', 'дүкөн', 'магазин', 'magasin'), { stress: 'магази́н', syllables: ['ма', 'га', 'зин'], sound: 'м' }),
+                word('цена', meanings('price', '价格', 'баа', 'цена', 'prix'), { stress: 'цена́', syllables: ['це', 'на'], sound: 'ц' }),
+                word('деньги', meanings('money', '钱', 'акча', 'деньги', 'argent'), { stress: 'де́ньги', syllables: ['день', 'ги'], sound: 'д' }),
+                word('пакет', meanings('bag', '袋子', 'баштык', 'пакет', 'sac'), { stress: 'паке́т', syllables: ['па', 'кет'], sound: 'п' }),
+                word('одежда', meanings('clothes', '衣服', 'кийим', 'одежда', 'vetements'), { stress: 'оде́жда', syllables: ['о', 'деж', 'да'], sound: 'жд' }),
+                word('рынок', meanings('market', '市场', 'базар', 'рынок', 'marche'), { stress: 'ры́нок', syllables: ['ры', 'нок'], sound: 'р' })
+            ]),
+            category('russian-daily-words', starterLabel.dailyWords, [
+                word('утро', meanings('morning', '早晨', 'эртең менен', 'утро', 'matin'), { stress: 'у́тро', syllables: ['у', 'тро'], sound: 'у' }),
+                word('завтрак', meanings('breakfast', '早餐', 'эртең мененки тамак', 'завтрак', 'petit-dejeuner'), { stress: 'за́втрак', syllables: ['зав', 'трак'], sound: 'з' }),
+                word('школа', meanings('school', '学校', 'мектеп', 'школа', 'ecole'), { stress: 'шко́ла', syllables: ['шко', 'ла'], sound: 'шк' }),
+                word('обед', meanings('lunch', '午餐', 'түшкү тамак', 'обед', 'dejeuner'), { stress: 'обе́д', syllables: ['о', 'бед'], sound: 'б' }),
+                word('дом', meanings('home', '家', 'үй', 'дом', 'maison'), { stress: 'дом', syllables: ['дом'], sound: 'д' }),
+                word('сон', meanings('sleep', '睡眠', 'уйку', 'сон', 'sommeil'), { stress: 'сон', syllables: ['сон'], sound: 'с' })
+            ]),
+            ...Object.entries(wordsData).map(([key, items]) => category(key, null, items))
+        ],
+        phrases: [
+            category('russian-greetings', starterLabel.greetings, [
+                phrase('Привет!', meanings('hello!', '你好！', 'салам!', 'привет!', 'salut !')),
+                phrase('Здравствуйте!', meanings('hello! (formal)', '您好！', 'саламатсызбы!', 'здравствуйте!', 'bonjour !')),
+                phrase('Доброе утро!', meanings('good morning!', '早上好！', 'кайырлы таң!', 'доброе утро!', 'bonjour !')),
+                phrase('Добрый день!', meanings('good afternoon!', '下午好！', 'кайырлуу күн!', 'добрый день!', 'bon apres-midi !')),
+                phrase('Добрый вечер!', meanings('good evening!', '晚上好！', 'кайырлуу кеч!', 'добрый вечер!', 'bonsoir !')),
+                phrase('До свидания!', meanings('goodbye!', '再见！', 'кош болуңуз!', 'до свидания!', 'au revoir !'))
+            ]),
+            category('russian-classroom-phrases', starterLabel.classroomPhrases, [
+                phrase('Повторите, пожалуйста.', meanings('please repeat.', '请重复。', 'кайталаңызчы.', 'повторите, пожалуйста.', 'repetez, s il vous plait.')),
+                phrase('Я не понимаю.', meanings('I do not understand.', '我不明白。', 'мен түшүнбөйм.', 'я не понимаю.', 'je ne comprends pas.')),
+                phrase('Можно вопрос?', meanings('May I ask a question?', '我可以问一个问题吗？', 'суроо берсем болобу?', 'можно вопрос?', 'je peux poser une question ?')),
+                phrase('Откройте книгу.', meanings('Open the book.', '打开书。', 'китепти ачкыла.', 'откройте книгу.', 'ouvrez le livre.')),
+                phrase('Слушайте внимательно.', meanings('Listen carefully.', '认真听。', 'жакшылап уккула.', 'слушайте внимательно.', 'ecoutez attentivement.')),
+                phrase('Напишите ответ.', meanings('Write the answer.', '写答案。', 'жоопту жазгыла.', 'напишите ответ.', 'ecrivez la reponse.'))
+            ]),
+            category('russian-daily-phrases', starterLabel.dailyPhrases, [
+                phrase('Как тебя зовут?', meanings('What is your name?', '你叫什么名字？', 'атың ким?', 'как тебя зовут?', 'comment tu t appelles ?')),
+                phrase('Меня зовут Анна.', meanings('My name is Anna.', '我叫安娜。', 'менин атым Анна.', 'меня зовут Анна.', 'je m appelle Anna.')),
+                phrase('Как дела?', meanings('How are you?', '你好吗？', 'кандайсың?', 'как дела?', 'comment ca va ?')),
+                phrase('У меня всё хорошо.', meanings('I am fine.', '我很好。', 'менде баары жакшы.', 'у меня всё хорошо.', 'je vais bien.')),
+                phrase('Я дома.', meanings('I am at home.', '我在家。', 'мен үйдөмүн.', 'я дома.', 'je suis a la maison.')),
+                phrase('Я иду в школу.', meanings('I am going to school.', '我去学校。', 'мен мектепке бара жатам.', 'я иду в школу.', 'je vais a l ecole.'))
+            ]),
+            category('russian-family-phrases', starterLabel.familyWords, [
+                phrase('Это моя мама.', meanings('This is my mother.', '这是我的妈妈。', 'бул менин апам.', 'это моя мама.', 'c est ma maman.')),
+                phrase('Это мой папа.', meanings('This is my father.', '这是我的爸爸。', 'бул менин атам.', 'это мой папа.', 'c est mon papa.')),
+                phrase('У меня есть брат.', meanings('I have a brother.', '我有一个兄弟。', 'менин агам бар.', 'у меня есть брат.', 'j ai un frere.')),
+                phrase('У меня есть сестра.', meanings('I have a sister.', '我有一个姐妹。', 'менин эжем бар.', 'у меня есть сестра.', 'j ai une soeur.')),
+                phrase('Моя бабушка дома.', meanings('My grandmother is at home.', '我的奶奶在家。', 'чоң энем үйдө.', 'моя бабушка дома.', 'ma grand-mere est a la maison.')),
+                phrase('Я люблю свою семью.', meanings('I love my family.', '我爱我的家人。', 'мен үй-бүлөмдү жакшы көрөм.', 'я люблю свою семью.', 'j aime ma famille.'))
+            ]),
+            category('russian-feelings-phrases', starterLabel.feelings, [
+                phrase('Я счастлив.', meanings('I am happy.', '我很开心。', 'мен бактылуумун.', 'я счастлив.', 'je suis heureux.')),
+                phrase('Я устал.', meanings('I am tired.', '我累了。', 'мен чарчадым.', 'я устал.', 'je suis fatigue.')),
+                phrase('Мне грустно.', meanings('I am sad.', '我很难过。', 'мага кайгылуу.', 'мне грустно.', 'je suis triste.')),
+                phrase('Я спокоен.', meanings('I am calm.', '我很平静。', 'мен тынчмын.', 'я спокоен.', 'je suis calme.')),
+                phrase('Я готов.', meanings('I am ready.', '我准备好了。', 'мен даярмын.', 'я готов.', 'je suis pret.')),
+                phrase('Я немного волнуюсь.', meanings('I am a little nervous.', '我有一点紧张。', 'мен бир аз тынчсызданып жатам.', 'я немного волнуюсь.', 'je suis un peu nerveux.'))
+            ]),
+            category('russian-help-phrases', starterLabel.helpPhrases, [
+                phrase('Помогите, пожалуйста.', meanings('Please help.', '请帮帮我。', 'жардам бериңизчи.', 'помогите, пожалуйста.', 'aidez-moi, s il vous plait.')),
+                phrase('Мне нужна помощь.', meanings('I need help.', '我需要帮助。', 'мага жардам керек.', 'мне нужна помощь.', 'j ai besoin d aide.')),
+                phrase('Где учитель?', meanings('Where is the teacher?', '老师在哪里？', 'мугалим кайда?', 'где учитель?', 'ou est le professeur ?')),
+                phrase('Я потерялся.', meanings('I am lost.', '我迷路了。', 'мен адаштым.', 'я потерялся.', 'je suis perdu.')),
+                phrase('Повторите медленно.', meanings('Repeat slowly.', '请慢一点重复。', 'жай кайталаңызчы.', 'повторите медленно.', 'repetez lentement.')),
+                phrase('Можно мне помочь?', meanings('Can someone help me?', '可以帮帮我吗？', 'мага жардам бере аласызбы?', 'можно мне помочь?', 'pouvez-vous m aider ?'))
+            ]),
+            category('russian-travel-phrases', starterLabel.travelPhrases, [
+                phrase('Где автобусная остановка?', meanings('Where is the bus stop?', '公共汽车站在哪里？', 'автобус аялдамасы кайда?', 'где автобусная остановка?', 'ou est l arret de bus ?')),
+                phrase('Мне нужен билет.', meanings('I need a ticket.', '我需要一张票。', 'мага билет керек.', 'мне нужен билет.', 'j ai besoin d un billet.')),
+                phrase('Этот поезд идёт в город?', meanings('Does this train go to the city?', '这列火车去城市吗？', 'бул поезд шаарга барабы?', 'этот поезд идёт в город?', 'ce train va-t-il en ville ?')),
+                phrase('Сколько стоит билет?', meanings('How much is the ticket?', '票多少钱？', 'билет канча турат?', 'сколько стоит билет?', 'combien coute le billet ?')),
+                phrase('Где вокзал?', meanings('Where is the station?', '车站在哪里？', 'бекет кайда?', 'где вокзал?', 'ou est la gare ?')),
+                phrase('Мне нужно такси.', meanings('I need a taxi.', '我需要出租车。', 'мага такси керек.', 'мне нужно такси.', 'j ai besoin d un taxi.'))
+            ]),
+            category('russian-food-phrases', starterLabel.foodPhrases, [
+                phrase('Я хочу чай.', meanings('I want tea.', '我想要茶。', 'чай каалайм.', 'я хочу чай.', 'je veux du the.')),
+                phrase('Мне, пожалуйста, суп.', meanings('Soup for me, please.', '请给我汤。', 'мага шорпо бериңизчи.', 'мне, пожалуйста, суп.', 'je voudrais une soupe, s il vous plait.')),
+                phrase('Я люблю хлеб.', meanings('I like bread.', '我喜欢面包。', 'мен нанды жакшы көрөм.', 'я люблю хлеб.', 'j aime le pain.')),
+                phrase('Где вода?', meanings('Where is the water?', '水在哪里？', 'суу кайда?', 'где вода?', 'ou est l eau ?')),
+                phrase('Можно меню?', meanings('May I have the menu?', '可以给我菜单吗？', 'меню бересизби?', 'можно меню?', 'puis-je avoir le menu ?')),
+                phrase('Это очень вкусно.', meanings('This is very tasty.', '这个很好吃。', 'бул абдан даамдуу.', 'это очень вкусно.', 'c est tres bon.'))
+            ]),
+            category('russian-weather-phrases', starterLabel.weatherPhrases, [
+                phrase('Сегодня холодно.', meanings('It is cold today.', '今天很冷。', 'бүгүн суук.', 'сегодня холодно.', 'il fait froid aujourd hui.')),
+                phrase('Сегодня жарко.', meanings('It is hot today.', '今天很热。', 'бүгүн ысык.', 'сегодня жарко.', 'il fait chaud aujourd hui.')),
+                phrase('Идёт дождь.', meanings('It is raining.', '下雨了。', 'жамгыр жаап жатат.', 'идёт дождь.', 'il pleut.')),
+                phrase('Светит солнце.', meanings('The sun is shining.', '太阳出来了。', 'күн тийип турат.', 'светит солнце.', 'le soleil brille.')),
+                phrase('На улице ветрено.', meanings('It is windy outside.', '外面有风。', 'тышта шамал болуп жатат.', 'на улице ветрено.', 'il y a du vent dehors.')),
+                phrase('Мне нужна куртка.', meanings('I need a jacket.', '我需要一件夹克。', 'мага куртка керек.', 'мне нужна куртка.', 'j ai besoin d une veste.'))
+            ]),
+            category('russian-shopping-phrases', starterLabel.shoppingPhrases, [
+                phrase('Сколько это стоит?', meanings('How much does this cost?', '这个多少钱？', 'бул канча турат?', 'сколько это стоит?', 'combien cela coute ?')),
+                phrase('Мне нужен пакет.', meanings('I need a bag.', '我需要一个袋子。', 'мага баштык керек.', 'мне нужен пакет.', 'j ai besoin d un sac.')),
+                phrase('У вас есть размер побольше?', meanings('Do you have a bigger size?', '你们有大一点的尺码吗？', 'чоңураак өлчөм барбы?', 'у вас есть размер побольше?', 'avez-vous une taille plus grande ?')),
+                phrase('Я хочу купить это.', meanings('I want to buy this.', '我想买这个。', 'муну сатып алгым келет.', 'я хочу купить это.', 'je veux acheter cela.')),
+                phrase('Где касса?', meanings('Where is the cash desk?', '收银台在哪里？', 'касса кайда?', 'где касса?', 'ou est la caisse ?')),
+                phrase('Это слишком дорого.', meanings('This is too expensive.', '这个太贵了。', 'бул өтө кымбат.', 'это слишком дорого.', 'c est trop cher.'))
+            ]),
+            category('russian-routine-phrases', starterLabel.dailyPhrases, [
+                phrase('Я просыпаюсь рано.', meanings('I wake up early.', '我起得很早。', 'мен эрте турам.', 'я просыпаюсь рано.', 'je me reveille tot.')),
+                phrase('Я завтракаю дома.', meanings('I eat breakfast at home.', '我在家吃早餐。', 'мен үйдө эртең мененки тамак ичем.', 'я завтракаю дома.', 'je prends le petit-dejeuner a la maison.')),
+                phrase('Потом я иду в школу.', meanings('Then I go to school.', '然后我去学校。', 'андан кийин мен мектепке барам.', 'потом я иду в школу.', 'ensuite je vais a l ecole.')),
+                phrase('После школы я отдыхаю.', meanings('After school I rest.', '放学后我休息。', 'мектептен кийин эс алам.', 'после школы я отдыхаю.', 'apres l ecole je me repose.')),
+                phrase('Вечером я делаю уроки.', meanings('In the evening I do homework.', '晚上我做作业。', 'кечинде мен сабак окуйм.', 'вечером я делаю уроки.', 'le soir je fais mes devoirs.')),
+                phrase('Ночью я сплю.', meanings('At night I sleep.', '晚上我睡觉。', 'түнкүсүн мен уктайм.', 'ночью я сплю.', 'la nuit je dors.'))
+            ]),
+            ...Object.entries(phrasesData).map(([key, items]) => category(key, null, items.map(item => ({ t: item, kind: 'phrase' }))))
+        ]
     }
 };
 
@@ -163,6 +344,22 @@ const englishContent = {
                 word('listen', meanings('listen', '听', 'ук', 'слушать', 'ecouter'), { syllables: ['lis', 'ten'], sound: 'l', pronunciation: 'LISS-en, t is silent' }),
                 word('walk', meanings('walk', '走', 'бас', 'ходить', 'marcher'), { syllables: ['walk'], sound: 'w', pronunciation: 'WAWK, l is silent' }),
                 word('run', meanings('run', '跑', 'чурка', 'бежать', 'courir'), { syllables: ['run'], sound: 'r', pronunciation: 'short U sound' })
+            ]),
+            category('english-long-e-words', soundLabel.longEWords, [
+                word('tree', meanings('tree', '树', 'дарак', 'дерево', 'arbre'), { syllables: ['tree'], sound: 'tr', pronunciation: 'long EE sound' }),
+                word('green', meanings('green', '绿色', 'жашыл', 'зеленый', 'vert'), { syllables: ['green'], sound: 'gr', pronunciation: 'stretch the EE' }),
+                word('three', meanings('three', '三', 'үч', 'три', 'trois'), { syllables: ['three'], sound: 'thr', pronunciation: 'TH + long EE' }),
+                word('sleep', meanings('sleep', '睡觉', 'уктоо', 'спать', 'dormir'), { syllables: ['sleep'], sound: 'sl', pronunciation: 'long EE sound' }),
+                word('teacher', meanings('teacher', '老师', 'мугалим', 'учитель', 'professeur'), { syllables: ['teach', 'er'], sound: 't', pronunciation: 'TEE-cher' }),
+                word('cheese', meanings('cheese', '奶酪', 'сыр', 'сыр', 'fromage'), { syllables: ['cheese'], sound: 'ch', pronunciation: 'CHEEZ' })
+            ]),
+            category('english-r-sound-words', soundLabel.rSoundWords, [
+                word('red', meanings('red', '红色', 'кызыл', 'красный', 'rouge'), { syllables: ['red'], sound: 'r', pronunciation: 'strong R at the start' }),
+                word('rain', meanings('rain', '雨', 'жамгыр', 'дождь', 'pluie'), { syllables: ['rain'], sound: 'r', pronunciation: 'R + long A' }),
+                word('river', meanings('river', '河', 'дарыя', 'река', 'riviere'), { syllables: ['ri', 'ver'], sound: 'r', pronunciation: 'RIV-er' }),
+                word('road', meanings('road', '路', 'жол', 'дорога', 'route'), { syllables: ['road'], sound: 'r', pronunciation: 'ROHD' }),
+                word('rabbit', meanings('rabbit', '兔子', 'коён', 'кролик', 'lapin'), { syllables: ['rab', 'bit'], sound: 'r', pronunciation: 'RAB-it' }),
+                word('robot', meanings('robot', '机器人', 'робот', 'робот', 'robot'), { syllables: ['ro', 'bot'], sound: 'r', pronunciation: 'ROH-bot' })
             ])
         ],
         phrases: [
@@ -237,6 +434,22 @@ const englishContent = {
                 phrase('I am going home', meanings('I am going home', '我要回家', 'мен үйгө бара жатам', 'я иду домой', 'je rentre a la maison'), { pronunciation: 'GO-ing home' }),
                 phrase('See you tomorrow', meanings('see you tomorrow', '明天见', 'эртең көрүшөбүз', 'увидимся завтра', 'a demain'), { pronunciation: 'to-MOR-row' }),
                 phrase('Good night', meanings('good night', '晚安', 'кайырлуу түн', 'спокойной ночи', 'bonne nuit'), { pronunciation: 'long I in night' })
+            ]),
+            category('english-long-e-phrases', soundLabel.longEPhrases, [
+                phrase('Please read with me', meanings('please read with me', '请和我一起读', 'мен менен окуңузчу', 'пожалуйста, читайте со мной', 'lisez avec moi, s il vous plait'), { pronunciation: 'long EE in please, read, and me' }),
+                phrase('We need three green leaves', meanings('we need three green leaves', '我们需要三片绿叶', 'бизге үч жашыл жалбырак керек', 'нам нужны три зеленых листа', 'il nous faut trois feuilles vertes'), { pronunciation: 'repeat the long EE sound several times' }),
+                phrase('Keep speaking clearly', meanings('keep speaking clearly', '继续清楚地说', 'так сүйлөй бериңиз', 'продолжайте говорить четко', 'continuez a parler clairement'), { pronunciation: 'KEEP SPEAK-ing CLEAR-lee' }),
+                phrase('She is reading quietly', meanings('she is reading quietly', '她正在安静地读书', 'ал тынч окуп жатат', 'она тихо читает', 'elle lit calmement'), { pronunciation: 'long EE in she and reading' }),
+                phrase('Please see the teacher', meanings('please see the teacher', '请看老师', 'мугалимди караңызчы', 'посмотрите на учителя', 'regardez le professeur, s il vous plait'), { pronunciation: 'long EE in please, see, and tea in teacher' }),
+                phrase('These keys are green', meanings('these keys are green', '这些钥匙是绿色的', 'бул ачкычтар жашыл', 'эти ключи зеленые', 'ces cles sont vertes'), { pronunciation: 'long EE in these, keys, green' })
+            ]),
+            category('english-r-sound-phrases', soundLabel.rSoundPhrases, [
+                phrase('Read the red card', meanings('read the red card', '读这张红色卡片', 'кызыл картаны оку', 'прочитай красную карточку', 'lis la carte rouge'), { pronunciation: 'strong R in read, red, card' }),
+                phrase('Bring your ruler here', meanings('bring your ruler here', '把你的尺子拿到这里', 'сызгычыңды бул жакка алып кел', 'принеси сюда линейку', 'apporte ta regle ici'), { pronunciation: 'clear R in bring, your, ruler, here' }),
+                phrase('The rabbit runs fast', meanings('the rabbit runs fast', '兔子跑得很快', 'коён тез чуркайт', 'кролик быстро бежит', 'le lapin court vite'), { pronunciation: 'R in rabbit and runs' }),
+                phrase('Turn right at the road', meanings('turn right at the road', '在路口右转', 'жолдон оңго бурул', 'поверните направо у дороги', 'tournez a droite a la route'), { pronunciation: 'strong R in turn, right, road' }),
+                phrase('My friend is ready', meanings('my friend is ready', '我的朋友准备好了', 'досум даяр', 'мой друг готов', 'mon ami est pret'), { pronunciation: 'blend FR in friend, strong R in ready' }),
+                phrase('Repeat after Robert', meanings('repeat after Robert', '跟着罗伯特重复', 'Роберттен кийин кайтала', 'повторяй за Робертом', 'repete apres Robert'), { pronunciation: 'strong R in repeat and Robert' })
             ])
         ]
     }
@@ -334,6 +547,22 @@ const kyrgyzContent = {
                 word('ук', meanings('listen', '听', 'ук', 'слушать', 'ecouter'), { syllables: ['ук'], sound: 'у', pronunciation: 'uk' }),
                 word('бас', meanings('walk; step', '走', 'бас', 'идти; шагать', 'marcher'), { syllables: ['бас'], sound: 'б', pronunciation: 'bas' }),
                 word('чурка', meanings('run', '跑', 'чурка', 'бежать', 'courir'), { syllables: ['чур', 'ка'], sound: 'ч', pronunciation: 'chur-KA' })
+            ]),
+            category('kyrgyz-rounded-vowel-words', soundLabel.roundedVowelWords, [
+                word('көл', meanings('lake', '湖', 'көл', 'озеро', 'lac'), { syllables: ['көл'], sound: 'к', pronunciation: 'rounded Ө vowel' }),
+                word('гүл', meanings('flower', '花', 'гүл', 'цветок', 'fleur'), { syllables: ['гүл'], sound: 'г', pronunciation: 'rounded Ү vowel' }),
+                word('жүрөк', meanings('heart', '心脏', 'жүрөк', 'сердце', 'coeur'), { syllables: ['жү', 'рөк'], sound: 'ж', pronunciation: 'rounded vowels in both syllables' }),
+                word('төө', meanings('camel', '骆驼', 'төө', 'верблюд', 'chameau'), { syllables: ['төө'], sound: 'т', pronunciation: 'long rounded ӨӨ' }),
+                word('үзүм', meanings('grapes', '葡萄', 'үзүм', 'виноград', 'raisin'), { syllables: ['ү', 'зүм'], sound: 'ү', pronunciation: 'rounded Ү in both syllables' }),
+                word('өрүк', meanings('apricot', '杏子', 'өрүк', 'абрикос', 'abricot'), { syllables: ['ө', 'рүк'], sound: 'р', pronunciation: 'R between rounded vowels' })
+            ]),
+            category('kyrgyz-r-sound-words', soundLabel.rSoundWords, [
+                word('арык', meanings('canal', '水渠', 'арык', 'арык', 'canal'), { syllables: ['а', 'рык'], sound: 'р', pronunciation: 'tap the R lightly' }),
+                word('дарыя', meanings('river', '河流', 'дарыя', 'река', 'riviere'), { syllables: ['да', 'ры', 'я'], sound: 'р', pronunciation: 'da-RY-ya' }),
+                word('эрте', meanings('early', '早', 'эрте', 'рано', 'tot'), { syllables: ['эр', 'те'], sound: 'р', pronunciation: 'ER-te' }),
+                word('рама', meanings('frame', '框架', 'рама', 'рама', 'cadre'), { syllables: ['ра', 'ма'], sound: 'р', pronunciation: 'RA-ma' }),
+                word('барат', meanings('goes', '去', 'барат', 'идет', 'va'), { syllables: ['ба', 'рат'], sound: 'р', pronunciation: 'ba-RAT' }),
+                word('көрүң', meanings('look', '看', 'көрүң', 'смотри', 'regarde'), { syllables: ['кө', 'рүң'], sound: 'р', pronunciation: 'R between rounded vowels' })
             ])
         ],
         phrases: [
@@ -408,6 +637,22 @@ const kyrgyzContent = {
                 phrase('Мен үйгө бара жатам', meanings('I am going home', '我要回家', 'мен үйгө бара жатам', 'я иду домой', 'je rentre a la maison'), { pronunciation: 'rounded Ү and Ө vowels' }),
                 phrase('Эртең көрүшөбүз', meanings('see you tomorrow', '明天见', 'эртең көрүшөбүз', 'увидимся завтра', 'a demain'), { pronunciation: 'er-TENG кө-rü-SHÖ-büz' }),
                 phrase('Кайырлуу түн', meanings('good night', '晚安', 'кайырлуу түн', 'спокойной ночи', 'bonne nuit'), { pronunciation: 'kai-YR-luu tün' })
+            ]),
+            category('kyrgyz-rounded-vowel-phrases', soundLabel.roundedVowelPhrases, [
+                phrase('Көл чоң экен', meanings('the lake is big', '湖很大', 'көл чоң экен', 'озеро большое', 'le lac est grand'), { pronunciation: 'practice rounded Ө in көл and чоң' }),
+                phrase('Гүл бүгүн гүлдөдү', meanings('the flower bloomed today', '花今天开了', 'гүл бүгүн гүлдөдү', 'цветок сегодня расцвел', 'la fleur a fleuri aujourd hui'), { pronunciation: 'repeat the rounded Ү vowel' }),
+                phrase('Жүрөгүм күчтүү', meanings('my heart is strong', '我的心很强壮', 'жүрөгүм күчтүү', 'мое сердце сильное', 'mon coeur est fort'), { pronunciation: 'rounded vowels across the whole phrase' }),
+                phrase('Үйгө бүгүн кеч келем', meanings('I will come home late today', '我今天晚点回家', 'үйгө бүгүн кеч келем', 'я сегодня поздно приду домой', 'je rentrerai tard aujourd hui'), { pronunciation: 'Үйгө and бүгүн use rounded front vowels' }),
+                phrase('Төө тоого чыкты', meanings('the camel climbed the mountain', '骆驼上山了', 'төө тоого чыкты', 'верблюд поднялся на гору', 'le chameau est monte a la montagne'), { pronunciation: 'long rounded ӨӨ in төө' }),
+                phrase('Үч гүл көрдүм', meanings('I saw three flowers', '我看到了三朵花', 'үч гүл көрдүм', 'я увидел три цветка', 'j ai vu trois fleurs'), { pronunciation: 'rounded Ү repeated in the phrase' })
+            ]),
+            category('kyrgyz-r-sound-phrases', soundLabel.rSoundPhrases, [
+                phrase('Эрте келиңиз', meanings('come early', '请早点来', 'эрте келиңиз', 'приходите рано', 'venez tot'), { pronunciation: 'tap the R in эрте' }),
+                phrase('Дарыя абдан терең', meanings('the river is very deep', '河很深', 'дарыя абдан терең', 'река очень глубокая', 'la riviere est tres profonde'), { pronunciation: 'repeat the R sound in дарыя and терең' }),
+                phrase('Барар жол даяр', meanings('the road ahead is ready', '前面的路准备好了', 'барар жол даяр', 'дорога впереди готова', 'la route est prete'), { pronunciation: 'multiple tapped R sounds' }),
+                phrase('Эртең рано чыгам', meanings('I will leave early tomorrow', '我明天会早出发', 'эртең рано чыгам', 'я завтра рано выйду', 'je partirai tot demain'), { pronunciation: 'practice R in эртең and рано' }),
+                phrase('Көрүп кайра кел', meanings('look and come back', '看完再回来', 'көрүп кайра кел', 'посмотри и вернись', 'regarde et reviens'), { pronunciation: 'repeated R in көрүп and кайра' }),
+                phrase('Рахмат, досум', meanings('thank you, my friend', '谢谢，我的朋友', 'рахмат, досум', 'спасибо, мой друг', 'merci, mon ami'), { pronunciation: 'clear starting R in рахмат' })
             ])
         ]
     }
@@ -505,6 +750,22 @@ const chineseContent = {
                 word('听', meanings('listen', '听', 'ук', 'слушать', 'ecouter'), { syllables: ['ting'], sound: 't', pronunciation: 'ting1' }),
                 word('走', meanings('walk', '走', 'бас', 'идти', 'marcher'), { syllables: ['zou'], sound: 'z', pronunciation: 'zou3' }),
                 word('跑', meanings('run', '跑', 'чурка', 'бежать', 'courir'), { syllables: ['pao'], sound: 'p', pronunciation: 'pao3' })
+            ]),
+            category('chinese-zh-sh-words', soundLabel.zhShWords, [
+                word('书', meanings('book', '书', 'китеп', 'книга', 'livre'), { syllables: ['shu'], sound: 'sh', pronunciation: 'shu1' }),
+                word('老师', meanings('teacher', '老师', 'мугалим', 'учитель', 'professeur'), { syllables: ['lao', 'shi'], sound: 'sh', pronunciation: 'lao3 shi1' }),
+                word('知道', meanings('know', '知道', 'билүү', 'знать', 'savoir'), { syllables: ['zhi', 'dao'], sound: 'zh', pronunciation: 'zhi1 dao4' }),
+                word('中国', meanings('China', '中国', 'Кытай', 'Китай', 'Chine'), { syllables: ['zhong', 'guo'], sound: 'zh', pronunciation: 'zhong1 guo2' }),
+                word('商店', meanings('shop', '商店', 'дүкөн', 'магазин', 'magasin'), { syllables: ['shang', 'dian'], sound: 'sh', pronunciation: 'shang1 dian4' }),
+                word('照片', meanings('photo', '照片', 'сүрөт', 'фотография', 'photo'), { syllables: ['zhao', 'pian'], sound: 'zh', pronunciation: 'zhao4 pian4' })
+            ]),
+            category('chinese-third-tone-words', soundLabel.thirdToneWords, [
+                word('好', meanings('good', '好', 'жакшы', 'хорошо', 'bien'), { syllables: ['hao'], sound: 'h', pronunciation: 'hao3' }),
+                word('水', meanings('water', '水', 'суу', 'вода', 'eau'), { syllables: ['shui'], sound: 'sh', pronunciation: 'shui3' }),
+                word('请', meanings('please', '请', 'сураныч', 'пожалуйста', 's il vous plait'), { syllables: ['qing'], sound: 'q', pronunciation: 'qing3' }),
+                word('想', meanings('want; think', '想', 'каалоо; ойлонуу', 'хотеть; думать', 'vouloir; penser'), { syllables: ['xiang'], sound: 'x', pronunciation: 'xiang3' }),
+                word('买', meanings('buy', '买', 'сатып алуу', 'покупать', 'acheter'), { syllables: ['mai'], sound: 'm', pronunciation: 'mai3' }),
+                word('远', meanings('far', '远', 'алыс', 'далеко', 'loin'), { syllables: ['yuan'], sound: 'y', pronunciation: 'yuan3' })
             ])
         ],
         phrases: [
@@ -579,6 +840,22 @@ const chineseContent = {
                 phrase('我要回家', meanings('I am going home', '我要回家', 'мен үйгө бара жатам', 'я иду домой', 'je rentre a la maison'), { pronunciation: 'wo3 yao4 hui2 jia1' }),
                 phrase('明天见', meanings('see you tomorrow', '明天见', 'эртең көрүшөбүз', 'увидимся завтра', 'a demain'), { pronunciation: 'ming2 tian1 jian4' }),
                 phrase('晚安', meanings('good night', '晚安', 'кайырлуу түн', 'спокойной ночи', 'bonne nuit'), { pronunciation: 'wan3 an1' })
+            ]),
+            category('chinese-zh-sh-phrases', soundLabel.zhShPhrases, [
+                phrase('请说中文', meanings('please speak Chinese', '请说中文', 'кытайча сүйлөңүзчү', 'пожалуйста, говорите по-китайски', 'parlez chinois, s il vous plait'), { pronunciation: 'qing3 shuo1 zhong1 wen2' }),
+                phrase('老师说得真好', meanings('the teacher speaks very well', '老师说得真好', 'мугалим абдан жакшы сүйлөйт', 'учитель говорит очень хорошо', 'le professeur parle tres bien'), { pronunciation: 'lao3 shi1 shuo1 de zhen1 hao3' }),
+                phrase('这是谁的书？', meanings('whose book is this?', '这是谁的书？', 'бул кимдин китеби?', 'чья это книга?', 'a qui est ce livre ?'), { pronunciation: 'zhe4 shi4 shei2 de shu1' }),
+                phrase('中国是我的目标', meanings('China is my goal', '中国是我的目标', 'Кытай менин максатым', 'Китай моя цель', 'la Chine est mon objectif'), { pronunciation: 'zhong1 guo2 shi4 wo3 de mu4 biao1' }),
+                phrase('商店什么时候关门？', meanings('when does the shop close?', '商店什么时候关门？', 'дүкөн качан жабылат?', 'когда магазин закрывается?', 'quand le magasin ferme-t-il ?'), { pronunciation: 'shang1 dian4 shen2 me shi2 hou guan1 men2' }),
+                phrase('我想照张照片', meanings('I want to take a photo', '我想照张照片', 'сүрөткө түшкүм келет', 'я хочу сделать фото', 'je veux prendre une photo'), { pronunciation: 'wo3 xiang3 zhao4 zhang1 zhao4 pian4' })
+            ]),
+            category('chinese-third-tone-phrases', soundLabel.thirdTonePhrases, [
+                phrase('我很好', meanings('I am fine', '我很好', 'мен жакшымын', 'у меня все хорошо', 'je vais bien'), { pronunciation: 'wo3 hen3 hao3' }),
+                phrase('请给我水', meanings('please give me water', '请给我水', 'мага суу бериңизчи', 'пожалуйста, дайте мне воды', 'donnez-moi de l eau, s il vous plait'), { pronunciation: 'qing3 gei3 wo3 shui3' }),
+                phrase('我想买水果', meanings('I want to buy fruit', '我想买水果', 'жемиш сатып алгым келет', 'я хочу купить фрукты', 'je veux acheter des fruits'), { pronunciation: 'wo3 xiang3 mai3 shui3 guo3' }),
+                phrase('你可以等我吗？', meanings('can you wait for me?', '你可以等我吗？', 'мени күтө аласызбы?', 'ты можешь меня подождать?', 'peux-tu m attendre ?'), { pronunciation: 'ni3 ke3 yi3 deng3 wo3 ma' }),
+                phrase('老师很好', meanings('the teacher is very good', '老师很好', 'мугалим абдан жакшы', 'учитель очень хороший', 'le professeur est tres bon'), { pronunciation: 'lao3 shi1 hen3 hao3' }),
+                phrase('我找我的本子', meanings('I am looking for my notebook', '我找我的本子', 'дептеримди издеп жатам', 'я ищу свою тетрадь', 'je cherche mon cahier'), { pronunciation: 'wo3 zhao3 wo3 de ben3 zi' })
             ])
         ]
     }
@@ -676,6 +953,22 @@ const frenchContent = {
                 word('ecouter', meanings('listen', '听', 'ук', 'слушать', 'ecouter'), { syllables: ['e', 'cou', 'ter'], sound: 'e', pronunciation: 'ay-koo-TAY' }),
                 word('marcher', meanings('walk', '走', 'бас', 'ходить', 'marcher'), { syllables: ['mar', 'cher'], sound: 'm', pronunciation: 'mar-SHAY' }),
                 word('courir', meanings('run', '跑', 'чурка', 'бежать', 'courir'), { syllables: ['cou', 'rir'], sound: 'k', pronunciation: 'koo-REER' })
+            ]),
+            category('french-nasal-words', soundLabel.nasalWords, [
+                word('pain', meanings('bread', '面包', 'нан', 'хлеб', 'pain'), { syllables: ['pain'], sound: 'p', pronunciation: 'nasal vowel, no final n' }),
+                word('nom', meanings('name', '名字', 'аты', 'имя', 'nom'), { syllables: ['nom'], sound: 'n', pronunciation: 'nasal OM sound' }),
+                word('blanc', meanings('white', '白色', 'ак', 'белый', 'blanc'), { syllables: ['blanc'], sound: 'bl', pronunciation: 'nasal AN sound' }),
+                word('bon', meanings('good', '好', 'жакшы', 'хороший', 'bon'), { syllables: ['bon'], sound: 'b', pronunciation: 'nasal ON sound' }),
+                word('monde', meanings('world', '世界', 'дүйнө', 'мир', 'monde'), { syllables: ['monde'], sound: 'm', pronunciation: 'nasal ON before d' }),
+                word('orange', meanings('orange', '橙子', 'апельсин', 'апельсин', 'orange'), { syllables: ['o', 'range'], sound: 'o', pronunciation: 'nasal AN in second syllable' })
+            ]),
+            category('french-r-sound-words', soundLabel.rSoundWords, [
+                word('rue', meanings('street', '街道', 'көчө', 'улица', 'rue'), { syllables: ['rue'], sound: 'r', pronunciation: 'French throat R' }),
+                word('rouge', meanings('red', '红色', 'кызыл', 'красный', 'rouge'), { syllables: ['rouge'], sound: 'r', pronunciation: 'start with throat R' }),
+                word('regarder', meanings('look', '看', 'кароо', 'смотреть', 'regarder'), { syllables: ['re', 'gar', 'der'], sound: 'r', pronunciation: 'multiple French R sounds' }),
+                word('rire', meanings('laugh', '笑', 'күлүү', 'смеяться', 'rire'), { syllables: ['rire'], sound: 'r', pronunciation: 'ree-r with throat R' }),
+                word('route', meanings('road', '路', 'жол', 'дорога', 'route'), { syllables: ['route'], sound: 'r', pronunciation: 'root with French R' }),
+                word('reponse', meanings('answer', '答案', 'жооп', 'ответ', 'reponse'), { syllables: ['re', 'ponse'], sound: 'r', pronunciation: 'French R at the start' })
             ])
         ],
         phrases: [
@@ -750,6 +1043,22 @@ const frenchContent = {
                 phrase('Je rentre a la maison', meanings('I am going home', '我要回家', 'мен үйгө бара жатам', 'я иду домой', 'je rentre a la maison'), { pronunciation: 'zhuh rahntr ah la meh-ZOHN' }),
                 phrase('A demain', meanings('see you tomorrow', '明天见', 'эртең көрүшөбүз', 'увидимся завтра', 'a demain'), { pronunciation: 'ah duh-MAN' }),
                 phrase('Bonne nuit', meanings('good night', '晚安', 'кайырлуу түн', 'спокойной ночи', 'bonne nuit'), { pronunciation: 'bun nwee' })
+            ]),
+            category('french-nasal-phrases', soundLabel.nasalPhrases, [
+                phrase('Mon nom est Alain', meanings('my name is Alain', '我的名字是阿兰', 'менин атым Ален', 'меня зовут Ален', 'mon nom est Alain'), { pronunciation: 'practice nasal sounds in mon, nom, Alain' }),
+                phrase('Un bon pain blanc', meanings('a good white bread', '一个好的白面包', 'жакшы ак нан', 'хороший белый хлеб', 'un bon pain blanc'), { pronunciation: 'four nasal sounds in one short phrase' }),
+                phrase('Le vent est lent', meanings('the wind is slow', '风很慢', 'шамал жай', 'ветер медленный', 'le vent est lent'), { pronunciation: 'nasal EN in vent and lent' }),
+                phrase('Nous avons un grand train', meanings('we have a big train', '我们有一辆大火车', 'бизде чоң поезд бар', 'у нас есть большой поезд', 'nous avons un grand train'), { pronunciation: 'nasal AN in grand and train' }),
+                phrase('Mon ami mange bien', meanings('my friend eats well', '我的朋友吃得很好', 'досум жакшы жейт', 'мой друг хорошо ест', 'mon ami mange bien'), { pronunciation: 'nasal ON and nasal EN sounds' }),
+                phrase('C est un bon moment', meanings('it is a good moment', '这是一个好时刻', 'бул жакшы учур', 'это хороший момент', 'c est un bon moment'), { pronunciation: 'repeat the nasal ON sound' })
+            ]),
+            category('french-r-sound-phrases', soundLabel.rSoundPhrases, [
+                phrase('Regarde la rue rouge', meanings('look at the red street', '看那条红色的街道', 'кызыл көчөнү кара', 'посмотри на красную улицу', 'regarde la rue rouge'), { pronunciation: 'French R in regarde, rue, rouge' }),
+                phrase('Robert rentre rapidement', meanings('Robert comes back quickly', '罗伯特很快回来', 'Роберт бат келет', 'Роберт быстро возвращается', 'Robert rentre rapidement'), { pronunciation: 'repeat the French throat R' }),
+                phrase('Je regarde le professeur', meanings('I am looking at the teacher', '我在看老师', 'мугалимди карап жатам', 'я смотрю на учителя', 'je regarde le professeur'), { pronunciation: 'French R in regarde and professeur' }),
+                phrase('La route est claire', meanings('the road is clear', '路很清楚', 'жол ачык', 'дорога ясная', 'la route est claire'), { pronunciation: 'R in route and claire' }),
+                phrase('Merci pour la reponse', meanings('thank you for the answer', '谢谢你的回答', 'жообуңуз үчүн рахмат', 'спасибо за ответ', 'merci pour la reponse'), { pronunciation: 'French R in merci, pour, reponse' }),
+                phrase('Le train arrive a trois heures', meanings('the train arrives at three o clock', '火车三点到达', 'поезд саат үчтө келет', 'поезд прибывает в три часа', 'le train arrive a trois heures'), { pronunciation: 'R in train, arrive, trois, heures' })
             ])
         ]
     }

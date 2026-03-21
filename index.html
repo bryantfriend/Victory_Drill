@@ -16,14 +16,26 @@
     <!-- Splash Screen -->
     <div id="splash-screen"
         class="fixed inset-0 z-[100] bg-black flex items-center justify-center transition-opacity duration-1000">
+        <div class="splash-gradient"></div>
+        <div class="splash-orb splash-orb-a"></div>
+        <div class="splash-orb splash-orb-b"></div>
+        <div class="splash-grid"></div>
         <video id="splash-video" class="w-full h-full object-contain" muted playsinline>
             <source src="assets/OquWay_Logo_Animation_Generation.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
         <div id="splash-overlay"
-            class="absolute inset-0 bg-black/55 flex flex-col items-center justify-center gap-4 z-[101] px-6 text-center">
-            <h2 class="text-white text-3xl md:text-4xl font-black tracking-tight">Language Victory</h2>
-            <p class="text-white/80 text-sm md:text-base max-w-sm">Tap to begin and play the intro.</p>
+            class="absolute inset-0 flex flex-col items-center justify-center gap-5 z-[101] px-6 text-center">
+            <div class="splash-badge">Pronunciation + Memory Practice</div>
+            <div class="splash-panel">
+                <h2 class="text-white text-4xl md:text-6xl font-black tracking-tight">Language Victory</h2>
+                <p class="text-white/80 text-sm md:text-lg max-w-xl mx-auto">Build confident pronunciation through letters, words, and useful everyday phrases.</p>
+                <div class="splash-pill-row">
+                    <div class="splash-pill">5 base languages</div>
+                    <div class="splash-pill">5 target languages</div>
+                    <div class="splash-pill">Meaning + sound support</div>
+                </div>
+            </div>
             <button id="start-splash"
                 class="btn-3d bg-white hover:bg-slate-100 text-slate-900 font-bold py-3 px-8 rounded-xl text-lg border-b-4 border-slate-300"
                 style="--shadow-color: #cbd5e1;">
@@ -89,15 +101,21 @@
             </div>
 
             <!-- Mode Selection -->
-            <nav class="flex bg-slate-200 p-1 rounded-2xl w-full">
+            <nav class="grid grid-cols-2 md:grid-cols-5 gap-2 bg-slate-200 p-2 rounded-2xl w-full">
                 <button id="mode-letters"
-                    class="mode-btn btn-3d active flex-1 px-4 py-2 rounded-xl text-sm font-bold transition selected"
+                    class="mode-btn btn-3d active px-3 py-2 rounded-xl text-sm font-bold transition selected"
                     style="--shadow-color: #94a3b8;">Буквы</button>
-                <button id="mode-words"
-                    class="mode-btn btn-3d flex-1 px-4 py-2 rounded-xl text-sm font-bold transition bg-slate-100 text-slate-600"
+                <button id="mode-topic-words"
+                    class="mode-btn btn-3d px-3 py-2 rounded-xl text-sm font-bold transition bg-slate-100 text-slate-600"
                     style="--shadow-color: #94a3b8;">Слова</button>
-                <button id="mode-phrases"
-                    class="mode-btn btn-3d flex-1 px-4 py-2 rounded-xl text-sm font-bold transition bg-slate-100 text-slate-600"
+                <button id="mode-sound-words"
+                    class="mode-btn btn-3d px-3 py-2 rounded-xl text-sm font-bold transition bg-slate-100 text-slate-600"
+                    style="--shadow-color: #94a3b8;">Слова по звукам</button>
+                <button id="mode-topic-phrases"
+                    class="mode-btn btn-3d px-3 py-2 rounded-xl text-sm font-bold transition bg-slate-100 text-slate-600"
+                    style="--shadow-color: #94a3b8;">Фразы</button>
+                <button id="mode-sound-phrases"
+                    class="mode-btn btn-3d px-3 py-2 rounded-xl text-sm font-bold transition bg-slate-100 text-slate-600"
                     style="--shadow-color: #94a3b8;">Фразы</button>
             </nav>
 

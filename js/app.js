@@ -55,6 +55,13 @@ class App {
             { bg: 'bg-rose-500', hover: 'hover:bg-rose-600', shadow: '#e11d48' },
             { bg: 'bg-teal-500', hover: 'hover:bg-teal-600', shadow: '#0d9488' }
         ];
+        this.modeConfig = {
+            letters: { contentMode: 'letters', categoryGroup: null },
+            'topic-words': { contentMode: 'words', categoryGroup: 'topics' },
+            'sound-words': { contentMode: 'words', categoryGroup: 'sounds' },
+            'topic-phrases': { contentMode: 'phrases', categoryGroup: 'topics' },
+            'sound-phrases': { contentMode: 'phrases', categoryGroup: 'sounds' }
+        };
 
         this.voice = new VoiceManager();
         this.timer = new Timer(
@@ -116,6 +123,7 @@ class App {
 
         const tryPlay = () => {
             if (hasEnded || !hasStarted) return;
+            splash.classList.add('intro-playing');
             overlay.classList.add('hidden');
             const playAttempt = video.play();
             if (playAttempt?.catch) {
@@ -145,8 +153,10 @@ class App {
 
     init() {
         document.getElementById('mode-letters').onclick = () => this.setMode('letters');
-        document.getElementById('mode-words').onclick = () => this.setMode('words');
-        document.getElementById('mode-phrases').onclick = () => this.setMode('phrases');
+        document.getElementById('mode-topic-words').onclick = () => this.setMode('topic-words');
+        document.getElementById('mode-sound-words').onclick = () => this.setMode('sound-words');
+        document.getElementById('mode-topic-phrases').onclick = () => this.setMode('topic-phrases');
+        document.getElementById('mode-sound-phrases').onclick = () => this.setMode('sound-phrases');
 
         document.getElementById('time-60').onclick = () => this.setTimer(60);
         document.getElementById('time-120').onclick = () => this.setTimer(120);
@@ -178,8 +188,10 @@ class App {
             categoryPrompt: getUIText(language, 'categoryPrompt'),
             timerLabel: getUIText(language, 'timerLabel'),
             modeLetters: getUIText(language, 'modeLetters'),
-            modeWords: getUIText(language, 'modeWords'),
-            modePhrases: getUIText(language, 'modePhrases'),
+            modeTopicWords: getUIText(language, 'modeTopicWords'),
+            modeSoundWords: getUIText(language, 'modeSoundWords'),
+            modeTopicPhrases: getUIText(language, 'modeTopicPhrases'),
+            modeSoundPhrases: getUIText(language, 'modeSoundPhrases'),
             timeOneMin: getUIText(language, 'timeOneMin'),
             timeTwoMin: getUIText(language, 'timeTwoMin'),
             timeFree: getUIText(language, 'timeFree'),
@@ -208,6 +220,8 @@ class App {
             pronunciationToggleHint: getUIText(language, 'pronunciationToggleHint'),
             meaningToggle: getUIText(language, 'meaningToggle'),
             meaningToggleHint: getUIText(language, 'meaningToggleHint'),
+            categoryGroupTopics: getUIText(language, 'categoryGroupTopics'),
+            categoryGroupSounds: getUIText(language, 'categoryGroupSounds'),
             on: getUIText(language, 'on'),
             off: getUIText(language, 'off')
         });
@@ -224,6 +238,7 @@ class App {
     setTargetLanguage(language) {
         this.targetLanguage = language;
         this.voice.setLanguage(learningContent[language]?.speechLang || 'ru-RU');
+        this.ui.setTargetLanguage(language);
         this.ui.updateTargetLanguageButtons(language);
         this.currentCategory = null;
         this.currentList = [];
@@ -266,11 +281,44 @@ class App {
     }
 
     renderCategories() {
-        const categories = (learningContent[this.targetLanguage]?.modes?.[this.mode] || []).map(category => ({
+        const { contentMode, categoryGroup } = this.getModeConfig();
+        const categories = (learningContent[this.targetLanguage]?.modes?.[contentMode] || [])
+            .filter(category => !categoryGroup || this.getCategoryGroup(category.key) === categoryGroup)
+            .map(category => ({
             key: category.key,
             label: category.labels?.[this.baseLanguage] || getCategoryLabel(category.key, this.baseLanguage)
         }));
         this.ui.renderCategories(categories, this.colors);
+    }
+
+    getModeConfig() {
+        return this.modeConfig[this.mode] || this.modeConfig.letters;
+    }
+
+    getCategoryGroup(key) {
+        const soundPatterns = [
+            'long-e',
+            'r-sound',
+            'rounded-vowel',
+            'zh-sh',
+            'third-tone',
+            'nasal',
+            'vowel-sounds',
+            'special-sounds',
+            'special-letters',
+            'tone-practice',
+            'common-characters',
+            'Гласный',
+            'Буква',
+            'Правило',
+            'Мягкий',
+            'Твердый',
+            'Пары',
+            'Ь в середине',
+            'Удвоенные'
+        ];
+
+        return soundPatterns.some(pattern => key.includes(pattern)) ? 'sounds' : 'topics';
     }
 
     startGame(category) {
@@ -281,7 +329,7 @@ class App {
 
     getCategoryList(category) {
         this.currentCategory = category;
-        return [...getCategoryItems(this.targetLanguage, this.mode, category)];
+        return [...getCategoryItems(this.targetLanguage, this.getModeConfig().contentMode, category)];
     }
 
     startRound(list, preserveDifficult = false) {

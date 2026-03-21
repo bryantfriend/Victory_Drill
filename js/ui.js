@@ -4,6 +4,7 @@ export class UIManager {
     constructor(callbacks) {
         this.callbacks = callbacks; // { onSpeak, onSpeakWord, onChangeMode, onSelectCategory, onNextItem, onPrevItem, onRepeatItem, onTogglePause, onExit, onReplay }
         this.language = 'ru';
+        this.targetLanguage = 'ru';
         this.text = {};
         this.showPronunciation = true;
         this.showMeanings = true;
@@ -73,8 +74,10 @@ export class UIManager {
         this.meaningToggleHint.innerText = text.meaningToggleHint;
         document.getElementById('timer-label').innerText = text.timerLabel;
         document.getElementById('mode-letters').innerText = text.modeLetters;
-        document.getElementById('mode-words').innerText = text.modeWords;
-        document.getElementById('mode-phrases').innerText = text.modePhrases;
+        document.getElementById('mode-topic-words').innerText = text.modeTopicWords;
+        document.getElementById('mode-sound-words').innerText = text.modeSoundWords;
+        document.getElementById('mode-topic-phrases').innerText = text.modeTopicPhrases;
+        document.getElementById('mode-sound-phrases').innerText = text.modeSoundPhrases;
         document.getElementById('time-60').innerText = text.timeOneMin;
         document.getElementById('time-120').innerText = text.timeTwoMin;
         document.getElementById('time-free').innerText = text.timeFree;
@@ -90,6 +93,10 @@ export class UIManager {
         this.practiceDifficultBtn.innerText = text.difficult;
         this.updatePronunciationToggle(this.showPronunciation);
         this.updateMeaningToggle(this.showMeanings);
+    }
+
+    setTargetLanguage(language) {
+        this.targetLanguage = language;
     }
 
     renderLanguages(languages, selectedLanguage) {
@@ -199,8 +206,10 @@ export class UIManager {
 
     renderCategories(categories, colors) {
         this.categoryList.innerHTML = '';
-        categories.forEach((cat, index) => {
-            const color = colors[index % colors.length];
+        let colorIndex = 0;
+        categories.forEach(cat => {
+            const color = colors[colorIndex % colors.length];
+            colorIndex += 1;
             const btn = document.createElement('button');
             btn.className = `w-full btn-3d ${color.bg} ${color.hover} text-white font-bold py-3 px-3 rounded-xl text-sm md:text-base border-b-6 flex items-center justify-center text-center h-16 transition-all`;
             btn.style.setProperty('--shadow-color', color.shadow);
@@ -258,6 +267,135 @@ export class UIManager {
         this.meaningToggleBtn.style.setProperty('--shadow-color', showMeanings ? '#4338ca' : '#64748b');
     }
 
+    hasCyrillic(text) {
+        return /[А-Яа-яЁё]/.test(text || '');
+    }
+
+    transliterateWithMap(text, map) {
+        return (text || '')
+            .normalize('NFD')
+            .replace(/\u0301/g, '')
+            .split('')
+            .map(char => {
+                const lower = char.toLowerCase();
+                if (!(lower in map)) return char;
+                const latin = map[lower];
+                return char === lower ? latin : `${latin.charAt(0).toUpperCase()}${latin.slice(1)}`;
+            })
+            .join('');
+    }
+
+    transliterateRussian(text) {
+        const map = {
+            а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'yo', ж: 'zh', з: 'z', и: 'i', й: 'y',
+            к: 'k', л: 'l', м: 'm', н: 'n', о: 'o', п: 'p', р: 'r', с: 's', т: 't', у: 'u', ф: 'f',
+            х: 'kh', ц: 'ts', ч: 'ch', ш: 'sh', щ: 'shch', ъ: '', ы: 'y', ь: '', э: 'e', ю: 'yu', я: 'ya'
+        };
+
+        return this.transliterateWithMap(text, map);
+    }
+
+    transliterateKyrgyz(text) {
+        const map = {
+            а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'yo', ж: 'zh', з: 'z', и: 'i', й: 'y',
+            к: 'k', л: 'l', м: 'm', н: 'n', ң: 'ng', о: 'o', ө: 'oe', п: 'p', р: 'r', с: 's', т: 't',
+            у: 'u', ү: 'ue', ф: 'f', х: 'kh', ц: 'ts', ч: 'ch', ш: 'sh', щ: 'shch', ъ: '', ы: 'y',
+            ь: '', э: 'e', ю: 'yu', я: 'ya'
+        };
+
+        return this.transliterateWithMap(text, map);
+    }
+
+    getRussianStressLetterIndex(stressText) {
+        if (!stressText) return -1;
+
+        let letterIndex = 0;
+        let previousLetterIndex = -1;
+        for (const char of stressText.normalize('NFD')) {
+            if (char === '\u0301') {
+                return previousLetterIndex;
+            }
+            if (/[А-Яа-яЁё]/.test(char)) {
+                if (char === 'ё' || char === 'Ё') {
+                    return letterIndex;
+                }
+                previousLetterIndex = letterIndex;
+                letterIndex += 1;
+            }
+        }
+
+        return -1;
+    }
+
+    buildRussianWordPronunciation(content) {
+        if (!content?.stress || !content?.syllables?.length) return '';
+
+        const stressedLetterIndex = this.getRussianStressLetterIndex(content.stress);
+        let traversedLetters = 0;
+
+        return content.syllables
+            .map(syllable => {
+                const cleanSyllable = syllable.normalize('NFD').replace(/\u0301/g, '');
+                const syllableLetterCount = [...cleanSyllable].filter(char => /[А-Яа-яЁё]/.test(char)).length;
+                const isStressed = stressedLetterIndex >= traversedLetters
+                    && stressedLetterIndex < traversedLetters + syllableLetterCount;
+                traversedLetters += syllableLetterCount;
+
+                const transliterated = this.transliterateRussian(cleanSyllable);
+                return isStressed ? transliterated.toUpperCase() : transliterated;
+            })
+            .join('-');
+    }
+
+    buildRussianPhrasePronunciation(text) {
+        if (!this.hasCyrillic(text)) return '';
+        return this.transliterateRussian(text).replace(/\s+/g, ' ').trim();
+    }
+
+    buildKyrgyzWordPronunciation(content) {
+        if (!content?.syllables?.length) return '';
+
+        return content.syllables
+            .map(syllable => this.transliterateKyrgyz(syllable))
+            .join('-');
+    }
+
+    buildKyrgyzPhrasePronunciation(text) {
+        if (!this.hasCyrillic(text)) return '';
+        return this.transliterateKyrgyz(text).replace(/\s+/g, ' ').trim();
+    }
+
+    buildFrenchPronunciation(content) {
+        if (!content) return '';
+
+        if (content.syllables?.length) {
+            return content.syllables.join('-');
+        }
+
+        if (content.kind === 'phrase' && content.t) {
+            return this.splitPhraseIntoChunks(content.t).join(' / ');
+        }
+
+        return '';
+    }
+
+    buildChinesePronunciation(content) {
+        if (!content) return '';
+
+        if (content.syllables?.length) {
+            return content.syllables.join(' ');
+        }
+
+        if (content.kind === 'phrase' && content.t) {
+            const chunks = this.splitPhraseIntoChunks(content.t);
+            if (chunks.length > 1) {
+                return chunks.join(' / ');
+            }
+        }
+
+        return '';
+    }
+
     getMeaning(contentOrText) {
         if (typeof contentOrText === 'object' && contentOrText?.meanings) {
             return contentOrText.meanings[this.language] || contentOrText.meanings.ru || '';
@@ -270,11 +408,34 @@ export class UIManager {
         if (!content || typeof content !== 'object') return '';
         if (content.pronunciation) return content.pronunciation;
 
+        if (this.targetLanguage === 'ru' && content.stress && content.syllables?.length && this.hasCyrillic(content.stress)) {
+            return this.buildRussianWordPronunciation(content);
+        }
+
+        if (this.targetLanguage === 'ky' && content.syllables?.length && this.hasCyrillic(content.t || content.w || content.l || '')) {
+            return content.kind === 'phrase'
+                ? this.buildKyrgyzPhrasePronunciation(content.t)
+                : this.buildKyrgyzWordPronunciation(content);
+        }
+
+        if (this.targetLanguage === 'fr') {
+            const frenchHint = this.buildFrenchPronunciation(content);
+            if (frenchHint) return frenchHint;
+        }
+
+        if (this.targetLanguage === 'zh') {
+            const chineseHint = this.buildChinesePronunciation(content);
+            if (chineseHint) return chineseHint;
+        }
+
         if (content.syllables?.length) {
             return content.syllables.join('-');
         }
 
         if (content.kind === 'phrase' && content.t) {
+            if (this.targetLanguage === 'ru' && this.hasCyrillic(content.t)) {
+                return this.buildRussianPhrasePronunciation(content.t);
+            }
             const words = content.t.split(/\s+/).filter(Boolean);
             if (words.length > 1) {
                 return words.join(' / ');

@@ -43,3 +43,40 @@ Original prompt: Ok, let's skip that bug for now. Please update each language so
 - ky: letters 2, words 9, phrases 9
 - zh: letters 2, words 9, phrases 9
 - fr: letters 2, words 9, phrases 9
+- Added sound-focused categories for each non-Russian target language.
+- English now includes long E and R-sound word/phrase drills.
+- Kyrgyz now includes rounded-vowel and R-sound word/phrase drills.
+- Chinese now includes zh/sh and third-tone word/phrase drills.
+- French now includes nasal-sound and R-sound word/phrase drills.
+- Updated non-Russian content counts after sound-drill expansion:
+- en: letters 2, words 11, phrases 11
+- ky: letters 2, words 11, phrases 11
+- zh: letters 2, words 11, phrases 11
+- fr: letters 2, words 11, phrases 11
+- Grouped category selection into topic practice vs sound practice sections on the start screen.
+- Refined grouped category headings so words and phrases each show their own sections:
+- Words by Category
+- Words by Sound
+- Phrases by Category
+- Phrases by Sound
+- Replaced the grouped headings approach with 5 direct practice buttons on the start screen:
+- Letters
+- Topic Words
+- Sound Words
+- Topic Phrases
+- Sound Phrases
+- Added true Russian topic content so Topic Words and Topic Phrases are meaningful for Russian.
+- New Russian topic word sets: family, food and drink, classroom.
+- New Russian topic phrase sets: greetings, classroom phrases, daily phrases.
+- Updated Russian category grouping so phonics/sound drills stay under Sound Words.
+- Expanded Russian topic words with colors, body, actions, and travel.
+- Expanded Russian topic phrases with help, travel, food, and weather.
+- Added Russian shopping topic words.
+- Added Russian daily routine topic words.
+- Added Russian shopping topic phrases.
+- Added Russian daily routine topic phrases.
+- Added Russian family topic phrases.
+- Added Russian feelings topic phrases.
+- Improved Russian pronunciation support in the UI with automatic Cyrillic-to-Latin hints.
+- Russian words with stress and syllables now show stressed transliteration instead of plain syllable fallback.
+- Russian phrases now show transliterated pronunciation support instead of generic word-splitting only.

@@ -14,7 +14,9 @@ body {
     inset: 0;
     z-index: 1000;
     overflow: hidden;
-    background: #000;
+    background:
+        radial-gradient(circle at top, rgba(99, 102, 241, 0.35), transparent 35%),
+        linear-gradient(145deg, #06111f 0%, #102042 45%, #12284f 100%);
 }
 
 #splash-screen.hidden {
@@ -29,12 +31,25 @@ body {
     object-fit: contain;
     background: #000;
     pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.45s ease;
+}
+
+#splash-screen.intro-playing #splash-video {
+    opacity: 1;
 }
 
 #splash-overlay {
     position: absolute;
     inset: 0;
     z-index: 1002;
+    background:
+        linear-gradient(180deg, rgba(6, 17, 31, 0.12) 0%, rgba(6, 17, 31, 0.62) 100%);
+}
+
+#splash-screen.intro-playing #splash-overlay {
+    background: rgba(6, 17, 31, 0.14);
+    backdrop-filter: blur(4px);
 }
 
 #start-splash {
@@ -44,6 +59,114 @@ body {
 
 #skip-splash {
     z-index: 1003;
+}
+
+.splash-gradient,
+.splash-grid,
+.splash-orb {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.splash-gradient {
+    background:
+        radial-gradient(circle at 20% 20%, rgba(45, 212, 191, 0.22), transparent 30%),
+        radial-gradient(circle at 80% 18%, rgba(251, 191, 36, 0.18), transparent 28%),
+        radial-gradient(circle at 50% 82%, rgba(244, 114, 182, 0.14), transparent 32%);
+}
+
+.splash-grid {
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.65), transparent 85%);
+    opacity: 0.35;
+}
+
+.splash-orb {
+    width: 34rem;
+    height: 34rem;
+    border-radius: 999px;
+    filter: blur(40px);
+    opacity: 0.42;
+    animation: float-orb 10s ease-in-out infinite;
+}
+
+.splash-orb-a {
+    inset: auto auto -10rem -8rem;
+    background: rgba(56, 189, 248, 0.36);
+}
+
+.splash-orb-b {
+    inset: -10rem -7rem auto auto;
+    background: rgba(129, 140, 248, 0.34);
+    animation-delay: -5s;
+}
+
+.splash-panel {
+    max-width: 46rem;
+    padding: 2rem 2rem 1.5rem;
+    border-radius: 1.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(7, 15, 30, 0.42);
+    box-shadow: 0 30px 80px rgba(2, 8, 23, 0.45);
+    backdrop-filter: blur(14px);
+}
+
+.splash-badge {
+    border-radius: 999px;
+    padding: 0.55rem 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.88);
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+}
+
+.splash-pill-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 1.4rem;
+}
+
+.splash-pill {
+    padding: 0.55rem 0.9rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+@keyframes float-orb {
+    0%, 100% {
+        transform: translate3d(0, 0, 0) scale(1);
+    }
+    50% {
+        transform: translate3d(0, -18px, 0) scale(1.04);
+    }
+}
+
+@media (max-width: 640px) {
+    .splash-panel {
+        padding: 1.4rem 1.15rem 1.15rem;
+        border-radius: 1.4rem;
+    }
+
+    .splash-pill-row {
+        gap: 0.5rem;
+    }
+
+    .splash-pill {
+        font-size: 0.75rem;
+    }
 }
 
 /* 3D Button Styles */
