@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Русская Победа</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="css/style.css?v=20260322b">
+    <link rel="stylesheet" href="css/style.css?v=20260322c">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -57,7 +57,7 @@
                 <i data-lucide="book-open" class="text-indigo-600 w-12 h-12"></i>
                 <h1 id="app-title" class="text-4xl md:text-5xl font-black text-indigo-800">Русская Победа</h1>
             </div>
-            <p id="app-version" class="text-xs font-bold uppercase tracking-[0.2em] text-indigo-400">Build 2026.03.22b</p>
+            <p id="app-version" class="text-xs font-bold uppercase tracking-[0.2em] text-indigo-400">Build 2026.03.22c</p>
 
             <div class="bg-white p-4 rounded-2xl shadow-sm border border-indigo-100">
                 <p id="language-prompt" class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-3">Выберите родной язык:</p>
@@ -160,8 +160,16 @@
                 </div>
                 <div id="category-empty" class="category-empty hidden">No categories match your search.</div>
             </div>
-            <div id="category-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3 h-80 overflow-y-auto pr-2 scrollbar-thin">
-                <!-- Category buttons will be inserted here by JavaScript -->
+            <div class="category-rail-wrap">
+                <button id="category-prev" class="category-rail-arrow" type="button" aria-label="Previous categories">
+                    <i data-lucide="chevron-left" class="w-5 h-5"></i>
+                </button>
+                <div id="category-list" class="category-rail scrollbar-thin">
+                    <!-- Category buttons will be inserted here by JavaScript -->
+                </div>
+                <button id="category-next" class="category-rail-arrow" type="button" aria-label="Next categories">
+                    <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                </button>
             </div>
         </div>
 
@@ -369,7 +377,7 @@
 
     </div>
 
-    <script type="module" src="js/app.js?v=20260322b"></script>
+    <script type="module" src="js/app.js?v=20260322c"></script>
 </body>
 
 </html>

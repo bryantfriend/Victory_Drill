@@ -22,8 +22,8 @@ const VOICE_PREFERENCES = {
 };
 
 const DEFAULT_VENDORS = ['Microsoft', 'Google', 'Premium', 'Enhanced', 'Natural'];
-const GOOD_VOICE_PATTERNS = ['natural', 'neural', 'online', 'premium', 'enhanced', 'aria', 'jenny', 'xiaoxiao', 'denise'];
-const BAD_VOICE_PATTERNS = ['espeak', 'compact', 'default', 'fallback', 'basic', 'robot'];
+const GOOD_VOICE_PATTERNS = ['natural', 'neural', 'online', 'premium', 'enhanced', 'aria', 'jenny', 'xiaoxiao', 'denise', 'samantha', 'hortense'];
+const BAD_VOICE_PATTERNS = ['espeak', 'compact', 'default', 'fallback', 'basic', 'robot', 'microsoft david desktop'];
 
 export class VoiceManager {
     constructor() {
@@ -85,7 +85,7 @@ export class VoiceManager {
         }
 
         if (BAD_VOICE_PATTERNS.some(pattern => name.includes(pattern))) {
-            score -= 40;
+            score -= 85;
         }
 
         if (DEFAULT_VENDORS.some(vendor => name.includes(vendor.toLowerCase()))) {
@@ -122,7 +122,7 @@ export class VoiceManager {
 
         const ranked = this.voices
             .map(voice => ({ voice, score: this._scoreVoice(voice, config) }))
-            .filter(entry => entry.score > 0)
+            .filter(entry => entry.score > 25)
             .sort((a, b) => b.score - a.score);
 
         if (ranked.length) {
@@ -143,7 +143,9 @@ export class VoiceManager {
         }
 
         for (const candidate of config.fallbackLangs) {
-            const fallbackVoice = this.voices.find(voice => this._langMatches(voice.lang, candidate));
+            const fallbackVoice = this.voices
+                .filter(voice => this._langMatches(voice.lang, candidate))
+                .sort((a, b) => this._scoreVoice(b, config) - this._scoreVoice(a, config))[0];
             if (fallbackVoice) {
                 this.voiceCache.set(lang, fallbackVoice.name);
                 return {
@@ -151,6 +153,17 @@ export class VoiceManager {
                     lang: fallbackVoice.lang || candidate
                 };
             }
+        }
+
+        const vendorVoice = this.voices
+            .filter(voice => !BAD_VOICE_PATTERNS.some(pattern => (voice.name || '').toLowerCase().includes(pattern)))
+            .sort((a, b) => this._scoreVoice(b, config) - this._scoreVoice(a, config))[0];
+        if (vendorVoice) {
+            this.voiceCache.set(lang, vendorVoice.name);
+            return {
+                voice: vendorVoice,
+                lang: vendorVoice.lang || lang
+            };
         }
 
         return {

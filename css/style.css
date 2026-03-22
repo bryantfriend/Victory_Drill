@@ -327,6 +327,42 @@ body {
     margin-bottom: 0.9rem;
 }
 
+.category-rail-wrap {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.category-rail {
+    display: flex;
+    gap: 0.85rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x proximity;
+    padding: 0.25rem 0.2rem 0.7rem;
+    min-height: 8.75rem;
+}
+
+.category-rail-arrow {
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 999px;
+    border: 1px solid rgba(165, 180, 252, 0.55);
+    background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(224,231,255,0.94));
+    color: #4f46e5;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.85);
+    transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.category-rail-arrow:hover {
+    transform: translateY(-1px);
+    border-color: rgba(99, 102, 241, 0.7);
+}
+
 .category-toolbar {
     display: flex;
     flex-direction: column;
@@ -376,6 +412,9 @@ body {
 
 .category-option {
     gap: 1rem;
+    scroll-snap-align: start;
+    flex: 0 0 15rem;
+    min-height: 8rem;
 }
 
 .category-option__content {
@@ -784,7 +823,8 @@ body {
 }
 
 .game-style-classic #pronunciation-lab,
-.game-style-classic #speech-feedback {
+.game-style-classic #speech-feedback,
+.game-style-classic #record-btn {
     display: none !important;
 }
 
@@ -792,14 +832,16 @@ body {
     display: none !important;
 }
 
-.game-style-speaking #pronunciation-lab-body,
+.game-style-speaking #pronunciation-lab,
 .game-style-speaking #listen-quiz-panel {
     display: none !important;
 }
 
 .game-style-listening #speech-feedback,
-.game-style-listening #pronunciation-lab-body .coach-focus-card,
-.game-style-listening #pronunciation-lab-body .coach-detail-list {
+.game-style-listening #record-btn,
+.game-style-listening .pronunciation-lab-header,
+.game-style-listening #pronunciation-lab-actions,
+.game-style-listening #pronunciation-lab-body {
     display: none !important;
 }
 
@@ -987,6 +1029,26 @@ body {
         max-width: none;
     }
 
+    .category-rail-wrap {
+        grid-template-columns: auto 1fr auto;
+        gap: 0.45rem;
+    }
+
+    .category-rail {
+        gap: 0.65rem;
+        min-height: 7.8rem;
+    }
+
+    .category-option {
+        flex-basis: 13.5rem;
+        min-height: 7.5rem;
+    }
+
+    .category-rail-arrow {
+        width: 2.35rem;
+        height: 2.35rem;
+    }
+
     .game-shell {
         min-height: calc(100dvh - 1.5rem);
         padding-left: 1rem;
@@ -1116,6 +1178,10 @@ body {
     .pronunciation-lab-panel {
         margin-top: 0.9rem;
         padding: 0.9rem 0.85rem;
+    }
+
+    .game-style-listening #pronunciation-lab {
+        padding: 0.8rem;
     }
 
     .pronunciation-lab-header,

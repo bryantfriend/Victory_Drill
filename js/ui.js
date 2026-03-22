@@ -27,6 +27,8 @@ export class UIManager {
         this.languageList = document.getElementById('language-list');
         this.targetLanguageList = document.getElementById('target-language-list');
         this.categoryList = document.getElementById('category-list');
+        this.categoryPrevBtn = document.getElementById('category-prev');
+        this.categoryNextBtn = document.getElementById('category-next');
         this.categorySearch = document.getElementById('category-search');
         this.categoryCount = document.getElementById('category-count');
         this.categoryEmpty = document.getElementById('category-empty');
@@ -100,6 +102,8 @@ export class UIManager {
         if (this.pronunciationToggleBtn) this.pronunciationToggleBtn.onclick = () => this.callbacks.onTogglePronunciation();
         if (this.meaningToggleBtn) this.meaningToggleBtn.onclick = () => this.callbacks.onToggleMeanings();
         if (this.categorySearch) this.categorySearch.oninput = () => this.applyCategoryFilter();
+        if (this.categoryPrevBtn) this.categoryPrevBtn.onclick = () => this.scrollCategories(-1);
+        if (this.categoryNextBtn) this.categoryNextBtn.onclick = () => this.scrollCategories(1);
         if (this.slowPlayBtn) this.slowPlayBtn.onclick = () => this.callbacks.onSlowPlay();
         if (this.shadowBtn) this.shadowBtn.onclick = () => this.callbacks.onShadow();
         if (this.listenQuizBtn) this.listenQuizBtn.onclick = () => this.callbacks.onStartListeningQuiz();
@@ -116,7 +120,7 @@ export class UIManager {
         document.getElementById('app-title').innerText = text.appTitle;
         const versionEl = document.getElementById('app-version');
         if (versionEl) {
-            versionEl.innerText = 'Build 2026.03.22b';
+            versionEl.innerText = 'Build 2026.03.22c';
         }
         document.getElementById('language-prompt').innerText = text.languagePrompt;
         document.getElementById('target-language-prompt').innerText = text.targetLanguagePrompt;
@@ -424,7 +428,7 @@ export class UIManager {
         filtered.forEach(cat => {
             const color = cat.color;
             const btn = document.createElement('button');
-            btn.className = `category-option w-full btn-3d ${color.bg} ${color.hover} text-white font-bold py-3 px-4 rounded-2xl text-sm md:text-base border-b-6 flex items-center justify-between text-left min-h-[4.5rem] transition-all`;
+            btn.className = `category-option btn-3d ${color.bg} ${color.hover} text-white font-bold py-3 px-4 rounded-2xl text-sm md:text-base border-b-6 flex items-center justify-between text-left transition-all`;
             btn.style.setProperty('--shadow-color', color.shadow);
             const tags = (cat.tags || [])
                 .map(tag => `<span class="category-option__tag category-option__tag--${tag.tone || 'default'}">${tag.label || tag}</span>`)
@@ -441,6 +445,19 @@ export class UIManager {
         });
         this.categoryCount.innerText = `${filtered.length} ${this.text.categoryCountLabel || 'categories'}`;
         this.categoryEmpty.classList.toggle('hidden', filtered.length !== 0);
+        this.updateCategoryRailState(filtered.length);
+    }
+
+    scrollCategories(direction) {
+        if (!this.categoryList) return;
+        const amount = Math.max(220, Math.round(this.categoryList.clientWidth * 0.75)) * direction;
+        this.categoryList.scrollBy({ left: amount, behavior: 'smooth' });
+    }
+
+    updateCategoryRailState(count) {
+        const hasItems = count > 0;
+        if (this.categoryPrevBtn) this.categoryPrevBtn.disabled = !hasItems;
+        if (this.categoryNextBtn) this.categoryNextBtn.disabled = !hasItems;
     }
 
     createMetaPill(label, value) {
