@@ -22,6 +22,10 @@ class App {
         this.isPaused = false;
         this.isFlipped = false;
         this.speechFeedback = null;
+        this.itemStats = new Map();
+        this.activeSyllableTimer = null;
+        this.shadowTimeout = null;
+        this.listeningQuiz = null;
 
         this.russianAlphabetVariations = [
             "Следующая буква {n}. Она дает звук {s}.",
@@ -89,7 +93,12 @@ class App {
             ,
             onTogglePronunciation: () => this.togglePronunciation(),
             onToggleMeanings: () => this.toggleMeanings(),
-            onRecord: () => this.toggleRecording()
+            onRecord: () => this.toggleRecording(),
+            onSlowPlay: () => this.playSlowAudio(),
+            onShadow: () => this.startShadowing(),
+            onStartListeningQuiz: () => this.startListeningQuiz(),
+            onPlayMinimalPair: () => this.playMinimalPair(),
+            onChooseListeningOption: (index) => this.chooseListeningOption(index)
         });
 
         this.init();
@@ -239,6 +248,26 @@ class App {
             speechNoSpeech: getUIText(language, 'speechNoSpeech'),
             speechRecord: getUIText(language, 'speechRecord'),
             speechStop: getUIText(language, 'speechStop'),
+            speechMissed: getUIText(language, 'speechMissed'),
+            speechExtra: getUIText(language, 'speechExtra'),
+            speechScore: getUIText(language, 'speechScore'),
+            labTitle: getUIText(language, 'labTitle'),
+            labSubtitle: getUIText(language, 'labSubtitle'),
+            syllableLabel: getUIText(language, 'syllableLabel'),
+            mouthTipLabel: getUIText(language, 'mouthTipLabel'),
+            intonationLabel: getUIText(language, 'intonationLabel'),
+            minimalPairPanelLabel: getUIText(language, 'minimalPairPanelLabel'),
+            slowPlay: getUIText(language, 'slowPlay'),
+            shadowMode: getUIText(language, 'shadowMode'),
+            listenQuiz: getUIText(language, 'listenQuiz'),
+            minimalPairAction: getUIText(language, 'minimalPairAction'),
+            listenQuizQuestion: getUIText(language, 'listenQuizQuestion'),
+            listenCorrect: getUIText(language, 'listenCorrect'),
+            listenWrong: getUIText(language, 'listenWrong'),
+            mastery: getUIText(language, 'mastery'),
+            noMinimalPair: getUIText(language, 'noMinimalPair'),
+            defaultMouthTip: getUIText(language, 'defaultMouthTip'),
+            defaultRhythmTip: getUIText(language, 'defaultRhythmTip'),
             on: getUIText(language, 'on'),
             off: getUIText(language, 'off')
         });
@@ -249,6 +278,7 @@ class App {
             this.ui.setInitialContent(this.getCurrentItem());
             this.ui.updateDifficultSummary(this.difficultItems.length);
             this.ui.updateDifficultButton(this.isCurrentItemDifficult());
+            this.updatePracticeLab();
         }
     }
 
@@ -286,6 +316,7 @@ class App {
             if (this.isFlipped) {
                 this.ui.card.classList.add('is-flipped');
             }
+            this.updatePracticeLab();
         }
     }
 
@@ -297,6 +328,7 @@ class App {
             if (this.isFlipped) {
                 this.ui.card.classList.add('is-flipped');
             }
+            this.updatePracticeLab();
         }
     }
 
@@ -401,6 +433,7 @@ class App {
             return;
         }
         this.shuffle(this.currentList);
+        this.listeningQuiz = null;
 
         const firstItem = this.currentList[0];
         this.ui.updateScore(0);
@@ -408,9 +441,10 @@ class App {
         this.ui.updateDifficultSummary(this.difficultItems.length);
         this.ui.updateDifficultButton(this.isCurrentItemDifficult());
         this.ui.setInitialContent(firstItem);
+        this.updatePracticeLab();
         this.ui.showScreen('game');
 
-        this.voice.speak(this.getText(firstItem));
+        this.speakCurrentItem();
         this.timer.start(this.selectedTime);
     }
 
@@ -443,10 +477,310 @@ class App {
         return item.t || item.l;
     }
 
+    getDisplayText(item) {
+        if (!item) return '';
+        return typeof item === 'string' ? item : (item.t || item.w || item.l || '');
+    }
+
+    getNormalizedText(item) {
+        return this.normalizeForSpeechCompare(this.getDisplayText(item));
+    }
+
+    getItemStats(item) {
+        const key = this.getItemKey(item);
+        if (!this.itemStats.has(key)) {
+            this.itemStats.set(key, { attempts: 0, successes: 0, listens: 0, misses: 0 });
+        }
+        return this.itemStats.get(key);
+    }
+
+    getMasteryPercent(item) {
+        const stats = this.getItemStats(item);
+        if (!stats.attempts) return 0;
+        return Math.max(0, Math.min(100, Math.round((stats.successes / stats.attempts) * 100)));
+    }
+
+    getSyllableParts(item) {
+        if (!item) return [];
+        if (typeof item === 'object' && item.syllables?.length) {
+            return [...item.syllables];
+        }
+        const text = this.getDisplayText(item);
+        if (!text) return [];
+        if (typeof item === 'object' && item.kind === 'phrase') {
+            return text.split(/\s+/).filter(Boolean);
+        }
+        if (text.length <= 4) {
+            return [text];
+        }
+        return text.split(/[-\s]+/).filter(Boolean);
+    }
+
+    getMouthTip(item) {
+        const text = this.getDisplayText(item).toLowerCase();
+        const sound = typeof item === 'object' ? `${item.sound || ''} ${item.pronunciation || ''}`.toLowerCase() : text;
+
+        if (this.targetLanguage === 'en') {
+            if (/th/.test(text)) return 'Keep your tongue lightly between your teeth for TH.';
+            if (/r/.test(text)) return 'Pull the tongue back slightly and avoid tapping for the English R.';
+            if (/ee|ea|e\b|i\b/.test(text)) return 'Spread your lips slightly and keep the long E sound bright.';
+        }
+
+        if (this.targetLanguage === 'fr') {
+            if (/r/.test(text)) return 'Use a gentle throat R instead of rolling the tongue.';
+            if (/ou|u\b/.test(text) || /rounded/.test(sound)) return 'Round your lips tightly and keep the tongue forward.';
+            if (/nasal|an|on|in/.test(sound + text)) return 'Let the sound resonate through the nose and do not pronounce the final N.';
+        }
+
+        if (this.targetLanguage === 'zh') {
+            if (/[34]/.test(sound)) return 'Keep the tone shape clear: third tone dips, fourth tone falls strongly.';
+            if (/x|q|j|zh|sh|ch/.test(sound + text)) return 'Keep the tongue high and the airflow narrow for these consonants.';
+        }
+
+        if (this.targetLanguage === 'ky') {
+            if (/[өү]/.test(text)) return 'Round your lips and keep the vowel pure from start to finish.';
+            if (/ң/.test(text)) return 'Finish with the back of the tongue raised for NG.';
+        }
+
+        if (this.targetLanguage === 'ru') {
+            if (/ь|мяг/.test(sound + text)) return 'Soften the consonant by lifting the middle of the tongue toward the palate.';
+            if (/р/.test(text)) return 'Tap the Russian R clearly and keep it energetic.';
+            if (/ё|ю|я/.test(text)) return 'Open the vowel clearly and lean into the stressed syllable.';
+        }
+
+        return this.ui.text.defaultMouthTip || 'Watch the shape of your mouth and keep the sound smooth.';
+    }
+
+    getIntonationTip(item) {
+        const text = this.getDisplayText(item);
+        if (!text) {
+            return this.ui.text.defaultRhythmTip || 'Keep the phrase even and clear.';
+        }
+        const words = text.split(/\s+/).filter(Boolean);
+        if (typeof item === 'object' && item.kind === 'phrase') {
+            const focusWord = words.reduce((best, word) => word.length > best.length ? word : best, words[0] || '');
+            const endsQuestion = /[?？]$/.test(text);
+            const contour = endsQuestion ? 'Let your voice rise a little at the end.' : 'Finish with a calm falling tone.';
+            return focusWord
+                ? `Stress "${focusWord}" a little more. ${contour}`
+                : contour;
+        }
+        if (words.length === 1 && words[0]) {
+            return `Keep the strongest energy on "${words[0]}".`;
+        }
+        return this.ui.text.defaultRhythmTip || 'Keep the phrase even and clear.';
+    }
+
+    scoreSpeechAttempt(expectedText, heardText) {
+        const expected = this.normalizeForSpeechCompare(expectedText);
+        const heard = this.normalizeForSpeechCompare(heardText);
+        const expectedWords = expected ? expected.split(' ').filter(Boolean) : [];
+        const heardWords = heard ? heard.split(' ').filter(Boolean) : [];
+        const missed = expectedWords.filter(word => !heardWords.includes(word));
+        const extra = heardWords.filter(word => !expectedWords.includes(word));
+        const matches = expectedWords.filter(word => heardWords.includes(word)).length;
+        const score = expectedWords.length ? Math.round((matches / expectedWords.length) * 100) : 0;
+        return { missed, extra, score };
+    }
+
+    getMinimalPairCandidate(item) {
+        const currentText = this.getNormalizedText(item);
+        if (!currentText || !this.currentList.length) return null;
+        const sound = typeof item === 'object' ? (item.sound || '') : '';
+
+        const scored = this.currentList
+            .filter(candidate => this.getItemKey(candidate) !== this.getItemKey(item))
+            .map(candidate => {
+                const candidateText = this.getNormalizedText(candidate);
+                if (!candidateText) return null;
+                let score = 0;
+                if (candidateText.length === currentText.length) score += 3;
+                if (candidateText[0] === currentText[0]) score += 2;
+                if (candidateText.slice(-1) === currentText.slice(-1)) score += 2;
+                if (sound && typeof candidate === 'object' && candidate.sound === sound) score += 4;
+                if (Math.abs(candidateText.length - currentText.length) <= 2) score += 2;
+                return { candidate, score };
+            })
+            .filter(Boolean)
+            .sort((a, b) => b.score - a.score);
+
+        return scored[0]?.score > 0 ? scored[0].candidate : null;
+    }
+
+    buildListeningOptions(item) {
+        const target = this.getDisplayText(item);
+        const distractors = this.currentList
+            .filter(candidate => this.getItemKey(candidate) !== this.getItemKey(item))
+            .map(candidate => this.getDisplayText(candidate))
+            .filter(Boolean)
+            .filter(text => text !== target)
+            .slice(0, 6);
+        const selected = [target];
+        while (selected.length < 3 && distractors.length) {
+            const next = distractors.splice(Math.floor(Math.random() * distractors.length), 1)[0];
+            if (!selected.includes(next)) selected.push(next);
+        }
+        const options = [...selected];
+        this.shuffle(options);
+        return options;
+    }
+
+    buildPracticeLabData() {
+        const item = this.getCurrentItem();
+        const stats = item ? this.getItemStats(item) : { attempts: 0, successes: 0 };
+        const mastery = item ? this.getMasteryPercent(item) : 0;
+        const minimalPair = item ? this.getMinimalPairCandidate(item) : null;
+        return {
+            masteryLabel: `${this.ui.text.mastery || 'Mastery'} ${mastery}%`,
+            syllables: this.getSyllableParts(item),
+            activeSyllable: -1,
+            mouthTip: this.getMouthTip(item),
+            intonationTip: this.getIntonationTip(item),
+            minimalPairText: minimalPair
+                ? `${this.getDisplayText(item)} / ${this.getDisplayText(minimalPair)}`
+                : (this.ui.text.noMinimalPair || 'No contrast partner yet.'),
+            listenQuiz: this.listeningQuiz
+                ? {
+                    visible: true,
+                    question: this.ui.text.listenQuizQuestion || 'Which one did you hear?',
+                    result: this.listeningQuiz.result || '',
+                    options: this.listeningQuiz.options.map((option, index) => ({
+                        label: option,
+                        state: this.listeningQuiz.revealed
+                            ? (option === this.listeningQuiz.correct
+                                ? 'correct'
+                                : (index === this.listeningQuiz.selectedIndex ? 'wrong' : ''))
+                            : ''
+                    }))
+                }
+                : { visible: false }
+        };
+    }
+
+    updatePracticeLab(activeSyllable = -1) {
+        const data = this.buildPracticeLabData();
+        data.activeSyllable = activeSyllable;
+        this.ui.renderPronunciationLab(data);
+    }
+
+    clearSyllableHighlightTimer() {
+        if (this.activeSyllableTimer) {
+            clearInterval(this.activeSyllableTimer);
+            this.activeSyllableTimer = null;
+        }
+    }
+
+    highlightSyllablesForPlayback(item, rate = 0.7) {
+        this.clearSyllableHighlightTimer();
+        const parts = this.getSyllableParts(item);
+        if (!parts.length) {
+            this.updatePracticeLab(-1);
+            return;
+        }
+        let index = 0;
+        this.updatePracticeLab(index);
+        const duration = Math.max(260, Math.round((900 / Math.max(rate, 0.55))));
+        this.activeSyllableTimer = setInterval(() => {
+            index += 1;
+            if (index >= parts.length) {
+                this.clearSyllableHighlightTimer();
+                this.updatePracticeLab(-1);
+                return;
+            }
+            this.updatePracticeLab(index);
+        }, duration);
+    }
+
+    speakCurrentItem(rate = null, onEnd = null) {
+        const item = this.getCurrentItem();
+        if (!item) return;
+        const speechText = this.getText(item);
+        this.highlightSyllablesForPlayback(item, rate ?? 0.9);
+        this.voice.speak(speechText, rate, {
+            onEnd: () => {
+                this.clearSyllableHighlightTimer();
+                this.updatePracticeLab(-1);
+                if (onEnd) onEnd();
+            }
+        });
+    }
+
+    playSlowAudio() {
+        if (this.isPaused || !this.currentList.length) return;
+        this.speakCurrentItem(0.62);
+    }
+
+    startShadowing() {
+        if (this.isPaused || !this.currentList.length) return;
+        clearTimeout(this.shadowTimeout);
+        this.resetSpeechFeedback();
+        this.speakCurrentItem(0.72, () => {
+            this.shadowTimeout = setTimeout(() => {
+                this.toggleRecording();
+            }, 500);
+        });
+    }
+
+    startListeningQuiz() {
+        if (this.isPaused || !this.currentList.length) return;
+        const item = this.getCurrentItem();
+        const options = this.buildListeningOptions(item);
+        this.listeningQuiz = {
+            correct: this.getDisplayText(item),
+            options,
+            result: '',
+            revealed: false,
+            selectedIndex: -1
+        };
+        this.updatePracticeLab();
+        this.voice.speak(this.getDisplayText(item), 0.88);
+        const stats = this.getItemStats(item);
+        stats.listens += 1;
+    }
+
+    chooseListeningOption(index) {
+        if (!this.listeningQuiz) return;
+        this.listeningQuiz.selectedIndex = index;
+        this.listeningQuiz.revealed = true;
+        const chosen = this.listeningQuiz.options[index];
+        const correct = chosen === this.listeningQuiz.correct;
+        this.listeningQuiz.result = correct
+            ? (this.ui.text.listenCorrect || 'Correct')
+            : (this.ui.text.listenWrong || 'Listen again');
+        if (!correct) {
+            this.voice.speak(this.listeningQuiz.correct, 0.88);
+        }
+        this.updatePracticeLab();
+    }
+
+    playMinimalPair() {
+        if (this.isPaused || !this.currentList.length) return;
+        const item = this.getCurrentItem();
+        const pair = this.getMinimalPairCandidate(item);
+        if (!pair) {
+            this.updatePracticeLab();
+            return;
+        }
+        this.voice.speak(`${this.getDisplayText(item)} ... ${this.getDisplayText(pair)}`, 0.78);
+    }
+
+    reinforceCurrentItem(success = false) {
+        const item = this.getCurrentItem();
+        if (!item || !this.currentList.length) return;
+        const key = this.getItemKey(item);
+        this.currentList = this.currentList.filter((entry, index) => {
+            if (index === this.currentIndex) return true;
+            return this.getItemKey(entry) !== key;
+        });
+        const insertAt = Math.min(this.currentList.length, this.currentIndex + (success ? 4 : 2));
+        this.currentList.splice(insertAt, 0, item);
+    }
+
     nextItem() {
         if (this.isPaused) return;
 
         this.resetSpeechFeedback();
+        this.listeningQuiz = null;
         this.currentIndex++;
         if (this.currentIndex >= this.currentList.length) {
             this.currentIndex = 0;
@@ -459,27 +793,30 @@ class App {
         this.ui.updateCard(nextItem, this.isFlipped);
         this.isFlipped = !this.isFlipped;
         this.ui.updateDifficultButton(this.isCurrentItemDifficult());
+        this.updatePracticeLab();
 
-        this.voice.speak(this.getText(nextItem));
+        this.speakCurrentItem();
     }
 
     prevItem() {
         if (this.isPaused || this.currentIndex === 0) return;
 
         this.resetSpeechFeedback();
+        this.listeningQuiz = null;
         this.currentIndex--;
 
         const prevItem = this.currentList[this.currentIndex];
         this.ui.updateCard(prevItem, this.isFlipped);
         this.isFlipped = !this.isFlipped;
         this.ui.updateDifficultButton(this.isCurrentItemDifficult());
+        this.updatePracticeLab();
 
-        this.voice.speak(this.getText(prevItem));
+        this.speakCurrentItem();
     }
 
     repeatItem() {
         if (this.isPaused) return;
-        this.voice.speak(this.getText(this.currentList[this.currentIndex]));
+        this.speakCurrentItem();
     }
 
     toggleRecording() {
@@ -522,6 +859,7 @@ class App {
 
         this.ui.updateDifficultButton(this.isCurrentItemDifficult());
         this.ui.updateDifficultSummary(this.difficultItems.length);
+        this.updatePracticeLab();
     }
 
     startDifficultPractice() {
@@ -534,6 +872,8 @@ class App {
         this.isPaused = !this.isPaused;
         if (this.isPaused) {
             this.recognition.stop();
+            clearTimeout(this.shadowTimeout);
+            this.clearSyllableHighlightTimer();
         }
         if (this.isPaused) {
             this.timer.stop();
@@ -545,15 +885,20 @@ class App {
 
     endGame() {
         this.recognition.stop();
+        clearTimeout(this.shadowTimeout);
+        this.clearSyllableHighlightTimer();
         this.ui.updateDifficultSummary(this.difficultItems.length);
         this.ui.showScreen('end');
     }
 
     exitToMenu() {
         this.recognition.stop();
+        clearTimeout(this.shadowTimeout);
+        this.clearSyllableHighlightTimer();
         this.resetSpeechFeedback();
         this.timer.stop();
         this.practiceSourceList = null;
+        this.listeningQuiz = null;
         this.ui.showScreen('start');
     }
 
@@ -607,6 +952,14 @@ class App {
     buildSpeechFeedback(state, transcript = '', expectedText = '') {
         const isMatch = state === 'result' && this.isSpeechMatch(expectedText, transcript);
         const isClose = state === 'result' && !isMatch && transcript;
+        const analysis = state === 'result' ? this.scoreSpeechAttempt(expectedText, transcript) : null;
+        const analysisText = analysis
+            ? [
+                `${this.ui.text.speechScore || 'Score'}: ${analysis.score}%`,
+                analysis.missed.length ? `${this.ui.text.speechMissed || 'Missed'}: ${analysis.missed.join(', ')}` : '',
+                analysis.extra.length ? `${this.ui.text.speechExtra || 'Extra'}: ${analysis.extra.join(', ')}` : ''
+            ].filter(Boolean).join(' | ')
+            : '';
         const statusMap = {
             idle: this.ui.text.speechIdle || 'Tap the mic and say the card.',
             listening: this.ui.text.speechListening || 'Listening...',
@@ -625,6 +978,7 @@ class App {
             status: statusMap[state] || statusMap.error,
             transcript: transcript || '',
             tone: isMatch ? 'success' : (isClose ? 'warning' : state),
+            analysis: analysisText,
             badge: isMatch
                 ? (this.ui.text.speechGreat || 'Great pronunciation!')
                 : (isClose ? (this.ui.text.speechTryAgain || 'Try again') : '')
@@ -632,9 +986,22 @@ class App {
     }
 
     handleRecognitionUpdate({ state, transcript = '', expectedText = '' }) {
+        if (state === 'result') {
+            const item = this.getCurrentItem();
+            const stats = this.getItemStats(item);
+            stats.attempts += 1;
+            if (this.isSpeechMatch(expectedText, transcript)) {
+                stats.successes += 1;
+                this.reinforceCurrentItem(true);
+            } else {
+                stats.misses += 1;
+                this.reinforceCurrentItem(false);
+            }
+        }
         this.speechFeedback = this.buildSpeechFeedback(state, transcript, expectedText);
         this.ui.updateRecordButton(this.recognition.isListening, this.recognition.supported);
         this.ui.updateSpeechFeedback(this.speechFeedback);
+        this.updatePracticeLab();
     }
 
     resetSpeechFeedback() {
@@ -642,6 +1009,7 @@ class App {
         this.speechFeedback = this.buildSpeechFeedback('idle');
         this.ui.updateRecordButton(false, this.recognition.supported);
         this.ui.updateSpeechFeedback(this.speechFeedback);
+        this.updatePracticeLab();
     }
 
     shuffle(array) {

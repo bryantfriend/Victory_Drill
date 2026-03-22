@@ -279,6 +279,13 @@ body {
 .card-face {
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
+    justify-content: flex-start;
+    padding-top: 1.35rem;
+    padding-bottom: 1.35rem;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
 }
 
 .card-face-back {
@@ -462,6 +469,7 @@ body {
 }
 
 .game-shell {
+    min-height: min(100dvh - 2rem, 58rem);
     background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.78)),
         radial-gradient(circle at top, rgba(191, 219, 254, 0.35), transparent 35%);
@@ -470,6 +478,24 @@ body {
         0 28px 60px rgba(99, 102, 241, 0.12),
         inset 0 1px 0 rgba(255, 255, 255, 0.75);
     backdrop-filter: blur(14px);
+}
+
+.game-header {
+    gap: 0.9rem;
+}
+
+.game-status-row {
+    flex: 1;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.game-card-stage {
+    height: clamp(17rem, 40vh, 27rem);
+}
+
+.game-card {
+    height: clamp(17rem, 34vh, 24rem);
 }
 
 .game-shell-glow {
@@ -528,6 +554,195 @@ body {
     border-radius: 999px;
     background: radial-gradient(circle, rgba(56, 189, 248, 0.14), transparent 68%);
     pointer-events: none;
+}
+
+.pronunciation-lab-panel {
+    border-radius: 1.5rem;
+    border: 1px solid rgba(196, 181, 253, 0.7);
+    background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(245, 243, 255, 0.9));
+    box-shadow:
+        0 18px 35px rgba(109, 40, 217, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.85);
+    padding: 1rem;
+}
+
+.pronunciation-lab-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.8rem;
+    align-items: flex-start;
+}
+
+.pronunciation-lab-title {
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #6d28d9;
+}
+
+.pronunciation-lab-subtitle {
+    margin-top: 0.3rem;
+    font-size: 0.93rem;
+    line-height: 1.4;
+    font-weight: 700;
+    color: #312e81;
+}
+
+.pronunciation-lab-chip {
+    flex-shrink: 0;
+    border-radius: 999px;
+    padding: 0.5rem 0.7rem;
+    background: rgba(237, 233, 254, 0.9);
+    border: 1px solid rgba(196, 181, 253, 0.95);
+    color: #6d28d9;
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.pronunciation-lab-actions {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.65rem;
+    margin-top: 1rem;
+}
+
+.lab-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    border-radius: 1rem;
+    border: 1px solid rgba(224, 231, 255, 0.95);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(238, 242, 255, 0.95));
+    color: #4f46e5;
+    padding: 0.75rem 0.55rem;
+    font-size: 0.8rem;
+    font-weight: 800;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.lab-action-btn:hover {
+    transform: translateY(-1px);
+    border-color: rgba(129, 140, 248, 0.9);
+}
+
+.pronunciation-lab-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.lab-card {
+    min-height: 6.8rem;
+    border-radius: 1.15rem;
+    border: 1px solid rgba(224, 231, 255, 0.9);
+    background: rgba(255, 255, 255, 0.84);
+    padding: 0.85rem 0.9rem;
+}
+
+.lab-card-label {
+    font-size: 0.68rem;
+    font-weight: 900;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #7c3aed;
+}
+
+.lab-card-text {
+    margin-top: 0.45rem;
+    font-size: 0.92rem;
+    line-height: 1.45;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.syllable-highlight {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.6rem;
+}
+
+.syllable-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    padding: 0.35rem 0.7rem;
+    background: rgba(224, 231, 255, 0.9);
+    color: #4338ca;
+    font-size: 0.84rem;
+    font-weight: 900;
+    transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.syllable-chip.active {
+    transform: translateY(-1px) scale(1.04);
+    background: linear-gradient(180deg, #8b5cf6, #6366f1);
+    color: #fff;
+}
+
+.listen-quiz-panel {
+    margin-top: 1rem;
+    border-radius: 1.2rem;
+    border: 1px solid rgba(186, 230, 253, 0.8);
+    background: rgba(240, 249, 255, 0.92);
+    padding: 0.9rem;
+}
+
+.listen-quiz-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.8rem;
+    align-items: center;
+}
+
+.listen-quiz-question {
+    font-size: 0.88rem;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.listen-quiz-result {
+    font-size: 0.78rem;
+    font-weight: 900;
+    color: #0369a1;
+}
+
+.listen-quiz-options {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.6rem;
+    margin-top: 0.8rem;
+}
+
+.listen-quiz-option {
+    border-radius: 1rem;
+    border: 1px solid rgba(191, 219, 254, 0.9);
+    background: #fff;
+    color: #1e3a8a;
+    padding: 0.7rem 0.55rem;
+    font-size: 0.85rem;
+    font-weight: 800;
+    line-height: 1.25;
+}
+
+.listen-quiz-option.is-correct {
+    background: rgba(220, 252, 231, 0.96);
+    border-color: rgba(74, 222, 128, 0.9);
+    color: #166534;
+}
+
+.listen-quiz-option.is-wrong {
+    background: rgba(254, 226, 226, 0.96);
+    border-color: rgba(248, 113, 113, 0.9);
+    color: #991b1b;
 }
 
 .speech-feedback-header {
@@ -639,6 +854,7 @@ body {
     justify-content: center;
     align-items: center;
     gap: 1rem;
+    flex-wrap: wrap;
     padding: 1rem 1.15rem;
     border-radius: 999px;
     background: rgba(255, 255, 255, 0.7);
@@ -699,15 +915,168 @@ body {
 }
 
 @media (max-width: 640px) {
+    body {
+        align-items: stretch;
+        min-height: 100dvh;
+        padding: 0.75rem;
+    }
+
+    #app-container {
+        max-width: none;
+    }
+
     .game-shell {
+        min-height: calc(100dvh - 1.5rem);
         padding-left: 1rem;
         padding-right: 1rem;
+        padding-top: 0.9rem;
+        padding-bottom: 0.9rem;
         border-radius: 1.6rem;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    .game-header {
+        position: sticky;
+        top: 0;
+        z-index: 30;
+        padding-bottom: 0.35rem;
+        margin-bottom: 0.9rem;
+        background: linear-gradient(180deg, rgba(246, 247, 255, 0.96), rgba(246, 247, 255, 0.8), transparent);
+        backdrop-filter: blur(8px);
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .game-header > button {
+        flex: 0 0 auto;
+    }
+
+    .game-status-row {
+        order: 3;
+        width: 100%;
+        gap: 0.6rem;
+        font-size: 1rem;
+    }
+
+    .game-status-row > div {
+        padding: 0.6rem 0.8rem;
+        font-size: 0.95rem;
+    }
+
+    .game-status-row i {
+        width: 1rem;
+        height: 1rem;
+    }
+
+    .game-card-stage {
+        height: auto;
+        min-height: 0;
+        align-items: stretch;
+        margin-top: 0.25rem;
+    }
+
+    .game-card {
+        height: min(22rem, 52vh);
+    }
+
+    .card-stage::before {
+        inset: 3% 2% 0;
+        border-radius: 1.5rem;
+    }
+
+    .card-face {
+        padding: 1rem 0.95rem 1.15rem;
+    }
+
+    #card-front,
+    #card-back {
+        font-size: 2rem;
+        line-height: 1.05;
+    }
+
+    #card-front img,
+    #card-back img {
+        max-width: 100%;
+        max-height: 7rem;
+    }
+
+    #card-front .w-32,
+    #card-back .w-32 {
+        width: 6.5rem;
+        height: 6.5rem;
     }
 
     .control-dock {
-        gap: 0.8rem;
-        padding: 0.85rem 0.9rem;
+        gap: 0.65rem;
+        padding: 0.7rem 0.75rem;
+        margin-top: 1rem;
+        border-radius: 1.4rem;
+    }
+
+    .control-dock > button {
+        width: 3rem;
+        height: 3rem;
+        border-bottom-width: 3px;
+    }
+
+    .control-dock > button i {
+        width: 1.15rem;
+        height: 1.15rem;
+    }
+
+    .control-dock > #play-btn {
+        width: 4.25rem;
+        height: 4.25rem;
+        border-bottom-width: 5px;
+    }
+
+    .control-dock > #play-btn i {
+        width: 1.8rem;
+        height: 1.8rem;
+    }
+
+    .record-btn-ring {
+        inset: -0.32rem;
+    }
+
+    #tap-hint {
+        margin-top: 0.9rem;
+        margin-bottom: 0.2rem;
+        font-size: 0.78rem;
+    }
+
+    .speech-feedback-panel {
+        margin-top: 0.9rem;
+        padding: 0.9rem 0.85rem;
+    }
+
+    .pronunciation-lab-panel {
+        margin-top: 0.9rem;
+        padding: 0.9rem 0.85rem;
+    }
+
+    .pronunciation-lab-header,
+    .listen-quiz-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .pronunciation-lab-actions {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .pronunciation-lab-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .listen-quiz-options {
+        grid-template-columns: 1fr;
+    }
+
+    .lab-action-btn {
+        font-size: 0.76rem;
+        padding: 0.7rem 0.5rem;
     }
 
     .speech-feedback-header {
@@ -722,5 +1091,10 @@ body {
         min-height: 1.2rem;
         justify-content: center;
         padding-top: 0;
+    }
+
+    .speech-feedback-status,
+    .speech-feedback-heard {
+        font-size: 0.9rem;
     }
 }

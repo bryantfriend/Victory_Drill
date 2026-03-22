@@ -155,18 +155,18 @@
         </div>
 
         <!-- Game Screen -->
-        <div id="game-screen" class="hidden relative game-shell overflow-hidden rounded-[2rem] px-4 py-5 md:px-6 md:py-6">
+        <div id="game-screen" class="hidden relative game-shell rounded-[2rem] px-4 py-5 md:px-6 md:py-6">
             <div class="game-shell-glow game-shell-glow-a"></div>
             <div class="game-shell-glow game-shell-glow-b"></div>
             <!-- Header Controls -->
-            <div class="relative z-10 flex justify-between items-center mb-6">
+            <div class="relative z-10 game-header flex justify-between items-center mb-6">
                 <button id="exit-game"
                     class="p-2 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-700 transition-colors">
                     <i data-lucide="arrow-left" class="w-6 h-6"></i>
                 </button>
 
                 <!-- Timer & Score -->
-                <div class="flex gap-4 text-xl font-bold">
+                <div class="game-status-row flex gap-4 text-xl font-bold">
                     <div
                         class="bg-white rounded-lg px-4 py-2 shadow-sm border border-slate-100 flex items-center gap-2">
                         <i data-lucide="clock" class="w-5 h-5 text-indigo-500"></i>
@@ -186,8 +186,8 @@
             </div>
 
             <!-- Card Area -->
-            <div class="card-stage perspective-1000 flex items-center justify-center relative z-10" style="height: 40vh;">
-                <div id="drill-card" class="card relative w-full h-72 cursor-pointer">
+            <div class="card-stage game-card-stage perspective-1000 flex items-center justify-center relative z-10">
+                <div id="drill-card" class="card relative w-full game-card cursor-pointer">
                     <div id="card-front"
                         class="card-face absolute inset-0 flex flex-col items-center justify-center bg-white rounded-3xl shadow-2xl text-6xl md:text-7xl font-black text-indigo-800 select-none p-4 break-all border-4 border-white">
                         <!-- Front text -->
@@ -222,6 +222,62 @@
                         <p id="speech-feedback-heard-label" class="speech-feedback-heard-label">What I heard</p>
                         <p id="speech-feedback-heard" class="speech-feedback-heard"></p>
                     </div>
+                </div>
+            </div>
+
+            <div id="pronunciation-lab" class="pronunciation-lab-panel mt-5 relative z-10 text-left">
+                <div class="pronunciation-lab-header">
+                    <div>
+                        <p id="lab-title" class="pronunciation-lab-title">Pronunciation Lab</p>
+                        <p id="lab-subtitle" class="pronunciation-lab-subtitle">Practice the sound, rhythm, and contrast of this card.</p>
+                    </div>
+                    <div id="mastery-chip" class="pronunciation-lab-chip">Mastery 0%</div>
+                </div>
+
+                <div class="pronunciation-lab-actions">
+                    <button id="slow-play-btn" class="lab-action-btn" type="button">
+                        <i data-lucide="turtle" class="w-4 h-4"></i>
+                        <span id="slow-play-label">Slow</span>
+                    </button>
+                    <button id="shadow-btn" class="lab-action-btn" type="button">
+                        <i data-lucide="repeat-2" class="w-4 h-4"></i>
+                        <span id="shadow-label">Shadow</span>
+                    </button>
+                    <button id="listen-quiz-btn" class="lab-action-btn" type="button">
+                        <i data-lucide="ear" class="w-4 h-4"></i>
+                        <span id="listen-quiz-label">Listen</span>
+                    </button>
+                    <button id="minimal-pair-btn" class="lab-action-btn" type="button">
+                        <i data-lucide="git-compare-arrows" class="w-4 h-4"></i>
+                        <span id="minimal-pair-label">Contrast</span>
+                    </button>
+                </div>
+
+                <div class="pronunciation-lab-grid">
+                    <div class="lab-card">
+                        <p id="syllable-highlight-label" class="lab-card-label">Syllables</p>
+                        <div id="syllable-highlight" class="syllable-highlight"></div>
+                    </div>
+                    <div class="lab-card">
+                        <p id="mouth-tip-label" class="lab-card-label">Mouth Tip</p>
+                        <p id="mouth-tip" class="lab-card-text">Watch the shape of your mouth and keep the sound smooth.</p>
+                    </div>
+                    <div class="lab-card">
+                        <p id="intonation-label" class="lab-card-label">Rhythm</p>
+                        <p id="intonation-tip" class="lab-card-text">Keep the phrase even and clear.</p>
+                    </div>
+                    <div class="lab-card">
+                        <p id="minimal-pair-panel-label" class="lab-card-label">Minimal Pair</p>
+                        <p id="minimal-pair-text" class="lab-card-text">No contrast partner yet.</p>
+                    </div>
+                </div>
+
+                <div id="listen-quiz-panel" class="listen-quiz-panel hidden">
+                    <div class="listen-quiz-header">
+                        <p id="listen-quiz-question" class="listen-quiz-question">Which one did you hear?</p>
+                        <p id="listen-quiz-result" class="listen-quiz-result"></p>
+                    </div>
+                    <div id="listen-quiz-options" class="listen-quiz-options"></div>
                 </div>
             </div>
 

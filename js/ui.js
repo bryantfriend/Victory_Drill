@@ -47,6 +47,25 @@ export class UIManager {
         this.speechFeedbackHeardWrap = document.getElementById('speech-feedback-heard-wrap');
         this.speechFeedbackHeardLabel = document.getElementById('speech-feedback-heard-label');
         this.speechFeedbackHeard = document.getElementById('speech-feedback-heard');
+        this.labTitle = document.getElementById('lab-title');
+        this.labSubtitle = document.getElementById('lab-subtitle');
+        this.masteryChip = document.getElementById('mastery-chip');
+        this.syllableHighlightLabel = document.getElementById('syllable-highlight-label');
+        this.syllableHighlight = document.getElementById('syllable-highlight');
+        this.mouthTipLabel = document.getElementById('mouth-tip-label');
+        this.mouthTip = document.getElementById('mouth-tip');
+        this.intonationLabel = document.getElementById('intonation-label');
+        this.intonationTip = document.getElementById('intonation-tip');
+        this.minimalPairPanelLabel = document.getElementById('minimal-pair-panel-label');
+        this.minimalPairText = document.getElementById('minimal-pair-text');
+        this.slowPlayLabel = document.getElementById('slow-play-label');
+        this.shadowLabel = document.getElementById('shadow-label');
+        this.listenQuizLabel = document.getElementById('listen-quiz-label');
+        this.minimalPairLabel = document.getElementById('minimal-pair-label');
+        this.listenQuizPanel = document.getElementById('listen-quiz-panel');
+        this.listenQuizQuestion = document.getElementById('listen-quiz-question');
+        this.listenQuizResult = document.getElementById('listen-quiz-result');
+        this.listenQuizOptions = document.getElementById('listen-quiz-options');
 
         this.card = document.getElementById('drill-card');
         this.cardFront = document.getElementById('card-front');
@@ -60,6 +79,10 @@ export class UIManager {
         this.playBtn = document.getElementById('play-btn');
         this.nextBtn = document.getElementById('next-btn');
         this.practiceDifficultBtn = document.getElementById('practice-difficult-btn');
+        this.slowPlayBtn = document.getElementById('slow-play-btn');
+        this.shadowBtn = document.getElementById('shadow-btn');
+        this.listenQuizBtn = document.getElementById('listen-quiz-btn');
+        this.minimalPairBtn = document.getElementById('minimal-pair-btn');
 
         // Setup Event Listeners
         this.card.onclick = () => this.callbacks.onNextItem();
@@ -72,6 +95,10 @@ export class UIManager {
         this.pronunciationToggleBtn.onclick = () => this.callbacks.onTogglePronunciation();
         this.meaningToggleBtn.onclick = () => this.callbacks.onToggleMeanings();
         this.categorySearch.oninput = () => this.applyCategoryFilter();
+        this.slowPlayBtn.onclick = () => this.callbacks.onSlowPlay();
+        this.shadowBtn.onclick = () => this.callbacks.onShadow();
+        this.listenQuizBtn.onclick = () => this.callbacks.onStartListeningQuiz();
+        this.minimalPairBtn.onclick = () => this.callbacks.onPlayMinimalPair();
     }
 
     applyTranslations(language, text) {
@@ -106,6 +133,17 @@ export class UIManager {
         document.getElementById('words-label').innerText = text.wordsLabel;
         this.speechFeedbackLabel.innerText = text.speechFeedback || 'Speech check';
         this.speechFeedbackHeardLabel.innerText = text.speechHeard || 'What I heard';
+        this.labTitle.innerText = text.labTitle || 'Pronunciation Lab';
+        this.labSubtitle.innerText = text.labSubtitle || 'Practice the sound, rhythm, and contrast of this card.';
+        this.syllableHighlightLabel.innerText = text.syllableLabel || 'Syllables';
+        this.mouthTipLabel.innerText = text.mouthTipLabel || 'Mouth Tip';
+        this.intonationLabel.innerText = text.intonationLabel || 'Rhythm';
+        this.minimalPairPanelLabel.innerText = text.minimalPairPanelLabel || 'Minimal Pair';
+        this.slowPlayLabel.innerText = text.slowPlay || 'Slow';
+        this.shadowLabel.innerText = text.shadowMode || 'Shadow';
+        this.listenQuizLabel.innerText = text.listenQuiz || 'Listen';
+        this.minimalPairLabel.innerText = text.minimalPairAction || 'Contrast';
+        this.listenQuizQuestion.innerText = text.listenQuizQuestion || 'Which one did you hear?';
         document.getElementById('menu-btn').innerText = text.menu;
         document.getElementById('replay-btn').innerText = text.replay;
         this.practiceDifficultBtn.innerText = text.difficult;
@@ -219,7 +257,7 @@ export class UIManager {
             ? (this.text.speechStop || 'Stop recording')
             : (this.text.speechRecord || 'Record your voice');
         this.recordBtn.style.setProperty('--shadow-color', isListening ? '#9f1239' : (isSupported ? '#38bdf8' : '#94a3b8'));
-        this.recordBtn.innerHTML = `<i data-lucide="${isListening ? 'mic-off' : 'mic'}" class="w-6 h-6"></i>`;
+        this.recordBtn.innerHTML = `<span class="record-btn-ring" aria-hidden="true"></span><i data-lucide="${isListening ? 'mic-off' : 'mic'}" class="w-6 h-6"></i>`;
         if (typeof lucide !== 'undefined') lucide.createIcons();
     }
 
@@ -237,6 +275,7 @@ export class UIManager {
         this.speechFeedbackStatus.innerText = feedback.status || '';
         this.speechFeedbackHeard.innerText = feedback.transcript || '';
         this.speechFeedbackHeardWrap.classList.toggle('hidden', !feedback.transcript);
+        this.speechFeedbackHeardWrap.title = feedback.analysis || '';
 
         const toneMap = {
             success: ['rgba(236, 253, 245, 0.98)', 'rgba(110, 231, 183, 0.9)', '#047857'],
@@ -264,6 +303,43 @@ export class UIManager {
         } else {
             this.speechFeedbackBadge.classList.add('hidden');
         }
+    }
+
+    setActiveSyllable(index = -1) {
+        this.syllableHighlight.querySelectorAll('.syllable-chip').forEach((chip, chipIndex) => {
+            chip.classList.toggle('active', chipIndex === index);
+        });
+    }
+
+    renderPronunciationLab(data = {}) {
+        this.masteryChip.innerText = data.masteryLabel || `${this.text.mastery || 'Mastery'} 0%`;
+        this.mouthTip.innerText = data.mouthTip || this.text.defaultMouthTip || 'Watch the shape of your mouth and keep the sound smooth.';
+        this.intonationTip.innerText = data.intonationTip || this.text.defaultRhythmTip || 'Keep the phrase even and clear.';
+        this.minimalPairText.innerText = data.minimalPairText || this.text.noMinimalPair || 'No contrast partner yet.';
+
+        this.syllableHighlight.innerHTML = '';
+        (data.syllables || []).forEach((syllable) => {
+            const chip = document.createElement('span');
+            chip.className = 'syllable-chip';
+            chip.innerText = syllable;
+            this.syllableHighlight.appendChild(chip);
+        });
+        this.setActiveSyllable(data.activeSyllable ?? -1);
+
+        this.listenQuizPanel.classList.toggle('hidden', !data.listenQuiz?.visible);
+        this.listenQuizResult.innerText = data.listenQuiz?.result || '';
+        this.listenQuizQuestion.innerText = data.listenQuiz?.question || this.text.listenQuizQuestion || 'Which one did you hear?';
+        this.listenQuizOptions.innerHTML = '';
+        (data.listenQuiz?.options || []).forEach((option, index) => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'listen-quiz-option';
+            btn.innerText = option.label;
+            if (option.state === 'correct') btn.classList.add('is-correct');
+            if (option.state === 'wrong') btn.classList.add('is-wrong');
+            btn.onclick = () => this.callbacks.onChooseListeningOption(index);
+            this.listenQuizOptions.appendChild(btn);
+        });
     }
 
     updatePauseUI(isPaused) {

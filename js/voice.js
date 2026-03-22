@@ -155,7 +155,7 @@ export class VoiceManager {
         this.currentSpeechLang = selection.lang;
     }
 
-    speak(text, rate = null) {
+    speak(text, rate = null, handlers = {}) {
         if (!text) return;
 
         this.synth.cancel();
@@ -167,6 +167,16 @@ export class VoiceManager {
         if (this.currentVoice) {
             utterance.voice = this.currentVoice;
             utterance.lang = this.currentVoice.lang || this.currentSpeechLang || this.currentLang;
+        }
+
+        if (handlers.onStart) {
+            utterance.onstart = handlers.onStart;
+        }
+        if (handlers.onEnd) {
+            utterance.onend = handlers.onEnd;
+        }
+        if (handlers.onError) {
+            utterance.onerror = handlers.onError;
         }
 
         this.synth.speak(utterance);
