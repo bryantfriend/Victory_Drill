@@ -306,9 +306,31 @@ class App {
             .filter(category => !categoryGroup || this.getCategoryGroup(category.key) === categoryGroup)
             .map(category => ({
             key: category.key,
-            label: category.labels?.[this.baseLanguage] || getCategoryLabel(category.key, this.baseLanguage)
+            label: category.labels?.[this.baseLanguage] || getCategoryLabel(category.key, this.baseLanguage),
+            tags: this.getCategoryTags(contentMode, categoryGroup)
         }));
         this.ui.renderCategories(categories, this.colors);
+    }
+
+    getCategoryTags(contentMode, categoryGroup) {
+        if (contentMode === 'letters') {
+            return [
+                { label: getUIText(this.baseLanguage, 'tagLetters'), tone: 'letters' },
+                { label: getUIText(this.baseLanguage, 'tagBeginner'), tone: 'beginner' }
+            ];
+        }
+
+        if (categoryGroup === 'sounds') {
+            return [
+                { label: getUIText(this.baseLanguage, 'tagSound'), tone: 'sound' },
+                { label: getUIText(this.baseLanguage, 'tagPronunciation'), tone: 'pronunciation' }
+            ];
+        }
+
+        return [
+            { label: getUIText(this.baseLanguage, 'tagTopic'), tone: 'topic' },
+            { label: getUIText(this.baseLanguage, 'tagBeginner'), tone: 'beginner' }
+        ];
     }
 
     getModeConfig() {
@@ -318,11 +340,21 @@ class App {
     getCategoryGroup(key) {
         const soundPatterns = [
             'long-e',
+            'th-sound',
+            'short-i',
+            'l-blend',
+            'v-w',
             'r-sound',
             'rounded-vowel',
+            'ng-sound',
             'zh-sh',
+            'x-q-j',
             'third-tone',
             'nasal',
+            'u-vs-ou',
+            'eu-sound',
+            'liaison',
+            'ou-sound',
             'vowel-sounds',
             'special-sounds',
             'special-letters',

@@ -103,19 +103,19 @@
             <!-- Mode Selection -->
             <nav class="grid grid-cols-2 md:grid-cols-5 gap-2 bg-slate-200 p-2 rounded-2xl w-full">
                 <button id="mode-letters"
-                    class="mode-btn btn-3d active px-3 py-2 rounded-xl text-sm font-bold transition selected"
+                    class="mode-btn mode-tone-letters btn-3d active px-3 py-2 rounded-xl text-sm font-bold transition selected flex items-center justify-center gap-2"
                     style="--shadow-color: #94a3b8;">Буквы</button>
                 <button id="mode-topic-words"
-                    class="mode-btn btn-3d px-3 py-2 rounded-xl text-sm font-bold transition bg-slate-100 text-slate-600"
+                    class="mode-btn mode-tone-topic btn-3d px-3 py-2 rounded-xl text-sm font-bold transition bg-slate-100 text-slate-600 flex items-center justify-center gap-2"
                     style="--shadow-color: #94a3b8;">Слова</button>
                 <button id="mode-sound-words"
-                    class="mode-btn btn-3d px-3 py-2 rounded-xl text-sm font-bold transition bg-slate-100 text-slate-600"
+                    class="mode-btn mode-tone-sound btn-3d px-3 py-2 rounded-xl text-sm font-bold transition bg-slate-100 text-slate-600 flex items-center justify-center gap-2"
                     style="--shadow-color: #94a3b8;">Слова по звукам</button>
                 <button id="mode-topic-phrases"
-                    class="mode-btn btn-3d px-3 py-2 rounded-xl text-sm font-bold transition bg-slate-100 text-slate-600"
+                    class="mode-btn mode-tone-topic btn-3d px-3 py-2 rounded-xl text-sm font-bold transition bg-slate-100 text-slate-600 flex items-center justify-center gap-2"
                     style="--shadow-color: #94a3b8;">Фразы</button>
                 <button id="mode-sound-phrases"
-                    class="mode-btn btn-3d px-3 py-2 rounded-xl text-sm font-bold transition bg-slate-100 text-slate-600"
+                    class="mode-btn mode-tone-sound btn-3d px-3 py-2 rounded-xl text-sm font-bold transition bg-slate-100 text-slate-600 flex items-center justify-center gap-2"
                     style="--shadow-color: #94a3b8;">Фразы</button>
             </nav>
 
@@ -142,7 +142,14 @@
             </div>
 
             <p id="category-prompt" class="text-lg text-slate-600">Выберите категорию:</p>
-            <div id="category-list" class="grid grid-cols-2 gap-3 h-80 overflow-y-auto pr-2 scrollbar-thin">
+            <div class="category-browser">
+                <div class="category-toolbar">
+                    <input id="category-search" type="text" class="category-search-input" placeholder="Search categories">
+                    <div id="category-count" class="category-count">0 categories</div>
+                </div>
+                <div id="category-empty" class="category-empty hidden">No categories match your search.</div>
+            </div>
+            <div id="category-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3 h-80 overflow-y-auto pr-2 scrollbar-thin">
                 <!-- Category buttons will be inserted here by JavaScript -->
             </div>
         </div>

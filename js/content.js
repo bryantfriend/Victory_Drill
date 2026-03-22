@@ -1,3 +1,4 @@
+import { CONTENT_BONUSES } from './content-extras.js';
 import { alphabetData, wordsData, phrasesData } from './data.js';
 
 const meanings = (en, zh, ky, ru, fr) => ({ en, zh, ky, ru, fr });
@@ -244,6 +245,110 @@ const russianContent = {
                 phrase('После школы я отдыхаю.', meanings('After school I rest.', '放学后我休息。', 'мектептен кийин эс алам.', 'после школы я отдыхаю.', 'apres l ecole je me repose.')),
                 phrase('Вечером я делаю уроки.', meanings('In the evening I do homework.', '晚上我做作业。', 'кечинде мен сабак окуйм.', 'вечером я делаю уроки.', 'le soir je fais mes devoirs.')),
                 phrase('Ночью я сплю.', meanings('At night I sleep.', '晚上我睡觉。', 'түнкүсүн мен уктайм.', 'ночью я сплю.', 'la nuit je dors.'))
+            ]),
+            category('Гласный А phrases', { en: 'Russian A Sound Phrases', zh: '俄语A元音短语', ky: 'Орусча А үндүү фразалар', ru: 'Фразы с гласной А', fr: 'Phrases russes avec le son A' }, [
+                phrase('Мама дома.', meanings('Mom is at home.', '妈妈在家。', 'апа үйдө.', 'мама дома.', 'maman est a la maison.'), { pronunciation: 'MA-ma DO-ma' }),
+                phrase('Папа рад.', meanings('Dad is happy.', '爸爸很高兴。', 'ата кубанычта.', 'папа рад.', 'papa est content.'), { pronunciation: 'PA-pa RAD' }),
+                phrase('Анна читает.', meanings('Anna is reading.', '安娜在读书。', 'Анна окуп жатат.', 'Анна читает.', 'Anna lit.'), { pronunciation: 'AN-na chi-TA-yet' }),
+                phrase('Лампа упала.', meanings('The lamp fell.', '灯掉了。', 'лампа кулап калды.', 'лампа упала.', 'la lampe est tombee.'), { pronunciation: 'LAM-pa u-PA-la' }),
+                phrase('Наша карта там.', meanings('Our map is there.', '我们的地图在那里。', 'биздин карта ал жакта.', 'наша карта там.', 'notre carte est la-bas.'), { pronunciation: 'NA-sha KAR-ta TAM' }),
+                phrase('Саша машет маме.', meanings('Sasha is waving to mom.', '萨沙在向妈妈挥手。', 'Саша апасына кол булгап жатат.', 'Саша машет маме.', 'Sacha fait signe a maman.'), { pronunciation: 'SA-sha MA-shet MA-me' })
+            ]),
+            category('Правило ЖИ-ШИ phrases', { en: 'Russian ZHI-SHI Rule Phrases', zh: '俄语ЖИ-ШИ规则短语', ky: 'Орусча ЖИ-ШИ эрежеси фразалар', ru: 'Фразы на правило ЖИ-ШИ', fr: 'Phrases russes sur la regle ZHI-SHI' }, [
+                phrase('Жираф живёт далеко.', meanings('The giraffe lives far away.', '长颈鹿住得很远。', 'жираф алыс жашайт.', 'жираф живёт далеко.', 'la girafe vit loin.'), { pronunciation: 'zhi-RAF zhi-VYOT da-la-KO' }),
+                phrase('Шина лежит тут.', meanings('The tire is lying here.', '轮胎在这里。', 'шина бул жерде жатат.', 'шина лежит тут.', 'le pneu est ici.'), { pronunciation: 'SHI-na le-ZHIT TUT' }),
+                phrase('Малыши спешат домой.', meanings('The little children hurry home.', '孩子们赶回家。', 'кичинелер үйгө шашып жатышат.', 'малыши спешат домой.', 'les petits se depechent de rentrer.'), { pronunciation: 'ma-ly-SHI spe-SHAT da-MOY' }),
+                phrase('У Маши жил жилец.', meanings('Masha had a lodger.', '玛莎有一个房客。', 'Машада квартирант болгон.', 'у Маши жил жилец.', 'Macha avait un locataire.'), { pronunciation: 'u MA-shi ZHIL zhi-LETS' }),
+                phrase('Шишки лежат в корзине.', meanings('Pinecones are in the basket.', '松果在篮子里。', 'бүрлөр себетте жатат.', 'шишки лежат в корзине.', 'les pommes de pin sont dans le panier.'), { pronunciation: 'SHISH-ki le-ZHAT v kar-ZI-ne' }),
+                phrase('Жили-были мыши.', meanings('Once there were mice.', '从前有老鼠。', 'илгери чычкандар болгон.', 'жили-были мыши.', 'il etait une fois des souris.'), { pronunciation: 'zhi-LI BY-li MY-shi' })
+            ]),
+            category('Мягкий знак phrases', { en: 'Russian Soft Sign Phrases', zh: '俄语软音符号短语', ky: 'Орусча жумшартуу белгиси фразалар', ru: 'Фразы с мягким знаком', fr: 'Phrases russes avec signe mou' }, [
+                phrase('День был тёплый.', meanings('The day was warm.', '那天天气很暖。', 'күн жылуу болду.', 'день был тёплый.', 'la journee etait douce.'), { pronunciation: 'DEN byl TYOP-lyy' }),
+                phrase('Конь бежит быстро.', meanings('The horse runs fast.', '马跑得很快。', 'ат тез чуркайт.', 'конь бежит быстро.', 'le cheval court vite.'), { pronunciation: 'KON bye-ZHIT BY-stra' }),
+                phrase('Учитель пишет мелом.', meanings('The teacher writes with chalk.', '老师用粉笔写字。', 'мугалим бор менен жазат.', 'учитель пишет мелом.', 'le professeur ecrit a la craie.'), { pronunciation: 'u-CHI-tel PI-shet MYE-lam' }),
+                phrase('Огонь ярко горит.', meanings('The fire burns brightly.', '火烧得很旺。', 'от жалындап күйүп жатат.', 'огонь ярко горит.', 'le feu brille vivement.'), { pronunciation: 'a-GON yar-ka ga-RIT' }),
+                phrase('Июль очень тёплый.', meanings('July is very warm.', '七月很暖和。', 'июль абдан жылуу.', 'июль очень тёплый.', 'juillet est tres chaud.'), { pronunciation: 'i-YUL o-chen TYOP-lyy' }),
+                phrase('Семь друзей здесь.', meanings('Seven friends are here.', '七个朋友在这里。', 'жети дос бул жерде.', 'семь друзей здесь.', 'sept amis sont ici.'), { pronunciation: 'SYEM dru-ZEY ZDES' })
+            ]),
+            category('Пары Б-П phrases', { en: 'Russian B-P Contrast Phrases', zh: '俄语B-P对比短语', ky: 'Орусча Б-П айырма фразалар', ru: 'Фразы на пары Б-П', fr: 'Phrases russes contraste B-P' }, [
+                phrase('Боря купил пирог.', meanings('Borya bought a pie.', '鲍里亚买了馅饼。', 'Боря пирог сатып алды.', 'Боря купил пирог.', 'Boria a achete une tourte.'), { pronunciation: 'BO-rya ku-PIL pi-ROG' }),
+                phrase('Папа берёт банку.', meanings('Dad takes a jar.', '爸爸拿一个罐子。', 'ата банка алып жатат.', 'папа берёт банку.', 'papa prend un bocal.'), { pronunciation: 'PA-pa bye-RYOT BAN-ku' }),
+                phrase('Белый пёс бежит.', meanings('A white dog is running.', '一只白狗在跑。', 'ак ит чуркап жатат.', 'белый пёс бежит.', 'un chien blanc court.'), { pronunciation: 'BYE-lyy PYOS bye-ZHIT' }),
+                phrase('Полка была пустой.', meanings('The shelf was empty.', '架子是空的。', 'текче бош болгон.', 'полка была пустой.', 'l etagere etait vide.'), { pronunciation: 'POL-ka by-LA pus-TOY' }),
+                phrase('Бабушка поёт песню.', meanings('Grandma sings a song.', '奶奶在唱歌。', 'чоң эне ырдап жатат.', 'бабушка поёт песню.', 'grand-mere chante une chanson.'), { pronunciation: 'BA-bush-ka pa-YOT PES-nyu' }),
+                phrase('Петя любит булку.', meanings('Petya likes a bun.', '彼佳喜欢小面包。', 'Петя токочту жакшы көрөт.', 'Петя любит булку.', 'Petia aime le petit pain.'), { pronunciation: 'PYE-tya LYU-bit BUL-ku' })
+            ]),
+            category('Правило ЧА-ЩА phrases', { en: 'Russian CHA-SHCHA Rule Phrases', zh: '俄语ЧА-ЩА规则短语', ky: 'Орусча ЧА-ЩА эрежеси фразалар', ru: 'Фразы на правило ЧА-ЩА', fr: 'Phrases russes sur la regle CHA-SHCHA' }, [
+                phrase('Чашка чая горячая.', meanings('The cup of tea is hot.', '这杯茶很热。', 'чай ысык.', 'чашка чая горячая.', 'la tasse de the est chaude.'), { pronunciation: 'CHASH-ka CHA-ya ga-RYA-cha-ya' }),
+                phrase('Щавель часто растёт там.', meanings('Sorrel often grows there.', '酸模常常长在那里。', 'щавель ал жерде көп өсөт.', 'щавель часто растёт там.', 'l oseille pousse souvent la-bas.'), { pronunciation: 'sha-VEL CHAS-ta ras-TYOT TAM' }),
+                phrase('Чайка кричала утром.', meanings('The seagull cried in the morning.', '海鸥早上叫了。', 'чайка эртең менен кыйкырды.', 'чайка кричала утром.', 'la mouette a crie le matin.'), { pronunciation: 'CHAI-ka kri-CHA-la U-tram' }),
+                phrase('Роща сначала молчала.', meanings('The grove was quiet at first.', '树林一开始很安静。', 'токой башында тынч болду.', 'роща сначала молчала.', 'le bosquet etait d abord silencieux.'), { pronunciation: 'RO-shcha sna-CHA-la mal-CHA-la' }),
+                phrase('Часто щука прячется.', meanings('The pike often hides.', '狗鱼经常躲起来。', 'шортан көп жашынат.', 'часто щука прячется.', 'le brochet se cache souvent.'), { pronunciation: 'CHAS-ta SHCHU-ka PRYA-chet-sya' }),
+                phrase('Чайник ждёт чашку.', meanings('The kettle is waiting for the cup.', '水壶在等杯子。', 'чайнек чөйчөктү күтүп жатат.', 'чайник ждёт чашку.', 'la bouilloire attend la tasse.'), { pronunciation: 'CHAI-nik ZHDYOT CHASH-ku' })
+            ]),
+            category('Пары Р-Л phrases', { en: 'Russian R-L Contrast Phrases', zh: '俄语R-L对比短语', ky: 'Орусча Р-Л айырма фразалар', ru: 'Фразы на пары Р-Л', fr: 'Phrases russes contraste R-L' }, [
+                phrase('Рома ловит рыбу.', meanings('Roma is catching fish.', '罗马在抓鱼。', 'Рома балык кармап жатат.', 'Рома ловит рыбу.', 'Roma attrape du poisson.'), { pronunciation: 'RO-ma LO-vit RY-bu' }),
+                phrase('Лара рисует луну.', meanings('Lara is drawing the moon.', '拉拉在画月亮。', 'Лара айды тартып жатат.', 'Лара рисует луну.', 'Lara dessine la lune.'), { pronunciation: 'LA-ra ri-SU-yet lu-NU' }),
+                phrase('Река около леса.', meanings('The river is near the forest.', '河在森林旁边。', 'дарыя токойдун жанында.', 'река около леса.', 'la riviere est pres de la foret.'), { pronunciation: 'ri-KA O-ka-la LE-sa' }),
+                phrase('Лев громко рычит.', meanings('The lion roars loudly.', '狮子大声吼叫。', 'арстан катуу күркүрөйт.', 'лев громко рычит.', 'le lion rugit fort.'), { pronunciation: 'LYEF GROM-ka ry-CHIT' }),
+                phrase('Рита любит роллы.', meanings('Rita likes rolls.', '丽塔喜欢寿司卷。', 'Рита роллдорду жакшы көрөт.', 'Рита любит роллы.', 'Rita aime les rolls.'), { pronunciation: 'RI-ta LYU-bit ROL-ly' }),
+                phrase('Лодка плывёт к берегу.', meanings('The boat is sailing to the shore.', '船正驶向岸边。', 'кайык жээкке сүзүп бара жатат.', 'лодка плывёт к берегу.', 'le bateau va vers le rivage.'), { pronunciation: 'LOT-ka ply-VYOT k BYE-ri-gu' })
+            ]),
+            category('Твердый и мягкий phrases', { en: 'Russian Hard and Soft Consonant Phrases', zh: '俄语硬软辅音短语', ky: 'Орусча катуу жана жумшак үнсүз фразалар', ru: 'Фразы на твёрдые и мягкие согласные', fr: 'Phrases russes consonnes dures et molles' }, [
+                phrase('Лук лежит рядом.', meanings('The onion is lying nearby.', '洋葱放在旁边。', 'пияз жанында жатат.', 'лук лежит рядом.', 'l oignon est juste a cote.'), { pronunciation: 'compare hard Л in лук with soft Л in лежит' }),
+                phrase('Мел белый, а мыло мягкое.', meanings('The chalk is white, and the soap is soft.', '粉笔是白的，肥皂很软。', 'бор ак, самын жумшак.', 'мел белый, а мыло мягкое.', 'la craie est blanche, et le savon est doux.'), { pronunciation: 'soft M in мел and мыло' }),
+                phrase('Брат нёс синюю сумку.', meanings('The brother carried a blue bag.', '哥哥提着一个蓝色的包。', 'ага көк сумканы көтөрүп жүрдү.', 'брат нёс синюю сумку.', 'le frere portait un sac bleu.'), { pronunciation: 'hard Б in брат, soft Н in нёс, soft С in синюю' }),
+                phrase('Тётя села тихо.', meanings('Aunt sat down quietly.', '阿姨安静地坐下了。', 'эжей тынч отурду.', 'тётя села тихо.', 'la tante s est assise calmement.'), { pronunciation: 'soft Т in тётя and тихо' }),
+                phrase('Мать любит мёд.', meanings('Mother likes honey.', '妈妈喜欢蜂蜜。', 'апа балды жакшы көрөт.', 'мать любит мёд.', 'la mere aime le miel.'), { pronunciation: 'soft Т in мать and soft М in мёд' }),
+                phrase('Угол стал углём.', meanings('The corner turned into coal.', '角变成了煤。', 'бурч көмүргө айланды.', 'угол стал углём.', 'le coin est devenu charbon.'), { pronunciation: 'contrast hard Л in угол with soft Л in углём' })
+            ]),
+            category('Правило ЧУ-ЩУ phrases', { en: 'Russian CHU-SHCHU Rule Phrases', zh: '俄语ЧУ-ЩУ规则短语', ky: 'Орусча ЧУ-ЩУ эрежеси фразалар', ru: 'Фразы на правило ЧУ-ЩУ', fr: 'Phrases russes sur la regle CHU-SHCHU' }, [
+                phrase('Чудо случилось утром.', meanings('A miracle happened in the morning.', '早上发生了奇迹。', 'эртең менен керемет болду.', 'чудо случилось утром.', 'un miracle s est produit le matin.'), { pronunciation: 'CHU-da slu-CHI-las U-tram' }),
+                phrase('Щука чувствует шум.', meanings('The pike senses noise.', '狗鱼感觉到声音。', 'шортан үндү сезет.', 'щука чувствует шум.', 'le brochet sent le bruit.'), { pronunciation: 'SHCHU-ka CHUV-stvu-yet SHUM' }),
+                phrase('Я хочу чудную игрушку.', meanings('I want a wonderful toy.', '我想要一个很棒的玩具。', 'мен сонун оюнчук каалайм.', 'я хочу чудную игрушку.', 'je veux un jouet merveilleux.'), { pronunciation: 'ya ha-CHU CHUD-nu-yu i-GRUSH-ku' }),
+                phrase('Щур быстро чует пищу.', meanings('The shrew quickly smells the food.', '鼩鼱很快闻到食物。', 'кемирүүчү тамакты бат жыттайт.', 'щур быстро чует пищу.', 'la musaraigne sent vite la nourriture.'), { pronunciation: 'SHCHUR BY-stra CHU-yet PI-shchu' }),
+                phrase('Чудный щенок уснул.', meanings('The lovely puppy fell asleep.', '可爱的小狗睡着了。', 'сонун күчүк уктап калды.', 'чудный щенок уснул.', 'le joli chiot s est endormi.'), { pronunciation: 'CHUD-nyy shche-NOK us-NUL' }),
+                phrase('Чулок ищу в шкафу.', meanings('I am looking for a sock in the wardrobe.', '我在衣柜里找袜子。', 'шкафтан байпак издеп жатам.', 'чулок ищу в шкафу.', 'je cherche une chaussette dans l armoire.'), { pronunciation: 'chu-LOK i-SHCHU f shkafu' })
+            ]),
+            category('Пары С-Ш phrases', { en: 'Russian S-SH Contrast Phrases', zh: '俄语S-SH对比短语', ky: 'Орусча С-Ш айырма фразалар', ru: 'Фразы на пары С-Ш', fr: 'Phrases russes contraste S-SH' }, [
+                phrase('Саша сушит сапоги.', meanings('Sasha is drying boots.', '萨沙在晾靴子。', 'Саша өтүгүн кургатып жатат.', 'Саша сушит сапоги.', 'Sacha fait secher des bottes.'), { pronunciation: 'contrast soft С and broad Ш' }),
+                phrase('Шесть сосен шумят.', meanings('Six pines are rustling.', '六棵松树在沙沙作响。', 'алты карагай шуулдап жатат.', 'шесть сосен шумят.', 'six pins bruissent.'), { pronunciation: 'SHYEST so-sen shu-MYAT' }),
+                phrase('Соня нашла шарф.', meanings('Sonya found a scarf.', '索尼娅找到了一条围巾。', 'Соня шарф таап алды.', 'Соня нашла шарф.', 'Sonia a trouve une echarpe.'), { pronunciation: 'SO-nya nash-LA SHARF' }),
+                phrase('Шум слышен в саду.', meanings('Noise is heard in the garden.', '花园里能听见声音。', 'бакчадан үн угулат.', 'шум слышен в саду.', 'on entend du bruit dans le jardin.'), { pronunciation: 'SHUM SLY-shen f sa-DU' }),
+                phrase('Саша пишет шесть слов.', meanings('Sasha writes six words.', '萨沙写六个单词。', 'Саша алты сөз жазып жатат.', 'Саша пишет шесть слов.', 'Sacha ecrit six mots.'), { pronunciation: 'PI-shet SHYEST SLOF' }),
+                phrase('Суп ещё слишком шумный.', meanings('The soup is still too noisy.', '汤还太“吵”了。', 'шорпо дагы эле өтө “шумдуу”.', 'суп ещё слишком шумный.', 'la soupe est encore trop bruyante.'), { pronunciation: 'practice switching С and Ш' })
+            ]),
+            category('Пары З-С phrases', { en: 'Russian Z-S Contrast Phrases', zh: '俄语Z-S对比短语', ky: 'Орусча З-С айырма фразалар', ru: 'Фразы на пары З-С', fr: 'Phrases russes contraste Z-S' }, [
+                phrase('Зоя несёт сумку.', meanings('Zoya is carrying a bag.', '佐娅提着一个包。', 'Зоя сумка көтөрүп баратат.', 'Зоя несёт сумку.', 'Zoya porte un sac.'), { pronunciation: 'contrast voiced З and voiceless С' }),
+                phrase('Соня зовёт сестру.', meanings('Sonya is calling her sister.', '索尼娅在叫她妹妹。', 'Соня эжесин чакырып жатат.', 'Соня зовёт сестру.', 'Sonia appelle sa soeur.'), { pronunciation: 'SO-nya za-VYOT sis-TRU' }),
+                phrase('Зуб заболел сегодня.', meanings('A tooth started hurting today.', '今天牙疼了。', 'бүгүн тиш ооруп калды.', 'зуб заболел сегодня.', 'une dent a commence a faire mal aujourd hui.'), { pronunciation: 'ZUP zaba-LYEL si-VOD-nya' }),
+                phrase('Снег закрыл забор.', meanings('Snow covered the fence.', '雪盖住了栅栏。', 'кар тосмону жаап калды.', 'снег закрыл забор.', 'la neige a recouvert la cloture.'), { pronunciation: 'SNYEK za-KRYL za-BOR' }),
+                phrase('Зал совсем светлый.', meanings('The hall is very bright.', '大厅非常明亮。', 'зал абдан жарык.', 'зал совсем светлый.', 'la salle est tres claire.'), { pronunciation: 'ZAL saf-SYEM SVYET-lyy' }),
+                phrase('Сова заметила зайца.', meanings('The owl noticed the hare.', '猫头鹰看见了野兔。', 'үкү коёнду байкады.', 'сова заметила зайца.', 'le hibou a remarque le lievre.'), { pronunciation: 'sa-VA za-MYE-ti-la ZAI-tsa' })
+            ]),
+            category('Пары Ч-К Ш-К phrases', { en: 'Russian CH-K and SH-K Cluster Phrases', zh: '俄语Ч-К/Ш-К组合短语', ky: 'Орусча Ч-К жана Ш-К топтору фразалар', ru: 'Фразы на сочетания Ч-К и Ш-К', fr: 'Phrases russes groupes CH-K et SH-K' }, [
+                phrase('Дочка читает книжку.', meanings('The daughter is reading a little book.', '女儿在读一本小书。', 'кыз кичинекей китеп окуп жатат.', 'дочка читает книжку.', 'la fille lit un petit livre.'), { pronunciation: 'DOCH-ka chi-TA-yet KNIZH-ku' }),
+                phrase('Кошка ищет чашку.', meanings('The cat is looking for the cup.', '猫在找杯子。', 'мышык чөйчөктү издеп жатат.', 'кошка ищет чашку.', 'le chat cherche la tasse.'), { pronunciation: 'KOSH-ka I-shchet CHASH-ku' }),
+                phrase('Печка греет комнату.', meanings('The stove warms the room.', '炉子给房间取暖。', 'меш бөлмөнү жылытат.', 'печка греет комнату.', 'le poele chauffe la piece.'), { pronunciation: 'PYECH-ka GRE-yet KOM-na-tu' }),
+                phrase('Мишка нашёл ложку.', meanings('Mishka found a spoon.', '米什卡找到了一把勺子。', 'Мишка кашык таап алды.', 'Мишка нашёл ложку.', 'Michka a trouve une cuillere.'), { pronunciation: 'MISH-ka na-SHYOL LOZH-ku' }),
+                phrase('Ручка лежит в мешке.', meanings('The pen is in the bag.', '钢笔在袋子里。', 'калем баштыктын ичинде жатат.', 'ручка лежит в мешке.', 'le stylo est dans le sac.'), { pronunciation: 'RUCH-ka le-ZHIT f myesh-KE' }),
+                phrase('Шишка упала с ёлки.', meanings('A pinecone fell from the fir tree.', '松果从冷杉树上掉下来了。', 'бүрлүү карагайдан томпок кулады.', 'шишка упала с ёлки.', 'une pomme de pin est tombee du sapin.'), { pronunciation: 'SHISH-ka u-PA-la s YOL-ki' })
+            ]),
+            category('Редукция О-А phrases', { en: 'Russian O-A Reduction Phrases', zh: '俄语O-A弱化短语', ky: 'Орусча О-А редукция фразалар', ru: 'Фразы на редукцию О-А', fr: 'Phrases russes reduction O-A' }, [
+                phrase('Молоко на столе.', meanings('The milk is on the table.', '牛奶在桌子上。', 'сүт үстөлдүн үстүндө.', 'молоко на столе.', 'le lait est sur la table.'), { pronunciation: 'ma-la-KO na sta-LYE; first unstressed о sounds closer to a' }),
+                phrase('Собака бежала домой.', meanings('The dog ran home.', '狗跑回家了。', 'ит үйгө чуркады.', 'собака бежала домой.', 'le chien a couru a la maison.'), { pronunciation: 'sa-BA-ka bye-ZHA-la da-MOY' }),
+                phrase('Вода далеко отсюда.', meanings('The water is far from here.', '水离这里很远。', 'суу бул жерден алыс.', 'вода далеко отсюда.', 'l eau est loin d ici.'), { pronunciation: 'va-DA da-la-KO at-SYU-da' }),
+                phrase('Корова ест траву.', meanings('The cow is eating grass.', '牛在吃草。', 'уй чөп жеп жатат.', 'корова ест траву.', 'la vache mange de l herbe.'), { pronunciation: 'ka-RO-va yest tra-VU' }),
+                phrase('Хорошо дома утром.', meanings('It is nice at home in the morning.', '早上在家很好。', 'эртең менен үйдө жакшы.', 'хорошо дома утром.', 'c est bien a la maison le matin.'), { pronunciation: 'ha-ra-SHO DO-ma U-tram' }),
+                phrase('Окно было открыто.', meanings('The window was open.', '窗户开着。', 'терезе ачык болчу.', 'окно было открыто.', 'la fenetre etait ouverte.'), { pronunciation: 'ak-NO BY-la at-KRY-ta' })
+            ]),
+            category('Ударение phrases', { en: 'Russian Word Stress Phrase Drills', zh: '俄语重音短语练习', ky: 'Орусча басым фраза машыгуулары', ru: 'Фразы на ударение', fr: 'Phrases russes accent tonique' }, [
+                phrase('МУка на столе, а мукА в голосе.', meanings('Flour is on the table, but anguish is in the voice.', '桌上是面粉，而声音里有痛苦。', 'үстөлдө ун, ал эми үнүндө муң бар.', 'МУка на столе, а мукА в голосе.', 'la farine est sur la table, mais la souffrance est dans la voix.'), { pronunciation: 'contrast MOO-ka and mu-KA by stress only' }),
+                phrase('ЗАмок открыт, а замОк сломан.', meanings('The castle is open, and the lock is broken.', '城堡开着，而锁坏了。', 'сепил ачык, ал эми кулпу сынган.', 'ЗАмок открыт, а замОк сломан.', 'le chateau est ouvert, et la serrure est cassee.'), { pronunciation: 'ZA-mak vs za-MOK' }),
+                phrase('Атлас лежит рядом, а атлАс блестит.', meanings('The atlas lies nearby, and satin shines.', '地图册在旁边，而缎子在发亮。', 'атлас жанында жатат, ал эми атлас жылтырайт.', 'Атлас лежит рядом, а атлАс блестит.', 'l atlas est a cote, et le satin brille.'), { pronunciation: 'AT-las vs at-LAS' }),
+                phrase('ПлАчу утром, но плачУ потом.', meanings('I cry in the morning, but I will pay later.', '我早上哭，但我之后会付款。', 'эртең менен ыйлайм, бирок кийин төлөйм.', 'ПлАчу утром, но плачУ потом.', 'je pleure le matin, mais je paierai plus tard.'), { pronunciation: 'PLA-chu vs pla-CHU' }),
+                phrase('СтОит дом, а стоИт он ровно.', meanings('The house stands, and it stands straight.', '房子立着，而且它站得很直。', 'үй турат жана тик турат.', 'СтОит дом, а стоИт он ровно.', 'la maison est debout, et elle tient droite.'), { pronunciation: 'STO-it vs sta-IT' }),
+                phrase('ПИли сок, а пилИ потом.', meanings('They drank juice, then sawed later.', '他们喝了果汁，然后后来锯东西。', 'алар шире ичишти, анан кийин араалашты.', 'ПИли сок, а пилИ потом.', 'ils ont bu du jus, puis ont scie plus tard.'), { pronunciation: 'PI-li vs pi-LI' })
             ]),
             ...Object.entries(phrasesData).map(([key, items]) => category(key, null, items.map(item => ({ t: item, kind: 'phrase' }))))
         ]
@@ -1063,6 +1168,19 @@ const frenchContent = {
         ]
     }
 };
+
+englishContent.modes.words.push(...CONTENT_BONUSES.en.words);
+englishContent.modes.phrases.push(...CONTENT_BONUSES.en.phrases);
+englishContent.modes.letters.push(...(CONTENT_BONUSES.en.letters || []));
+kyrgyzContent.modes.words.push(...CONTENT_BONUSES.ky.words);
+kyrgyzContent.modes.phrases.push(...CONTENT_BONUSES.ky.phrases);
+kyrgyzContent.modes.letters.push(...(CONTENT_BONUSES.ky.letters || []));
+chineseContent.modes.words.push(...CONTENT_BONUSES.zh.words);
+chineseContent.modes.phrases.push(...CONTENT_BONUSES.zh.phrases);
+chineseContent.modes.letters.push(...(CONTENT_BONUSES.zh.letters || []));
+frenchContent.modes.words.push(...CONTENT_BONUSES.fr.words);
+frenchContent.modes.phrases.push(...CONTENT_BONUSES.fr.phrases);
+frenchContent.modes.letters.push(...(CONTENT_BONUSES.fr.letters || []));
 
 export const TARGET_LANGUAGES = [
     { code: 'ru', label: 'Русский' },

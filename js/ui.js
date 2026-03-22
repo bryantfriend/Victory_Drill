@@ -8,6 +8,7 @@ export class UIManager {
         this.text = {};
         this.showPronunciation = true;
         this.showMeanings = true;
+        this.allCategories = [];
 
         // Screens
         this.screens = {
@@ -26,6 +27,9 @@ export class UIManager {
         this.languageList = document.getElementById('language-list');
         this.targetLanguageList = document.getElementById('target-language-list');
         this.categoryList = document.getElementById('category-list');
+        this.categorySearch = document.getElementById('category-search');
+        this.categoryCount = document.getElementById('category-count');
+        this.categoryEmpty = document.getElementById('category-empty');
         this.pronunciationToggleLabel = document.getElementById('pronunciation-toggle-label');
         this.pronunciationToggleHint = document.getElementById('pronunciation-toggle-hint');
         this.pronunciationToggleBtn = document.getElementById('pronunciation-toggle-btn');
@@ -67,6 +71,7 @@ export class UIManager {
         this.practiceDifficultBtn.onclick = () => this.callbacks.onPracticeDifficult();
         this.pronunciationToggleBtn.onclick = () => this.callbacks.onTogglePronunciation();
         this.meaningToggleBtn.onclick = () => this.callbacks.onToggleMeanings();
+        this.categorySearch.oninput = () => this.applyCategoryFilter();
     }
 
     applyTranslations(language, text) {
@@ -77,16 +82,18 @@ export class UIManager {
         document.getElementById('language-prompt').innerText = text.languagePrompt;
         document.getElementById('target-language-prompt').innerText = text.targetLanguagePrompt;
         document.getElementById('category-prompt').innerText = text.categoryPrompt;
+        this.categorySearch.placeholder = text.categorySearchPlaceholder || 'Search categories';
+        this.categoryEmpty.innerText = text.categoryEmpty || 'No categories match your search.';
         this.pronunciationToggleLabel.innerText = text.pronunciationToggle;
         this.pronunciationToggleHint.innerText = text.pronunciationToggleHint;
         this.meaningToggleLabel.innerText = text.meaningToggle;
         this.meaningToggleHint.innerText = text.meaningToggleHint;
         document.getElementById('timer-label').innerText = text.timerLabel;
-        document.getElementById('mode-letters').innerText = text.modeLetters;
-        document.getElementById('mode-topic-words').innerText = text.modeTopicWords;
-        document.getElementById('mode-sound-words').innerText = text.modeSoundWords;
-        document.getElementById('mode-topic-phrases').innerText = text.modeTopicPhrases;
-        document.getElementById('mode-sound-phrases').innerText = text.modeSoundPhrases;
+        document.getElementById('mode-letters').innerHTML = `<i data-lucide="type" class="w-4 h-4"></i><span>${text.modeLetters}</span>`;
+        document.getElementById('mode-topic-words').innerHTML = `<i data-lucide="tag" class="w-4 h-4"></i><span>${text.modeTopicWords}</span>`;
+        document.getElementById('mode-sound-words').innerHTML = `<i data-lucide="volume-2" class="w-4 h-4"></i><span>${text.modeSoundWords}</span>`;
+        document.getElementById('mode-topic-phrases').innerHTML = `<i data-lucide="message-square" class="w-4 h-4"></i><span>${text.modeTopicPhrases}</span>`;
+        document.getElementById('mode-sound-phrases').innerHTML = `<i data-lucide="radio" class="w-4 h-4"></i><span>${text.modeSoundPhrases}</span>`;
         document.getElementById('time-60').innerText = text.timeOneMin;
         document.getElementById('time-120').innerText = text.timeTwoMin;
         document.getElementById('time-free').innerText = text.timeFree;
@@ -105,6 +112,7 @@ export class UIManager {
         this.updatePronunciationToggle(this.showPronunciation);
         this.updateMeaningToggle(this.showMeanings);
         this.updateRecordButton(false, true);
+        if (typeof lucide !== 'undefined') lucide.createIcons();
     }
 
     setTargetLanguage(language) {
@@ -265,12 +273,12 @@ export class UIManager {
     updateModeButtons(mode) {
         document.querySelectorAll('.mode-btn').forEach(btn => {
             btn.classList.remove('selected', 'active');
-            btn.classList.add('bg-slate-100', 'text-slate-600');
+            btn.setAttribute('aria-pressed', 'false');
         });
         const activeBtn = document.getElementById(`mode-${mode}`);
         if (activeBtn) {
             activeBtn.classList.add('selected', 'active');
-            activeBtn.classList.remove('bg-slate-100', 'text-slate-600');
+            activeBtn.setAttribute('aria-pressed', 'true');
         }
     }
 
@@ -283,18 +291,38 @@ export class UIManager {
     }
 
     renderCategories(categories, colors) {
+        this.allCategories = categories.map((cat, index) => ({
+            ...cat,
+            color: colors[index % colors.length]
+        }));
+        this.categorySearch.value = '';
+        this.applyCategoryFilter();
+    }
+
+    applyCategoryFilter() {
+        const query = (this.categorySearch.value || '').trim().toLowerCase();
+        const filtered = this.allCategories.filter(cat => cat.label.toLowerCase().includes(query));
         this.categoryList.innerHTML = '';
-        let colorIndex = 0;
-        categories.forEach(cat => {
-            const color = colors[colorIndex % colors.length];
-            colorIndex += 1;
+        filtered.forEach(cat => {
+            const color = cat.color;
             const btn = document.createElement('button');
-            btn.className = `w-full btn-3d ${color.bg} ${color.hover} text-white font-bold py-3 px-3 rounded-xl text-sm md:text-base border-b-6 flex items-center justify-center text-center h-16 transition-all`;
+            btn.className = `category-option w-full btn-3d ${color.bg} ${color.hover} text-white font-bold py-3 px-4 rounded-2xl text-sm md:text-base border-b-6 flex items-center justify-between text-left min-h-[4.5rem] transition-all`;
             btn.style.setProperty('--shadow-color', color.shadow);
-            btn.innerText = cat.label;
+            const tags = (cat.tags || [])
+                .map(tag => `<span class="category-option__tag category-option__tag--${tag.tone || 'default'}">${tag.label || tag}</span>`)
+                .join('');
+            btn.innerHTML = `
+                <span class="category-option__content">
+                    <span class="category-option__label">${cat.label}</span>
+                    <span class="category-option__tags">${tags}</span>
+                </span>
+                <span class="category-option__hint">${this.text.categoryOpen || 'Open'}</span>
+            `;
             btn.onclick = () => this.callbacks.onSelectCategory(cat.key);
             this.categoryList.appendChild(btn);
         });
+        this.categoryCount.innerText = `${filtered.length} ${this.text.categoryCountLabel || 'categories'}`;
+        this.categoryEmpty.classList.toggle('hidden', filtered.length !== 0);
     }
 
     createMetaPill(label, value) {

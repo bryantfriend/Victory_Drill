@@ -80,3 +80,29 @@ Original prompt: Ok, let's skip that bug for now. Please update each language so
 - Improved Russian pronunciation support in the UI with automatic Cyrillic-to-Latin hints.
 - Russian words with stress and syllables now show stressed transliteration instead of plain syllable fallback.
 - Russian phrases now show transliterated pronunciation support instead of generic word-splitting only.
+- Expanded non-Russian content again with extra home, weather, and sound-drill packs.
+- Added new topic word sets for English, Kyrgyz, Chinese, and French: home and weather.
+- Added new topic phrase sets for English, Kyrgyz, Chinese, and French: home and school day.
+- Added new sound word/phrase sets for each non-Russian language:
+- English: TH sound
+- Kyrgyz: NG sound
+- Chinese: X/Q/J sound family
+- French: OU sound
+- Added the first dedicated Russian sound-phrase practice sets.
+- Russian Sound Phrases now include 4 categories: vowel A, ЖИ-ШИ rule, soft sign, and Б-П contrast.
+- Expanded Russian Sound Phrases further with 3 more categories.
+- Added Russian sound-phrase drills for ЧА-ЩА, Р-Л contrast, and hard vs soft consonants.
+- Expanded Russian Sound Phrases again with 3 additional contrast sets.
+- Added Russian sound-phrase drills for ЧУ-ЩУ, С-Ш contrast, and З-С contrast.
+- Expanded Russian Sound Phrases with 3 more advanced drill sets.
+- Added Russian sound-phrase drills for Ч-К / Ш-К clusters, O-A reduction, and word-stress contrast pairs.
+- Expanded English Sound Phrases with short I, L-blend, and V/W drill sets.
+- Expanded French Sound Phrases with U vs OU, EU sound, and liaison drill sets.
+- Expanded Kyrgyz Sound Phrases with extra rounded-vowel, special-letter, and R-sound drill sets.
+- Expanded Chinese Sound Phrases with extra zh/sh, third-tone flow, and special-sounds drill sets.
+- Expanded English Sound Words with short I, L-blend, and V/W drill sets.
+- Expanded French Sound Words with U vs OU, EU sound, and extra R-sound drill sets.
+- Expanded Kyrgyz Sound Words with extra rounded-vowel, special-letter, and R-sound drill sets.
+- Expanded Chinese Sound Words with extra zh/sh, third-tone flow, and special-sounds drill sets.
+- Expanded the Letters section for English, French, Kyrgyz, and Chinese.
+- Added new supplemental letter/sound practice packs for blends, vowel combos, special consonants, pinyin initials, and pinyin finals.
