@@ -5,6 +5,7 @@ export class UIManager {
         this.callbacks = callbacks; // { onSpeak, onSpeakWord, onChangeMode, onSelectCategory, onNextItem, onPrevItem, onRepeatItem, onTogglePause, onExit, onReplay }
         this.language = 'ru';
         this.targetLanguage = 'ru';
+        this.practiceStyle = 'classic';
         this.text = {};
         this.showPronunciation = true;
         this.showMeanings = true;
@@ -398,10 +399,37 @@ export class UIManager {
     }
 
     setPracticeStyle(style) {
+        this.practiceStyle = style;
         if (!this.screens.game) return;
         this.screens.game.classList.remove('game-style-classic', 'game-style-coach', 'game-style-speaking', 'game-style-listening');
         this.screens.game.classList.add(`game-style-${style}`);
         this.updatePracticeStyleButtons(style);
+    }
+
+    renderListeningPrompt(element) {
+        element.classList.remove('text-6xl', 'md:text-7xl');
+        element.classList.add('text-4xl', 'md:text-5xl');
+
+        const wrap = document.createElement('div');
+        wrap.className = 'flex flex-col items-center justify-center gap-5 w-full h-full px-6 text-center';
+
+        const iconWrap = document.createElement('div');
+        iconWrap.className = 'w-20 h-20 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center shadow-inner';
+        iconWrap.innerHTML = '<i data-lucide="ear" class="w-10 h-10"></i>';
+
+        const title = document.createElement('div');
+        title.className = 'text-2xl md:text-3xl font-black tracking-tight text-indigo-800';
+        title.innerText = this.text.practiceStyleListening || 'Listening';
+
+        const prompt = document.createElement('div');
+        prompt.className = 'text-sm md:text-base font-semibold text-slate-500 leading-relaxed max-w-sm';
+        prompt.innerText = this.text.listenQuizQuestion || 'Which one did you hear?';
+
+        wrap.appendChild(iconWrap);
+        wrap.appendChild(title);
+        wrap.appendChild(prompt);
+        element.appendChild(wrap);
+        if (typeof lucide !== 'undefined') lucide.createIcons();
     }
 
     updateTimerButtons(seconds) {
@@ -844,6 +872,10 @@ export class UIManager {
             emptyEl.className = 'text-2xl md:text-3xl text-slate-400';
             emptyEl.innerText = 'No content';
             element.appendChild(emptyEl);
+            return;
+        }
+        if (this.practiceStyle === 'listening') {
+            this.renderListeningPrompt(element);
             return;
         }
         const text = typeof content === 'string' ? content : (content.t || content.l);
