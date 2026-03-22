@@ -106,6 +106,10 @@ export class UIManager {
         this.text = text;
 
         document.getElementById('app-title').innerText = text.appTitle;
+        const versionEl = document.getElementById('app-version');
+        if (versionEl) {
+            versionEl.innerText = 'Build 2026.03.22b';
+        }
         document.getElementById('language-prompt').innerText = text.languagePrompt;
         document.getElementById('target-language-prompt').innerText = text.targetLanguagePrompt;
         document.getElementById('category-prompt').innerText = text.categoryPrompt;
