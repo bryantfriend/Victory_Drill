@@ -252,6 +252,12 @@ body {
     border-color: rgba(109, 40, 217, 0.95);
 }
 
+.practice-style-btn.selected {
+    background: linear-gradient(180deg, #4338ca, #3730a3);
+    color: #eef2ff;
+    border-color: rgba(55, 48, 163, 0.95);
+}
+
 /* Card Flipping Styles */
 .perspective-1000 {
     perspective: 1000px;
@@ -775,6 +781,30 @@ body {
     background: rgba(254, 226, 226, 0.96);
     border-color: rgba(248, 113, 113, 0.9);
     color: #991b1b;
+}
+
+.game-style-classic #pronunciation-lab,
+.game-style-classic #speech-feedback {
+    display: none !important;
+}
+
+.game-style-coach #speech-feedback.hidden {
+    display: none !important;
+}
+
+.game-style-speaking #pronunciation-lab-body,
+.game-style-speaking #listen-quiz-panel {
+    display: none !important;
+}
+
+.game-style-listening #speech-feedback,
+.game-style-listening #pronunciation-lab-body .coach-focus-card,
+.game-style-listening #pronunciation-lab-body .coach-detail-list {
+    display: none !important;
+}
+
+.game-style-listening #listen-quiz-panel.hidden {
+    display: none !important;
 }
 
 .speech-feedback-header {

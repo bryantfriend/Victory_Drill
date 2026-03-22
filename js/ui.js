@@ -36,6 +36,7 @@ export class UIManager {
         this.meaningToggleLabel = document.getElementById('meaning-toggle-label');
         this.meaningToggleHint = document.getElementById('meaning-toggle-hint');
         this.meaningToggleBtn = document.getElementById('meaning-toggle-btn');
+        this.practiceStyleLabel = document.getElementById('practice-style-label');
         this.timeDisplay = document.getElementById('time-display');
         this.scoreDisplay = document.getElementById('score-display');
         this.finalScore = document.getElementById('final-score');
@@ -66,6 +67,9 @@ export class UIManager {
         this.listenQuizQuestion = document.getElementById('listen-quiz-question');
         this.listenQuizResult = document.getElementById('listen-quiz-result');
         this.listenQuizOptions = document.getElementById('listen-quiz-options');
+        this.pronunciationLab = document.getElementById('pronunciation-lab');
+        this.pronunciationLabActions = document.getElementById('pronunciation-lab-actions');
+        this.pronunciationLabBody = document.getElementById('pronunciation-lab-body');
 
         this.card = document.getElementById('drill-card');
         this.cardFront = document.getElementById('card-front');
@@ -83,6 +87,7 @@ export class UIManager {
         this.shadowBtn = document.getElementById('shadow-btn');
         this.listenQuizBtn = document.getElementById('listen-quiz-btn');
         this.minimalPairBtn = document.getElementById('minimal-pair-btn');
+        this.practiceStyleButtons = Array.from(document.querySelectorAll('.practice-style-btn'));
 
         // Setup Event Listeners
         if (this.card) this.card.onclick = () => this.callbacks.onNextItem();
@@ -99,6 +104,9 @@ export class UIManager {
         if (this.shadowBtn) this.shadowBtn.onclick = () => this.callbacks.onShadow();
         if (this.listenQuizBtn) this.listenQuizBtn.onclick = () => this.callbacks.onStartListeningQuiz();
         if (this.minimalPairBtn) this.minimalPairBtn.onclick = () => this.callbacks.onPlayMinimalPair();
+        this.practiceStyleButtons.forEach(btn => {
+            btn.onclick = () => this.callbacks.onChangePracticeStyle(btn.id.replace('style-', ''));
+        });
     }
 
     applyTranslations(language, text) {
@@ -119,6 +127,7 @@ export class UIManager {
         this.pronunciationToggleHint.innerText = text.pronunciationToggleHint;
         this.meaningToggleLabel.innerText = text.meaningToggle;
         this.meaningToggleHint.innerText = text.meaningToggleHint;
+        if (this.practiceStyleLabel) this.practiceStyleLabel.innerText = text.practiceStyleLabel || 'Practice style';
         document.getElementById('timer-label').innerText = text.timerLabel;
         document.getElementById('mode-letters').innerHTML = `<i data-lucide="type" class="w-4 h-4"></i><span>${text.modeLetters}</span>`;
         document.getElementById('mode-topic-words').innerHTML = `<i data-lucide="tag" class="w-4 h-4"></i><span>${text.modeTopicWords}</span>`;
@@ -148,6 +157,14 @@ export class UIManager {
         if (this.listenQuizLabel) this.listenQuizLabel.innerText = text.listenQuiz || 'Listen';
         if (this.minimalPairLabel) this.minimalPairLabel.innerText = text.minimalPairAction || 'Contrast';
         if (this.listenQuizQuestion) this.listenQuizQuestion.innerText = text.listenQuizQuestion || 'Which one did you hear?';
+        const classicBtn = document.getElementById('style-classic');
+        const coachBtn = document.getElementById('style-coach');
+        const speakingBtn = document.getElementById('style-speaking');
+        const listeningBtn = document.getElementById('style-listening');
+        if (classicBtn) classicBtn.innerText = text.practiceStyleClassic || 'Classic';
+        if (coachBtn) coachBtn.innerText = text.practiceStyleCoach || 'Coach';
+        if (speakingBtn) speakingBtn.innerText = text.practiceStyleSpeaking || 'Speaking';
+        if (listeningBtn) listeningBtn.innerText = text.practiceStyleListening || 'Listening';
         document.getElementById('menu-btn').innerText = text.menu;
         document.getElementById('replay-btn').innerText = text.replay;
         this.practiceDifficultBtn.innerText = text.difficult;
@@ -367,6 +384,20 @@ export class UIManager {
             activeBtn.classList.add('selected', 'active');
             activeBtn.setAttribute('aria-pressed', 'true');
         }
+    }
+
+    updatePracticeStyleButtons(style) {
+        this.practiceStyleButtons.forEach(btn => {
+            const isSelected = btn.id === `style-${style}`;
+            btn.classList.toggle('selected', isSelected);
+        });
+    }
+
+    setPracticeStyle(style) {
+        if (!this.screens.game) return;
+        this.screens.game.classList.remove('game-style-classic', 'game-style-coach', 'game-style-speaking', 'game-style-listening');
+        this.screens.game.classList.add(`game-style-${style}`);
+        this.updatePracticeStyleButtons(style);
     }
 
     updateTimerButtons(seconds) {

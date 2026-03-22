@@ -22,6 +22,8 @@ const VOICE_PREFERENCES = {
 };
 
 const DEFAULT_VENDORS = ['Microsoft', 'Google', 'Premium', 'Enhanced', 'Natural'];
+const GOOD_VOICE_PATTERNS = ['natural', 'neural', 'online', 'premium', 'enhanced', 'aria', 'jenny', 'xiaoxiao', 'denise'];
+const BAD_VOICE_PATTERNS = ['espeak', 'compact', 'default', 'fallback', 'basic', 'robot'];
 
 export class VoiceManager {
     constructor() {
@@ -30,6 +32,7 @@ export class VoiceManager {
         this.currentLang = 'ru-RU';
         this.currentSpeechLang = 'ru-RU';
         this.currentVoice = null;
+        this.voiceCache = new Map();
 
         this._initVoices();
         if (this.synth.onvoiceschanged !== undefined) {
@@ -77,6 +80,14 @@ export class VoiceManager {
             }
         });
 
+        if (GOOD_VOICE_PATTERNS.some(pattern => name.includes(pattern))) {
+            score += 18;
+        }
+
+        if (BAD_VOICE_PATTERNS.some(pattern => name.includes(pattern))) {
+            score -= 40;
+        }
+
         if (DEFAULT_VENDORS.some(vendor => name.includes(vendor.toLowerCase()))) {
             score += 15;
         }
@@ -98,12 +109,24 @@ export class VoiceManager {
         }
 
         const config = this._getVoiceConfig(lang);
+        const cachedName = this.voiceCache.get(lang);
+        if (cachedName) {
+            const cachedVoice = this.voices.find(voice => voice.name === cachedName);
+            if (cachedVoice) {
+                return {
+                    voice: cachedVoice,
+                    lang: cachedVoice.lang || lang
+                };
+            }
+        }
+
         const ranked = this.voices
             .map(voice => ({ voice, score: this._scoreVoice(voice, config) }))
             .filter(entry => entry.score > 0)
             .sort((a, b) => b.score - a.score);
 
         if (ranked.length) {
+            this.voiceCache.set(lang, ranked[0].voice.name);
             return {
                 voice: ranked[0].voice,
                 lang: ranked[0].voice.lang || lang
@@ -122,6 +145,7 @@ export class VoiceManager {
         for (const candidate of config.fallbackLangs) {
             const fallbackVoice = this.voices.find(voice => this._langMatches(voice.lang, candidate));
             if (fallbackVoice) {
+                this.voiceCache.set(lang, fallbackVoice.name);
                 return {
                     voice: fallbackVoice,
                     lang: fallbackVoice.lang || candidate
@@ -129,10 +153,9 @@ export class VoiceManager {
             }
         }
 
-        const defaultVoice = this.voices.find(voice => voice.default) || this.voices[0] || null;
         return {
-            voice: defaultVoice,
-            lang: defaultVoice?.lang || lang
+            voice: null,
+            lang
         };
     }
 
@@ -157,6 +180,10 @@ export class VoiceManager {
 
     speak(text, rate = null, handlers = {}) {
         if (!text) return;
+
+        if (!this.voices.length || !this.currentVoice) {
+            this._initVoices();
+        }
 
         this.synth.cancel();
 

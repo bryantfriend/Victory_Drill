@@ -11,6 +11,7 @@ class App {
         this.baseLanguage = 'en';
         this.targetLanguage = 'ru';
         this.selectedTime = 60;
+        this.practiceStyle = 'classic';
         this.showPronunciation = true;
         this.showMeanings = true;
         this.currentCategory = null;
@@ -98,7 +99,8 @@ class App {
             onShadow: () => this.startShadowing(),
             onStartListeningQuiz: () => this.startListeningQuiz(),
             onPlayMinimalPair: () => this.playMinimalPair(),
-            onChooseListeningOption: (index) => this.chooseListeningOption(index)
+            onChooseListeningOption: (index) => this.chooseListeningOption(index),
+            onChangePracticeStyle: (style) => this.setPracticeStyle(style)
         });
 
         this.init();
@@ -189,6 +191,7 @@ class App {
         this.setLanguage(this.baseLanguage);
         this.setTargetLanguage(this.targetLanguage);
         this.setMode('letters');
+        this.setPracticeStyle('classic');
     }
 
     setLanguage(language) {
@@ -233,6 +236,11 @@ class App {
             pronunciationToggleHint: getUIText(language, 'pronunciationToggleHint'),
             meaningToggle: getUIText(language, 'meaningToggle'),
             meaningToggleHint: getUIText(language, 'meaningToggleHint'),
+            practiceStyleLabel: getUIText(language, 'practiceStyleLabel'),
+            practiceStyleClassic: getUIText(language, 'practiceStyleClassic'),
+            practiceStyleCoach: getUIText(language, 'practiceStyleCoach'),
+            practiceStyleSpeaking: getUIText(language, 'practiceStyleSpeaking'),
+            practiceStyleListening: getUIText(language, 'practiceStyleListening'),
             categoryGroupTopics: getUIText(language, 'categoryGroupTopics'),
             categoryGroupSounds: getUIText(language, 'categoryGroupSounds'),
             speechFeedback: getUIText(language, 'speechFeedback'),
@@ -273,6 +281,7 @@ class App {
         });
         this.ui.updatePronunciationToggle(this.showPronunciation);
         this.ui.updateMeaningToggle(this.showMeanings);
+        this.ui.setPracticeStyle(this.practiceStyle);
         this.renderCategories();
         if (this.currentList.length) {
             this.ui.setInitialContent(this.getCurrentItem());
@@ -301,6 +310,11 @@ class App {
         this.mode = mode;
         this.ui.updateModeButtons(mode);
         this.renderCategories();
+    }
+
+    setPracticeStyle(style) {
+        this.practiceStyle = style;
+        this.ui.setPracticeStyle(style);
     }
 
     setTimer(seconds) {
@@ -443,9 +457,13 @@ class App {
         this.ui.setInitialContent(firstItem);
         this.updatePracticeLab();
         this.ui.showScreen('game');
+        this.ui.setPracticeStyle(this.practiceStyle);
 
         this.speakCurrentItem();
         this.timer.start(this.selectedTime);
+        if (this.practiceStyle === 'listening') {
+            setTimeout(() => this.startListeningQuiz(), 250);
+        }
     }
 
     speakWord(item) {

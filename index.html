@@ -120,6 +120,16 @@
                     style="--shadow-color: #94a3b8;">Фразы</button>
             </nav>
 
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-indigo-100">
+                <p id="practice-style-label" class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-3">Practice style</p>
+                <div id="practice-style-list" class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                    <button id="style-classic" class="practice-style-btn btn-3d bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 px-3 rounded-xl text-sm border-b-4 border-slate-300 selected" style="--shadow-color: #cbd5e1;">Classic</button>
+                    <button id="style-coach" class="practice-style-btn btn-3d bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 px-3 rounded-xl text-sm border-b-4 border-slate-300" style="--shadow-color: #cbd5e1;">Coach</button>
+                    <button id="style-speaking" class="practice-style-btn btn-3d bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 px-3 rounded-xl text-sm border-b-4 border-slate-300" style="--shadow-color: #cbd5e1;">Speaking</button>
+                    <button id="style-listening" class="practice-style-btn btn-3d bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 px-3 rounded-xl text-sm border-b-4 border-slate-300" style="--shadow-color: #cbd5e1;">Listening</button>
+                </div>
+            </div>
+
             <!-- Timer Settings -->
             <div class="bg-white p-4 rounded-2xl shadow-sm border border-indigo-100">
                 <p id="timer-label" class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-3">Таймер</p>
@@ -235,7 +245,7 @@
                     <div id="mastery-chip" class="pronunciation-lab-chip">Mastery 0%</div>
                 </div>
 
-                <div class="pronunciation-lab-actions">
+                <div id="pronunciation-lab-actions" class="pronunciation-lab-actions">
                     <button id="slow-play-btn" class="lab-action-btn" type="button">
                         <i data-lucide="turtle" class="w-4 h-4"></i>
                         <span id="slow-play-label">Slow</span>
@@ -254,7 +264,7 @@
                     </button>
                 </div>
 
-                <div class="pronunciation-lab-body">
+                <div id="pronunciation-lab-body" class="pronunciation-lab-body">
                     <div class="coach-strip">
                         <p id="syllable-highlight-label" class="lab-card-label">Syllables</p>
                         <div id="syllable-highlight" class="syllable-highlight"></div>
