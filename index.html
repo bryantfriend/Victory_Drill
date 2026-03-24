@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Русская Победа</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="css/style.css?v=20260322c">
+    <link rel="stylesheet" href="css/style.css?v=20260324c">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -20,7 +20,7 @@
         <div class="splash-orb splash-orb-a"></div>
         <div class="splash-orb splash-orb-b"></div>
         <div class="splash-grid"></div>
-        <video id="splash-video" class="w-full h-full object-contain" muted playsinline>
+        <video id="splash-video" class="w-full h-full object-contain" muted playsinline webkit-playsinline x5-playsinline x5-video-player-type="h5-page" preload="auto">
             <source src="assets/OquWay_Logo_Animation_Generation.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
@@ -36,13 +36,14 @@
                     <div class="splash-pill">Meaning + sound support</div>
                 </div>
             </div>
-            <button id="start-splash"
+            <button id="start-splash" type="button"
                 class="btn-3d bg-white hover:bg-slate-100 text-slate-900 font-bold py-3 px-8 rounded-xl text-lg border-b-4 border-slate-300"
                 style="--shadow-color: #cbd5e1;">
                 Start
             </button>
+            <p class="splash-action-hint">Tap anywhere to continue</p>
         </div>
-        <button id="skip-splash"
+        <button id="skip-splash" type="button"
             class="absolute bottom-10 right-10 text-white/50 hover:text-white text-sm font-bold uppercase tracking-widest transition-colors z-[101]">
             Пропустить
         </button>
@@ -53,122 +54,218 @@
 
         <!-- Start Screen -->
         <div id="start-screen" class="space-y-6 pb-8">
-            <div class="flex justify-center items-center gap-3">
-                <i data-lucide="book-open" class="text-indigo-600 w-12 h-12"></i>
-                <h1 id="app-title" class="text-4xl md:text-5xl font-black text-indigo-800">Русская Победа</h1>
-            </div>
-            <p id="app-version" class="text-xs font-bold uppercase tracking-[0.2em] text-indigo-400">Build 2026.03.22c</p>
-
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-indigo-100">
-                <p id="language-prompt" class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-3">Выберите родной язык:</p>
-                <div id="language-list" class="grid grid-cols-2 md:grid-cols-5 gap-2">
-                    <!-- Language buttons will be inserted here by JavaScript -->
+            <div class="start-screen-topbar">
+                <div class="flex justify-center items-center gap-3">
+                    <i data-lucide="book-open" class="text-indigo-600 w-12 h-12"></i>
+                    <h1 id="app-title" class="text-4xl md:text-5xl font-black text-indigo-800">Русская Победа</h1>
                 </div>
-            </div>
-
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-indigo-100">
-                <p id="target-language-prompt" class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-3">Выберите язык для практики:</p>
-                <div id="target-language-list" class="grid grid-cols-2 md:grid-cols-5 gap-2">
-                    <!-- Target language buttons will be inserted here by JavaScript -->
-                </div>
-            </div>
-
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-indigo-100">
-                <div class="flex items-center justify-between gap-4">
-                    <div class="text-left">
-                        <p id="pronunciation-toggle-label" class="text-sm font-bold text-slate-500 uppercase tracking-wide">Show pronunciation help</p>
-                        <p id="pronunciation-toggle-hint" class="text-sm text-slate-400 mt-1">Display sound tips on each card</p>
-                    </div>
-                    <button id="pronunciation-toggle-btn"
-                        class="btn-3d bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-4 rounded-xl text-sm border-b-4 border-emerald-700"
-                        style="--shadow-color: #047857;">
-                        On
-                    </button>
-                </div>
-            </div>
-
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-indigo-100">
-                <div class="flex items-center justify-between gap-4">
-                    <div class="text-left">
-                        <p id="meaning-toggle-label" class="text-sm font-bold text-slate-500 uppercase tracking-wide">Show meanings</p>
-                        <p id="meaning-toggle-hint" class="text-sm text-slate-400 mt-1">Display translations on each card</p>
-                    </div>
-                    <button id="meaning-toggle-btn"
-                        class="btn-3d bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-xl text-sm border-b-4 border-indigo-700"
-                        style="--shadow-color: #4338ca;">
-                        On
-                    </button>
-                </div>
-            </div>
-
-            <!-- Mode Selection -->
-            <nav class="grid grid-cols-2 md:grid-cols-5 gap-2 bg-slate-200 p-2 rounded-2xl w-full">
-                <button id="mode-letters"
-                    class="mode-btn mode-tone-letters btn-3d active px-3 py-2 rounded-xl text-sm font-bold transition selected flex items-center justify-center gap-2"
-                    style="--shadow-color: #94a3b8;">Буквы</button>
-                <button id="mode-topic-words"
-                    class="mode-btn mode-tone-topic btn-3d px-3 py-2 rounded-xl text-sm font-bold transition bg-slate-100 text-slate-600 flex items-center justify-center gap-2"
-                    style="--shadow-color: #94a3b8;">Слова</button>
-                <button id="mode-sound-words"
-                    class="mode-btn mode-tone-sound btn-3d px-3 py-2 rounded-xl text-sm font-bold transition bg-slate-100 text-slate-600 flex items-center justify-center gap-2"
-                    style="--shadow-color: #94a3b8;">Слова по звукам</button>
-                <button id="mode-topic-phrases"
-                    class="mode-btn mode-tone-topic btn-3d px-3 py-2 rounded-xl text-sm font-bold transition bg-slate-100 text-slate-600 flex items-center justify-center gap-2"
-                    style="--shadow-color: #94a3b8;">Фразы</button>
-                <button id="mode-sound-phrases"
-                    class="mode-btn mode-tone-sound btn-3d px-3 py-2 rounded-xl text-sm font-bold transition bg-slate-100 text-slate-600 flex items-center justify-center gap-2"
-                    style="--shadow-color: #94a3b8;">Фразы</button>
-            </nav>
-
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-indigo-100">
-                <p id="practice-style-label" class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-3">Practice style</p>
-                <div id="practice-style-list" class="grid grid-cols-2 md:grid-cols-4 gap-2">
-                    <button id="style-classic" class="practice-style-btn btn-3d bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 px-3 rounded-xl text-sm border-b-4 border-slate-300 selected" style="--shadow-color: #cbd5e1;">Classic</button>
-                    <button id="style-coach" class="practice-style-btn btn-3d bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 px-3 rounded-xl text-sm border-b-4 border-slate-300" style="--shadow-color: #cbd5e1;">Coach</button>
-                    <button id="style-speaking" class="practice-style-btn btn-3d bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 px-3 rounded-xl text-sm border-b-4 border-slate-300" style="--shadow-color: #cbd5e1;">Speaking</button>
-                    <button id="style-listening" class="practice-style-btn btn-3d bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 px-3 rounded-xl text-sm border-b-4 border-slate-300" style="--shadow-color: #cbd5e1;">Listening</button>
-                </div>
-            </div>
-
-            <!-- Timer Settings -->
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-indigo-100">
-                <p id="timer-label" class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-3">Таймер</p>
-                <div class="grid grid-cols-3 gap-3">
-                    <button id="time-60"
-                        class="time-btn btn-3d bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-bold py-2 px-2 rounded-lg text-sm border-indigo-300 selected"
-                        style="--shadow-color: #a5b4fc;">
-                        1 Мин
-                    </button>
-                    <button id="time-120"
-                        class="time-btn btn-3d bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-bold py-2 px-2 rounded-lg text-sm border-indigo-300"
-                        style="--shadow-color: #a5b4fc;">
-                        2 Мин
-                    </button>
-                    <button id="time-free"
-                        class="time-btn btn-3d bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-bold py-2 px-2 rounded-lg text-sm border-indigo-300"
-                        style="--shadow-color: #a5b4fc;">
-                        Свободно
-                    </button>
-                </div>
-            </div>
-
-            <p id="category-prompt" class="text-lg text-slate-600">Выберите категорию:</p>
-            <div class="category-browser">
-                <div class="category-toolbar">
-                    <input id="category-search" type="text" class="category-search-input" placeholder="Search categories">
-                    <div id="category-count" class="category-count">0 categories</div>
-                </div>
-                <div id="category-empty" class="category-empty hidden">No categories match your search.</div>
-            </div>
-            <div class="category-rail-wrap">
-                <button id="category-prev" class="category-rail-arrow" type="button" aria-label="Previous categories">
-                    <i data-lucide="chevron-left" class="w-5 h-5"></i>
+                <button id="open-settings" type="button" class="settings-trigger">
+                    <i data-lucide="sliders-horizontal" class="w-5 h-5"></i>
+                    <span id="settings-trigger-label">Settings</span>
                 </button>
-                <div id="category-list" class="category-rail scrollbar-thin">
-                    <!-- Category buttons will be inserted here by JavaScript -->
+            </div>
+            <p id="app-version" class="text-xs font-bold uppercase tracking-[0.2em] text-indigo-400">Build 2026.03.24c</p>
+
+            <div class="setup-section">
+                <p id="setup-step-languages" class="setup-step-label">Step 1 · Languages</p>
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-indigo-100">
+                    <p id="language-prompt" class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-3">Выберите родной язык:</p>
+                    <div id="language-list" class="grid grid-cols-2 md:grid-cols-5 gap-2">
+                        <!-- Language buttons will be inserted here by JavaScript -->
+                    </div>
                 </div>
-                <button id="category-next" class="category-rail-arrow" type="button" aria-label="Next categories">
-                    <i data-lucide="chevron-right" class="w-5 h-5"></i>
+
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-indigo-100">
+                    <p id="target-language-prompt" class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-3">Выберите язык для практики:</p>
+                    <div id="target-language-list" class="grid grid-cols-2 md:grid-cols-5 gap-2">
+                        <!-- Target language buttons will be inserted here by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="setup-section">
+                <div class="settings-summary-card">
+                    <div class="settings-summary-header">
+                        <div>
+                            <p id="settings-summary-title" class="settings-summary-title">Quick Setup</p>
+                            <p id="settings-summary-subtitle" class="settings-summary-subtitle">Open settings to change support, timer, or practice style.</p>
+                        </div>
+                        <button id="open-settings-inline" type="button" class="settings-inline-link">
+                            <span id="settings-inline-label">Open Settings</span>
+                            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    <div id="settings-summary-pills" class="settings-summary-pills"></div>
+                </div>
+            </div>
+
+            <div class="setup-section">
+                <p id="setup-step-mode" class="setup-step-label">Step 2 · Practice Type</p>
+                <nav class="grid grid-cols-2 md:grid-cols-5 gap-2 bg-slate-200 p-2 rounded-2xl w-full">
+                    <button id="mode-letters"
+                        class="mode-btn mode-tone-letters btn-3d active px-3 py-2 rounded-xl text-sm font-bold transition selected flex items-center justify-center gap-2"
+                        style="--shadow-color: #94a3b8;">Буквы</button>
+                    <button id="mode-topic-words"
+                        class="mode-btn mode-tone-topic btn-3d px-3 py-2 rounded-xl text-sm font-bold transition bg-slate-100 text-slate-600 flex items-center justify-center gap-2"
+                        style="--shadow-color: #94a3b8;">Слова</button>
+                    <button id="mode-sound-words"
+                        class="mode-btn mode-tone-sound btn-3d px-3 py-2 rounded-xl text-sm font-bold transition bg-slate-100 text-slate-600 flex items-center justify-center gap-2"
+                        style="--shadow-color: #94a3b8;">Слова по звукам</button>
+                    <button id="mode-topic-phrases"
+                        class="mode-btn mode-tone-topic btn-3d px-3 py-2 rounded-xl text-sm font-bold transition bg-slate-100 text-slate-600 flex items-center justify-center gap-2"
+                        style="--shadow-color: #94a3b8;">Фразы</button>
+                    <button id="mode-sound-phrases"
+                        class="mode-btn mode-tone-sound btn-3d px-3 py-2 rounded-xl text-sm font-bold transition bg-slate-100 text-slate-600 flex items-center justify-center gap-2"
+                        style="--shadow-color: #94a3b8;">Фразы</button>
+                </nav>
+            </div>
+
+            <div class="setup-section">
+                <p id="setup-step-category" class="setup-step-label">Step 3 · Choose Category</p>
+                <p id="category-prompt" class="text-lg text-slate-600">Выберите категорию:</p>
+                <div class="category-browser">
+                    <div class="category-toolbar">
+                        <input id="category-search" type="text" class="category-search-input" placeholder="Search categories">
+                        <div id="category-count" class="category-count">0 categories</div>
+                    </div>
+                    <div id="category-empty" class="category-empty hidden">No categories match your search.</div>
+                </div>
+                <div class="category-rail-wrap">
+                    <button id="category-prev" class="category-rail-arrow" type="button" aria-label="Previous categories">
+                        <i data-lucide="chevron-left" class="w-5 h-5"></i>
+                    </button>
+                    <div id="category-list" class="category-rail scrollbar-thin">
+                        <!-- Category buttons will be inserted here by JavaScript -->
+                    </div>
+                    <button id="category-next" class="category-rail-arrow" type="button" aria-label="Next categories">
+                        <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="settings-modal" class="settings-modal hidden" aria-hidden="true">
+            <div id="settings-backdrop" class="settings-backdrop"></div>
+            <div class="settings-sheet">
+                <div class="settings-sheet-header">
+                    <div>
+                        <p id="settings-title" class="settings-title">Settings</p>
+                        <p id="settings-subtitle" class="settings-subtitle">Fine-tune how practice feels before you start.</p>
+                    </div>
+                    <button id="close-settings" type="button" class="settings-close-btn" aria-label="Close settings">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+
+                <div class="settings-stack">
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-indigo-100">
+                        <p id="voice-label" class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-3">Voice</p>
+                        <select id="voice-select" class="settings-select">
+                            <option value="">Automatic best voice</option>
+                        </select>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-indigo-100">
+                        <div class="flex items-center justify-between gap-4 mb-3">
+                            <div class="text-left">
+                                <p id="speech-speed-label" class="text-sm font-bold text-slate-500 uppercase tracking-wide">Speech speed</p>
+                                <p id="speech-speed-hint" class="text-sm text-slate-400 mt-1">Adjust how fast the model voice speaks</p>
+                            </div>
+                            <div id="speech-speed-value" class="settings-range-value">1.0x</div>
+                        </div>
+                        <input id="speech-speed-range" type="range" min="0.7" max="1.2" step="0.05" value="1" class="settings-range">
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-indigo-100">
+                        <p id="practice-style-label" class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-3">Practice style</p>
+                        <div id="practice-style-list" class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                            <button id="style-classic" class="practice-style-btn btn-3d bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 px-3 rounded-xl text-sm border-b-4 border-slate-300 selected" style="--shadow-color: #cbd5e1;">Classic</button>
+                            <button id="style-coach" class="practice-style-btn btn-3d bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 px-3 rounded-xl text-sm border-b-4 border-slate-300" style="--shadow-color: #cbd5e1;">Coach</button>
+                            <button id="style-speaking" class="practice-style-btn btn-3d bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 px-3 rounded-xl text-sm border-b-4 border-slate-300" style="--shadow-color: #cbd5e1;">Speaking</button>
+                            <button id="style-listening" class="practice-style-btn btn-3d bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 px-3 rounded-xl text-sm border-b-4 border-slate-300" style="--shadow-color: #cbd5e1;">Listening</button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-indigo-100">
+                        <p id="timer-label" class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-3">Таймер</p>
+                        <div class="grid grid-cols-3 gap-3">
+                            <button id="time-60"
+                                class="time-btn btn-3d bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-bold py-2 px-2 rounded-lg text-sm border-indigo-300 selected"
+                                style="--shadow-color: #a5b4fc;">
+                                1 Мин
+                            </button>
+                            <button id="time-120"
+                                class="time-btn btn-3d bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-bold py-2 px-2 rounded-lg text-sm border-indigo-300"
+                                style="--shadow-color: #a5b4fc;">
+                                2 Мин
+                            </button>
+                            <button id="time-free"
+                                class="time-btn btn-3d bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-bold py-2 px-2 rounded-lg text-sm border-indigo-300"
+                                style="--shadow-color: #a5b4fc;">
+                                Свободно
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-indigo-100">
+                        <div class="flex items-center justify-between gap-4">
+                            <div class="text-left">
+                                <p id="auto-play-label" class="text-sm font-bold text-slate-500 uppercase tracking-wide">Auto-play new cards</p>
+                                <p id="auto-play-hint" class="text-sm text-slate-400 mt-1">Play the word or phrase automatically when the card changes</p>
+                            </div>
+                            <button id="auto-play-btn"
+                                class="btn-3d bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-2 px-4 rounded-xl text-sm border-b-4 border-cyan-700"
+                                style="--shadow-color: #0f766e;">
+                                On
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-indigo-100">
+                        <div class="flex items-center justify-between gap-4">
+                            <div class="text-left">
+                                <p id="splash-toggle-label" class="text-sm font-bold text-slate-500 uppercase tracking-wide">Opening video</p>
+                                <p id="splash-toggle-hint" class="text-sm text-slate-400 mt-1">Show the intro video when the app starts</p>
+                            </div>
+                            <button id="splash-toggle-btn"
+                                class="btn-3d bg-fuchsia-500 hover:bg-fuchsia-600 text-white font-bold py-2 px-4 rounded-xl text-sm border-b-4 border-fuchsia-700"
+                                style="--shadow-color: #a21caf;">
+                                On
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-indigo-100">
+                        <div class="flex items-center justify-between gap-4">
+                            <div class="text-left">
+                                <p id="pronunciation-toggle-label" class="text-sm font-bold text-slate-500 uppercase tracking-wide">Show pronunciation help</p>
+                                <p id="pronunciation-toggle-hint" class="text-sm text-slate-400 mt-1">Display sound tips on each card</p>
+                            </div>
+                            <button id="pronunciation-toggle-btn"
+                                class="btn-3d bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-4 rounded-xl text-sm border-b-4 border-emerald-700"
+                                style="--shadow-color: #047857;">
+                                On
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-indigo-100">
+                        <div class="flex items-center justify-between gap-4">
+                            <div class="text-left">
+                                <p id="meaning-toggle-label" class="text-sm font-bold text-slate-500 uppercase tracking-wide">Show meanings</p>
+                                <p id="meaning-toggle-hint" class="text-sm text-slate-400 mt-1">Display translations on each card</p>
+                            </div>
+                            <button id="meaning-toggle-btn"
+                                class="btn-3d bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-xl text-sm border-b-4 border-indigo-700"
+                                style="--shadow-color: #4338ca;">
+                                On
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="settings-done" type="button" class="settings-done-btn">
+                    <span id="settings-done-label">Done</span>
                 </button>
             </div>
         </div>
@@ -377,7 +474,7 @@
 
     </div>
 
-    <script type="module" src="js/app.js?v=20260322c"></script>
+    <script type="module" src="js/app.js?v=20260324c"></script>
 </body>
 
 </html>

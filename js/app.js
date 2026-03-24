@@ -14,6 +14,10 @@ class App {
         this.practiceStyle = 'classic';
         this.showPronunciation = true;
         this.showMeanings = true;
+        this.autoPlayAudio = true;
+        this.showSplashVideo = true;
+        this.speechRate = 1;
+        this.voiceChoices = {};
         this.currentCategory = null;
         this.currentList = [];
         this.currentIndex = 0;
@@ -77,7 +81,7 @@ class App {
             () => this.endGame()
         );
         this.ui = new UIManager({
-            onSpeak: (text) => this.voice.speak(text),
+            onSpeak: (text) => this.voice.speak(text, 0.9 * this.speechRate),
             onSpeakWord: (item) => this.speakWord(item),
             onChangeMode: (mode) => this.setMode(mode),
             onChangeLanguage: (language) => this.setLanguage(language),
@@ -100,9 +104,14 @@ class App {
             onStartListeningQuiz: () => this.startListeningQuiz(),
             onPlayMinimalPair: () => this.playMinimalPair(),
             onChooseListeningOption: (index) => this.chooseListeningOption(index),
-            onChangePracticeStyle: (style) => this.setPracticeStyle(style)
+            onChangePracticeStyle: (style) => this.setPracticeStyle(style),
+            onChangeVoice: (voiceName) => this.setVoiceChoice(voiceName),
+            onChangeSpeechRate: (rate) => this.setSpeechRate(rate),
+            onToggleAutoPlay: () => this.toggleAutoPlay(),
+            onToggleSplashVideo: () => this.toggleSplashVideo()
         });
 
+        this.loadSettings();
         this.init();
         this.handleSplash();
     }
@@ -113,9 +122,52 @@ class App {
         const splash = this.ui.splashScreen;
         const overlay = this.ui.splashOverlay;
         const startBtn = this.ui.startSplashBtn;
+        if (!video || !skipBtn || !splash || !overlay || !startBtn) {
+            this.ui.appContainer?.classList.remove('opacity-0');
+            this.ui.appContainer?.classList.add('opacity-100');
+            if (this.ui.appContainer) this.ui.appContainer.style.pointerEvents = 'auto';
+            return;
+        }
+        if (!this.showSplashVideo) {
+            splash.classList.add('hidden');
+            this.ui.appContainer?.classList.remove('opacity-0');
+            this.ui.appContainer?.classList.add('opacity-100');
+            if (this.ui.appContainer) this.ui.appContainer.style.pointerEvents = 'auto';
+            return;
+        }
         let hasEnded = false;
-        let safetyTimeout = null;
+        let playbackTimeout = null;
+        let autoBypassTimeout = null;
         let hasStarted = false;
+
+        const removeListeners = [];
+        const clearTimers = () => {
+            clearTimeout(playbackTimeout);
+            clearTimeout(autoBypassTimeout);
+        };
+
+        const bindPress = (element, handler, options = {}) => {
+            if (!element) return;
+            let lastTouch = 0;
+            const wrapped = (event) => {
+                if (options.stopPropagation) event.stopPropagation();
+                if (options.preventDefault !== false && event.cancelable) {
+                    event.preventDefault();
+                }
+                if (event.type === 'click' && Date.now() - lastTouch < 700) {
+                    return;
+                }
+                if (event.type === 'touchend' || event.type === 'pointerup') {
+                    lastTouch = Date.now();
+                }
+                handler(event);
+            };
+
+            ['pointerup', 'touchend', 'click'].forEach(type => {
+                element.addEventListener(type, wrapped, { passive: false });
+                removeListeners.push(() => element.removeEventListener(type, wrapped, { passive: false }));
+            });
+        };
 
         const endSplash = () => {
             if (hasEnded) return;
@@ -123,9 +175,9 @@ class App {
             video.onended = null;
             video.onerror = null;
             video.oncanplay = null;
-            skipBtn.onclick = null;
-            startBtn.onclick = null;
-            clearTimeout(safetyTimeout);
+            video.pause();
+            clearTimers();
+            removeListeners.forEach(remove => remove());
             splash.classList.add('pointer-events-none');
             splash.style.opacity = '0';
             setTimeout(() => {
@@ -140,20 +192,25 @@ class App {
             if (hasEnded || !hasStarted) return;
             splash.classList.add('intro-playing');
             overlay.classList.add('hidden');
-            const playAttempt = video.play();
+            let playAttempt = null;
+            try {
+                playAttempt = video.play();
+            } catch (error) {
+                endSplash();
+                return;
+            }
             if (playAttempt?.catch) {
                 playAttempt.catch(() => endSplash());
             }
         };
 
-        skipBtn.onclick = endSplash;
-        startBtn.onclick = () => {
+        const startIntro = () => {
             if (hasStarted) return;
             hasStarted = true;
 
             video.onended = endSplash;
             video.onerror = endSplash;
-            safetyTimeout = setTimeout(() => {
+            playbackTimeout = setTimeout(() => {
                 if (!hasEnded) endSplash();
             }, 5000);
 
@@ -164,6 +221,23 @@ class App {
                 video.load();
             }
         };
+
+        bindPress(skipBtn, () => endSplash(), { stopPropagation: true });
+        bindPress(startBtn, () => startIntro(), { stopPropagation: true });
+        bindPress(overlay, (event) => {
+            if (event.target === skipBtn || event.target === startBtn) return;
+            startIntro();
+        });
+        bindPress(splash, (event) => {
+            if (event.target === skipBtn || event.target === startBtn || overlay.contains(event.target)) return;
+            startIntro();
+        });
+
+        autoBypassTimeout = setTimeout(() => {
+            if (!hasStarted && !hasEnded) {
+                endSplash();
+            }
+        }, 6500);
     }
 
     init() {
@@ -191,7 +265,46 @@ class App {
         this.setLanguage(this.baseLanguage);
         this.setTargetLanguage(this.targetLanguage);
         this.setMode('letters');
-        this.setPracticeStyle('classic');
+        this.setPracticeStyle(this.practiceStyle);
+        this.setTimer(this.selectedTime);
+        this.ui.updateAutoPlayToggle(this.autoPlayAudio);
+        this.ui.updateSplashToggle(this.showSplashVideo);
+        this.ui.updateSpeechSpeed(this.speechRate);
+    }
+
+    loadSettings() {
+        try {
+            const raw = localStorage.getItem('victory-drill-settings');
+            if (!raw) return;
+            const saved = JSON.parse(raw);
+            if (typeof saved.selectedTime === 'number') this.selectedTime = saved.selectedTime;
+            if (typeof saved.practiceStyle === 'string') this.practiceStyle = saved.practiceStyle;
+            if (typeof saved.showPronunciation === 'boolean') this.showPronunciation = saved.showPronunciation;
+            if (typeof saved.showMeanings === 'boolean') this.showMeanings = saved.showMeanings;
+            if (typeof saved.autoPlayAudio === 'boolean') this.autoPlayAudio = saved.autoPlayAudio;
+            if (typeof saved.showSplashVideo === 'boolean') this.showSplashVideo = saved.showSplashVideo;
+            if (typeof saved.speechRate === 'number') this.speechRate = saved.speechRate;
+            if (saved.voiceChoices && typeof saved.voiceChoices === 'object') this.voiceChoices = saved.voiceChoices;
+        } catch (error) {
+            console.warn('Could not load saved settings', error);
+        }
+    }
+
+    saveSettings() {
+        try {
+            localStorage.setItem('victory-drill-settings', JSON.stringify({
+                selectedTime: this.selectedTime,
+                practiceStyle: this.practiceStyle,
+                showPronunciation: this.showPronunciation,
+                showMeanings: this.showMeanings,
+                autoPlayAudio: this.autoPlayAudio,
+                showSplashVideo: this.showSplashVideo,
+                speechRate: this.speechRate,
+                voiceChoices: this.voiceChoices
+            }));
+        } catch (error) {
+            console.warn('Could not save settings', error);
+        }
     }
 
     setLanguage(language) {
@@ -236,6 +349,14 @@ class App {
             pronunciationToggleHint: getUIText(language, 'pronunciationToggleHint'),
             meaningToggle: getUIText(language, 'meaningToggle'),
             meaningToggleHint: getUIText(language, 'meaningToggleHint'),
+            voiceLabel: getUIText(language, 'voiceLabel'),
+            voiceAuto: getUIText(language, 'voiceAuto'),
+            speechSpeedLabel: getUIText(language, 'speechSpeedLabel'),
+            speechSpeedHint: getUIText(language, 'speechSpeedHint'),
+            autoPlayLabel: getUIText(language, 'autoPlayLabel'),
+            autoPlayHint: getUIText(language, 'autoPlayHint'),
+            splashToggleLabel: getUIText(language, 'splashToggleLabel'),
+            splashToggleHint: getUIText(language, 'splashToggleHint'),
             practiceStyleLabel: getUIText(language, 'practiceStyleLabel'),
             practiceStyleClassic: getUIText(language, 'practiceStyleClassic'),
             practiceStyleCoach: getUIText(language, 'practiceStyleCoach'),
@@ -276,12 +397,33 @@ class App {
             noMinimalPair: getUIText(language, 'noMinimalPair'),
             defaultMouthTip: getUIText(language, 'defaultMouthTip'),
             defaultRhythmTip: getUIText(language, 'defaultRhythmTip'),
+            settingsButton: getUIText(language, 'settingsButton'),
+            settingsOpenInline: getUIText(language, 'settingsOpenInline'),
+            settingsTitle: getUIText(language, 'settingsTitle'),
+            settingsSubtitle: getUIText(language, 'settingsSubtitle'),
+            settingsDone: getUIText(language, 'settingsDone'),
+            settingsSummaryTitle: getUIText(language, 'settingsSummaryTitle'),
+            settingsSummarySubtitle: getUIText(language, 'settingsSummarySubtitle'),
+            settingsSupportLabel: getUIText(language, 'settingsSupportLabel'),
+            settingsSupportOff: getUIText(language, 'settingsSupportOff'),
+            settingsVoiceLabel: getUIText(language, 'settingsVoiceLabel'),
+            settingsAutoPlayShort: getUIText(language, 'settingsAutoPlayShort'),
+            settingsSplashShort: getUIText(language, 'settingsSplashShort'),
+            pronunciationShort: getUIText(language, 'pronunciationShort'),
+            meaningShort: getUIText(language, 'meaningShort'),
+            setupStepLanguages: getUIText(language, 'setupStepLanguages'),
+            setupStepMode: getUIText(language, 'setupStepMode'),
+            setupStepCategory: getUIText(language, 'setupStepCategory'),
             on: getUIText(language, 'on'),
             off: getUIText(language, 'off')
         });
         this.ui.updatePronunciationToggle(this.showPronunciation);
         this.ui.updateMeaningToggle(this.showMeanings);
+        this.ui.updateAutoPlayToggle(this.autoPlayAudio);
+        this.ui.updateSplashToggle(this.showSplashVideo);
+        this.ui.updateSpeechSpeed(this.speechRate);
         this.ui.setPracticeStyle(this.practiceStyle);
+        this.refreshVoiceOptions();
         this.renderCategories();
         if (this.currentList.length) {
             this.ui.setInitialContent(this.getCurrentItem());
@@ -295,9 +437,11 @@ class App {
         this.targetLanguage = language;
         const speechLang = learningContent[language]?.speechLang || 'ru-RU';
         this.voice.setLanguage(speechLang);
+        this.voice.setPreferredVoice(this.voiceChoices[language] || '');
         this.recognition.setLanguage(speechLang);
         this.ui.setTargetLanguage(language);
         this.ui.updateTargetLanguageButtons(language);
+        this.refreshVoiceOptions();
         this.resetSpeechFeedback();
         this.currentCategory = null;
         this.currentList = [];
@@ -315,6 +459,7 @@ class App {
     setPracticeStyle(style) {
         this.practiceStyle = style;
         this.ui.setPracticeStyle(style);
+        this.saveSettings();
         if (this.currentList.length) {
             if (style === 'listening') {
                 this.startListeningQuiz();
@@ -328,11 +473,13 @@ class App {
     setTimer(seconds) {
         this.selectedTime = seconds;
         this.ui.updateTimerButtons(seconds);
+        this.saveSettings();
     }
 
     togglePronunciation() {
         this.showPronunciation = !this.showPronunciation;
         this.ui.updatePronunciationToggle(this.showPronunciation);
+        this.saveSettings();
         if (this.currentList.length) {
             this.ui.setInitialContent(this.getCurrentItem());
             if (this.isFlipped) {
@@ -345,6 +492,7 @@ class App {
     toggleMeanings() {
         this.showMeanings = !this.showMeanings;
         this.ui.updateMeaningToggle(this.showMeanings);
+        this.saveSettings();
         if (this.currentList.length) {
             this.ui.setInitialContent(this.getCurrentItem());
             if (this.isFlipped) {
@@ -352,6 +500,35 @@ class App {
             }
             this.updatePracticeLab();
         }
+    }
+
+    toggleAutoPlay() {
+        this.autoPlayAudio = !this.autoPlayAudio;
+        this.ui.updateAutoPlayToggle(this.autoPlayAudio);
+        this.saveSettings();
+    }
+
+    toggleSplashVideo() {
+        this.showSplashVideo = !this.showSplashVideo;
+        this.ui.updateSplashToggle(this.showSplashVideo);
+        this.saveSettings();
+    }
+
+    setSpeechRate(rate) {
+        this.speechRate = rate;
+        this.ui.updateSpeechSpeed(rate);
+        this.saveSettings();
+    }
+
+    setVoiceChoice(voiceName) {
+        this.voiceChoices[this.targetLanguage] = voiceName;
+        this.voice.setPreferredVoice(voiceName);
+        this.refreshVoiceOptions();
+        this.saveSettings();
+    }
+
+    refreshVoiceOptions() {
+        this.ui.renderVoiceOptions(this.voice.getAvailableVoices(), this.voiceChoices[this.targetLanguage] || '');
     }
 
     renderCategories() {
@@ -470,7 +647,7 @@ class App {
 
         if (this.practiceStyle === 'listening') {
             setTimeout(() => this.startListeningQuiz(), 200);
-        } else {
+        } else if (this.autoPlayAudio) {
             this.speakCurrentItem();
         }
     }
@@ -478,7 +655,7 @@ class App {
     speakWord(item) {
         if (this.isPaused) return;
         const wordToSpeak = item.w || (typeof item === 'string' ? item : item.t);
-        this.voice.speak(wordToSpeak);
+        this.voice.speak(wordToSpeak, 0.9 * this.speechRate);
     }
 
     getText(item) {
@@ -722,8 +899,9 @@ class App {
         const item = this.getCurrentItem();
         if (!item) return;
         const speechText = this.getText(item);
-        this.highlightSyllablesForPlayback(item, rate ?? 0.9);
-        this.voice.speak(speechText, rate, {
+        const finalRate = (rate ?? 0.9) * this.speechRate;
+        this.highlightSyllablesForPlayback(item, finalRate);
+        this.voice.speak(speechText, finalRate, {
             onEnd: () => {
                 this.clearSyllableHighlightTimer();
                 this.updatePracticeLab(-1);
@@ -760,7 +938,7 @@ class App {
             selectedIndex: -1
         };
         this.updatePracticeLab();
-        this.voice.speak(this.getDisplayText(item), 0.88);
+        this.voice.speak(this.getDisplayText(item), 0.88 * this.speechRate);
         const stats = this.getItemStats(item);
         stats.listens += 1;
     }
@@ -775,7 +953,7 @@ class App {
             ? (this.ui.text.listenCorrect || 'Correct')
             : (this.ui.text.listenWrong || 'Listen again');
         if (!correct) {
-            this.voice.speak(this.listeningQuiz.correct, 0.88);
+            this.voice.speak(this.listeningQuiz.correct, 0.88 * this.speechRate);
         }
         this.updatePracticeLab();
     }
@@ -788,7 +966,7 @@ class App {
             this.updatePracticeLab();
             return;
         }
-        this.voice.speak(`${this.getDisplayText(item)} ... ${this.getDisplayText(pair)}`, 0.78);
+        this.voice.speak(`${this.getDisplayText(item)} ... ${this.getDisplayText(pair)}`, 0.78 * this.speechRate);
     }
 
     reinforceCurrentItem(success = false) {
@@ -823,7 +1001,7 @@ class App {
         this.updatePracticeLab();
         if (this.practiceStyle === 'listening') {
             this.startListeningQuiz();
-        } else {
+        } else if (this.autoPlayAudio) {
             this.speakCurrentItem();
         }
     }
@@ -842,7 +1020,7 @@ class App {
         this.updatePracticeLab();
         if (this.practiceStyle === 'listening') {
             this.startListeningQuiz();
-        } else {
+        } else if (this.autoPlayAudio) {
             this.speakCurrentItem();
         }
     }

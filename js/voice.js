@@ -33,6 +33,7 @@ export class VoiceManager {
         this.currentSpeechLang = 'ru-RU';
         this.currentVoice = null;
         this.voiceCache = new Map();
+        this.preferredVoiceName = null;
 
         this._initVoices();
         if (this.synth.onvoiceschanged !== undefined) {
@@ -109,6 +110,16 @@ export class VoiceManager {
         }
 
         const config = this._getVoiceConfig(lang);
+        if (this.preferredVoiceName) {
+            const preferredVoice = this.voices.find(voice => voice.name === this.preferredVoiceName);
+            if (preferredVoice) {
+                return {
+                    voice: preferredVoice,
+                    lang: preferredVoice.lang || lang
+                };
+            }
+        }
+
         const cachedName = this.voiceCache.get(lang);
         if (cachedName) {
             const cachedVoice = this.voices.find(voice => voice.name === cachedName);
@@ -189,6 +200,25 @@ export class VoiceManager {
         const selection = this._findVoiceSelection(lang);
         this.currentVoice = selection.voice;
         this.currentSpeechLang = selection.lang;
+    }
+
+    setPreferredVoice(name = '') {
+        this.preferredVoiceName = name || null;
+        const selection = this._findVoiceSelection(this.currentLang);
+        this.currentVoice = selection.voice;
+        this.currentSpeechLang = selection.lang;
+    }
+
+    getAvailableVoices(lang = this.currentLang) {
+        const config = this._getVoiceConfig(lang);
+        return this.voices
+            .filter(voice => config.fallbackLangs.some(candidate => this._langMatches(voice.lang, candidate)))
+            .sort((a, b) => this._scoreVoice(b, config) - this._scoreVoice(a, config))
+            .map(voice => ({
+                name: voice.name,
+                label: `${voice.name} (${voice.lang || lang})`,
+                lang: voice.lang || lang
+            }));
     }
 
     speak(text, rate = null, handlers = {}) {

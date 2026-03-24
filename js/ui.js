@@ -6,6 +6,7 @@ export class UIManager {
         this.language = 'ru';
         this.targetLanguage = 'ru';
         this.practiceStyle = 'classic';
+        this.selectedTime = 60;
         this.text = {};
         this.showPronunciation = true;
         this.showMeanings = true;
@@ -33,6 +34,35 @@ export class UIManager {
         this.categorySearch = document.getElementById('category-search');
         this.categoryCount = document.getElementById('category-count');
         this.categoryEmpty = document.getElementById('category-empty');
+        this.openSettingsBtn = document.getElementById('open-settings');
+        this.openSettingsInlineBtn = document.getElementById('open-settings-inline');
+        this.settingsModal = document.getElementById('settings-modal');
+        this.settingsBackdrop = document.getElementById('settings-backdrop');
+        this.closeSettingsBtn = document.getElementById('close-settings');
+        this.settingsDoneBtn = document.getElementById('settings-done');
+        this.settingsTriggerLabel = document.getElementById('settings-trigger-label');
+        this.settingsInlineLabel = document.getElementById('settings-inline-label');
+        this.settingsTitle = document.getElementById('settings-title');
+        this.settingsSubtitle = document.getElementById('settings-subtitle');
+        this.settingsDoneLabel = document.getElementById('settings-done-label');
+        this.settingsSummaryTitle = document.getElementById('settings-summary-title');
+        this.settingsSummarySubtitle = document.getElementById('settings-summary-subtitle');
+        this.settingsSummaryPills = document.getElementById('settings-summary-pills');
+        this.voiceLabel = document.getElementById('voice-label');
+        this.voiceSelect = document.getElementById('voice-select');
+        this.speechSpeedLabel = document.getElementById('speech-speed-label');
+        this.speechSpeedHint = document.getElementById('speech-speed-hint');
+        this.speechSpeedRange = document.getElementById('speech-speed-range');
+        this.speechSpeedValue = document.getElementById('speech-speed-value');
+        this.autoPlayLabel = document.getElementById('auto-play-label');
+        this.autoPlayHint = document.getElementById('auto-play-hint');
+        this.autoPlayBtn = document.getElementById('auto-play-btn');
+        this.splashToggleLabel = document.getElementById('splash-toggle-label');
+        this.splashToggleHint = document.getElementById('splash-toggle-hint');
+        this.splashToggleBtn = document.getElementById('splash-toggle-btn');
+        this.setupStepLanguages = document.getElementById('setup-step-languages');
+        this.setupStepMode = document.getElementById('setup-step-mode');
+        this.setupStepCategory = document.getElementById('setup-step-category');
         this.pronunciationToggleLabel = document.getElementById('pronunciation-toggle-label');
         this.pronunciationToggleHint = document.getElementById('pronunciation-toggle-hint');
         this.pronunciationToggleBtn = document.getElementById('pronunciation-toggle-btn');
@@ -105,12 +135,26 @@ export class UIManager {
         if (this.categorySearch) this.categorySearch.oninput = () => this.applyCategoryFilter();
         if (this.categoryPrevBtn) this.categoryPrevBtn.onclick = () => this.scrollCategories(-1);
         if (this.categoryNextBtn) this.categoryNextBtn.onclick = () => this.scrollCategories(1);
+        if (this.openSettingsBtn) this.openSettingsBtn.onclick = () => this.openSettings();
+        if (this.openSettingsInlineBtn) this.openSettingsInlineBtn.onclick = () => this.openSettings();
+        if (this.closeSettingsBtn) this.closeSettingsBtn.onclick = () => this.closeSettings();
+        if (this.settingsDoneBtn) this.settingsDoneBtn.onclick = () => this.closeSettings();
+        if (this.settingsBackdrop) this.settingsBackdrop.onclick = () => this.closeSettings();
+        if (this.voiceSelect) this.voiceSelect.onchange = () => this.callbacks.onChangeVoice(this.voiceSelect.value);
+        if (this.speechSpeedRange) this.speechSpeedRange.oninput = () => this.callbacks.onChangeSpeechRate(Number(this.speechSpeedRange.value));
+        if (this.autoPlayBtn) this.autoPlayBtn.onclick = () => this.callbacks.onToggleAutoPlay();
+        if (this.splashToggleBtn) this.splashToggleBtn.onclick = () => this.callbacks.onToggleSplashVideo();
         if (this.slowPlayBtn) this.slowPlayBtn.onclick = () => this.callbacks.onSlowPlay();
         if (this.shadowBtn) this.shadowBtn.onclick = () => this.callbacks.onShadow();
         if (this.listenQuizBtn) this.listenQuizBtn.onclick = () => this.callbacks.onStartListeningQuiz();
         if (this.minimalPairBtn) this.minimalPairBtn.onclick = () => this.callbacks.onPlayMinimalPair();
         this.practiceStyleButtons.forEach(btn => {
             btn.onclick = () => this.callbacks.onChangePracticeStyle(btn.id.replace('style-', ''));
+        });
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                this.closeSettings();
+            }
         });
     }
 
@@ -121,11 +165,28 @@ export class UIManager {
         document.getElementById('app-title').innerText = text.appTitle;
         const versionEl = document.getElementById('app-version');
         if (versionEl) {
-            versionEl.innerText = 'Build 2026.03.22c';
+            versionEl.innerText = 'Build 2026.03.24c';
         }
         document.getElementById('language-prompt').innerText = text.languagePrompt;
         document.getElementById('target-language-prompt').innerText = text.targetLanguagePrompt;
         document.getElementById('category-prompt').innerText = text.categoryPrompt;
+        if (this.setupStepLanguages) this.setupStepLanguages.innerText = text.setupStepLanguages || 'Step 1 · Languages';
+        if (this.setupStepMode) this.setupStepMode.innerText = text.setupStepMode || 'Step 2 · Practice Type';
+        if (this.setupStepCategory) this.setupStepCategory.innerText = text.setupStepCategory || 'Step 3 · Choose Category';
+        if (this.settingsTriggerLabel) this.settingsTriggerLabel.innerText = text.settingsButton || 'Settings';
+        if (this.settingsInlineLabel) this.settingsInlineLabel.innerText = text.settingsOpenInline || 'Open Settings';
+        if (this.settingsTitle) this.settingsTitle.innerText = text.settingsTitle || 'Settings';
+        if (this.settingsSubtitle) this.settingsSubtitle.innerText = text.settingsSubtitle || 'Fine-tune how practice feels before you start.';
+        if (this.settingsDoneLabel) this.settingsDoneLabel.innerText = text.settingsDone || 'Done';
+        if (this.settingsSummaryTitle) this.settingsSummaryTitle.innerText = text.settingsSummaryTitle || 'Quick Setup';
+        if (this.settingsSummarySubtitle) this.settingsSummarySubtitle.innerText = text.settingsSummarySubtitle || 'Open settings to change support, timer, or practice style.';
+        if (this.voiceLabel) this.voiceLabel.innerText = text.voiceLabel || 'Voice';
+        if (this.speechSpeedLabel) this.speechSpeedLabel.innerText = text.speechSpeedLabel || 'Speech speed';
+        if (this.speechSpeedHint) this.speechSpeedHint.innerText = text.speechSpeedHint || 'Adjust how fast the model voice speaks';
+        if (this.autoPlayLabel) this.autoPlayLabel.innerText = text.autoPlayLabel || 'Auto-play new cards';
+        if (this.autoPlayHint) this.autoPlayHint.innerText = text.autoPlayHint || 'Play the word or phrase automatically when the card changes';
+        if (this.splashToggleLabel) this.splashToggleLabel.innerText = text.splashToggleLabel || 'Opening video';
+        if (this.splashToggleHint) this.splashToggleHint.innerText = text.splashToggleHint || 'Show the intro video when the app starts';
         this.categorySearch.placeholder = text.categorySearchPlaceholder || 'Search categories';
         this.categoryEmpty.innerText = text.categoryEmpty || 'No categories match your search.';
         this.pronunciationToggleLabel.innerText = text.pronunciationToggle;
@@ -175,8 +236,25 @@ export class UIManager {
         this.practiceDifficultBtn.innerText = text.difficult;
         this.updatePronunciationToggle(this.showPronunciation);
         this.updateMeaningToggle(this.showMeanings);
+        this.renderVoiceOptions([], this.voiceSelect?.value || '');
+        this.updateSettingsSummary();
         this.updateRecordButton(false, true);
         if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    openSettings() {
+        if (!this.settingsModal) return;
+        this.settingsModal.classList.remove('hidden');
+        this.settingsModal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    closeSettings() {
+        if (!this.settingsModal || this.settingsModal.classList.contains('hidden')) return;
+        this.settingsModal.classList.add('hidden');
+        this.settingsModal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
     }
 
     setTargetLanguage(language) {
@@ -229,6 +307,9 @@ export class UIManager {
     showScreen(name) {
         Object.values(this.screens).forEach(s => s.classList.add('hidden'));
         this.screens[name].classList.remove('hidden');
+        if (name !== 'start') {
+            this.closeSettings();
+        }
         if (typeof lucide !== 'undefined') lucide.createIcons();
     }
 
@@ -396,6 +477,7 @@ export class UIManager {
             const isSelected = btn.id === `style-${style}`;
             btn.classList.toggle('selected', isSelected);
         });
+        this.updateSettingsSummary();
     }
 
     setPracticeStyle(style) {
@@ -433,11 +515,13 @@ export class UIManager {
     }
 
     updateTimerButtons(seconds) {
+        this.selectedTime = seconds;
         document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('selected'));
         let id = 'time-60';
         if (seconds === 120) id = 'time-120';
         if (seconds === -1) id = 'time-free';
         document.getElementById(id).classList.add('selected');
+        this.updateSettingsSummary();
     }
 
     renderCategories(categories, colors) {
@@ -522,6 +606,7 @@ export class UIManager {
         this.pronunciationToggleBtn.classList.toggle('hover:bg-slate-400', !showPronunciation);
         this.pronunciationToggleBtn.classList.toggle('border-slate-500', !showPronunciation);
         this.pronunciationToggleBtn.style.setProperty('--shadow-color', showPronunciation ? '#047857' : '#64748b');
+        this.updateSettingsSummary();
     }
 
     updateMeaningToggle(showMeanings) {
@@ -534,6 +619,102 @@ export class UIManager {
         this.meaningToggleBtn.classList.toggle('hover:bg-slate-400', !showMeanings);
         this.meaningToggleBtn.classList.toggle('border-slate-500', !showMeanings);
         this.meaningToggleBtn.style.setProperty('--shadow-color', showMeanings ? '#4338ca' : '#64748b');
+        this.updateSettingsSummary();
+    }
+
+    updateAutoPlayToggle(enabled) {
+        if (!this.autoPlayBtn) return;
+        this.autoPlayBtn.innerText = enabled ? (this.text.on || 'On') : (this.text.off || 'Off');
+        this.autoPlayBtn.classList.toggle('bg-cyan-500', enabled);
+        this.autoPlayBtn.classList.toggle('hover:bg-cyan-600', enabled);
+        this.autoPlayBtn.classList.toggle('border-cyan-700', enabled);
+        this.autoPlayBtn.classList.toggle('bg-slate-300', !enabled);
+        this.autoPlayBtn.classList.toggle('hover:bg-slate-400', !enabled);
+        this.autoPlayBtn.classList.toggle('border-slate-500', !enabled);
+        this.autoPlayBtn.style.setProperty('--shadow-color', enabled ? '#0f766e' : '#64748b');
+        this.updateSettingsSummary();
+    }
+
+    updateSplashToggle(enabled) {
+        if (!this.splashToggleBtn) return;
+        this.splashToggleBtn.innerText = enabled ? (this.text.on || 'On') : (this.text.off || 'Off');
+        this.splashToggleBtn.classList.toggle('bg-fuchsia-500', enabled);
+        this.splashToggleBtn.classList.toggle('hover:bg-fuchsia-600', enabled);
+        this.splashToggleBtn.classList.toggle('border-fuchsia-700', enabled);
+        this.splashToggleBtn.classList.toggle('bg-slate-300', !enabled);
+        this.splashToggleBtn.classList.toggle('hover:bg-slate-400', !enabled);
+        this.splashToggleBtn.classList.toggle('border-slate-500', !enabled);
+        this.splashToggleBtn.style.setProperty('--shadow-color', enabled ? '#a21caf' : '#64748b');
+        this.updateSettingsSummary();
+    }
+
+    updateSpeechSpeed(rate) {
+        if (this.speechSpeedRange) {
+            this.speechSpeedRange.value = `${rate}`;
+        }
+        if (this.speechSpeedValue) {
+            this.speechSpeedValue.innerText = `${rate.toFixed(2)}x`;
+        }
+        this.updateSettingsSummary();
+    }
+
+    renderVoiceOptions(voices, selectedVoice) {
+        if (!this.voiceSelect) return;
+        this.voiceSelect.innerHTML = '';
+        const autoOption = document.createElement('option');
+        autoOption.value = '';
+        autoOption.innerText = this.text.voiceAuto || 'Automatic best voice';
+        this.voiceSelect.appendChild(autoOption);
+
+        voices.forEach(voice => {
+            const option = document.createElement('option');
+            option.value = voice.name;
+            option.innerText = voice.label;
+            this.voiceSelect.appendChild(option);
+        });
+
+        this.voiceSelect.value = selectedVoice || '';
+        this.updateSettingsSummary();
+    }
+
+    updateSettingsSummary() {
+        if (!this.settingsSummaryPills) return;
+
+        const styleMap = {
+            classic: this.text.practiceStyleClassic || 'Classic',
+            coach: this.text.practiceStyleCoach || 'Coach',
+            speaking: this.text.practiceStyleSpeaking || 'Speaking',
+            listening: this.text.practiceStyleListening || 'Listening'
+        };
+        const timerMap = {
+            60: this.text.timeOneMin || '1 Min',
+            120: this.text.timeTwoMin || '2 Min',
+            '-1': this.text.timeFree || 'Free'
+        };
+        const supportBits = [];
+        if (this.showPronunciation) supportBits.push(this.text.pronunciationShort || this.text.pronunciation || 'Pronunciation');
+        if (this.showMeanings) supportBits.push(this.text.meaningShort || this.text.meaning || 'Meaning');
+        const supportLabel = supportBits.length
+            ? supportBits.join(' + ')
+            : (this.text.settingsSupportOff || 'Support off');
+
+        const pills = [
+            `${this.text.practiceStyleLabel || 'Practice style'}: ${styleMap[this.practiceStyle] || styleMap.classic}`,
+            `${this.text.timerLabel || 'Timer'}: ${timerMap[this.selectedTime] || timerMap[60]}`,
+            `${this.text.settingsSupportLabel || 'Support'}: ${supportLabel}`,
+            `${this.text.settingsVoiceLabel || 'Voice'}: ${this.voiceSelect?.selectedOptions?.[0]?.text || (this.text.voiceAuto || 'Automatic best voice')}`,
+            `${this.text.speechSpeedLabel || 'Speech speed'}: ${this.speechSpeedRange ? `${Number(this.speechSpeedRange.value).toFixed(2)}x` : '1.00x'}`,
+            `${this.text.settingsAutoPlayShort || 'Auto-play'}: ${this.autoPlayBtn?.innerText || (this.text.on || 'On')}`,
+            `${this.text.settingsSplashShort || 'Opening video'}: ${this.splashToggleBtn?.innerText || (this.text.on || 'On')}`
+        ];
+
+        this.settingsSummaryPills.innerHTML = '';
+        pills.forEach(label => {
+            const pill = document.createElement('div');
+            pill.className = 'settings-summary-pill';
+            pill.innerText = label;
+            this.settingsSummaryPills.appendChild(pill);
+        });
     }
 
     hasCyrillic(text) {
