@@ -106,3 +106,5 @@ Original prompt: Ok, let's skip that bug for now. Please update each language so
 - Expanded Chinese Sound Words with extra zh/sh, third-tone flow, and special-sounds drill sets.
 - Expanded the Letters section for English, French, Kyrgyz, and Chinese.
 - Added new supplemental letter/sound practice packs for blends, vowel combos, special consonants, pinyin initials, and pinyin finals.
+- Added a new visual pronunciation guide button with an animated SVG mouth/tongue helper modal.
+- Added language-aware visual articulation hints for Russian, English, Kyrgyz, Chinese, and French sounds.

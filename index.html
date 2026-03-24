@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Русская Победа</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="css/style.css?v=20260324c">
+    <link rel="stylesheet" href="css/style.css?v=20260324d">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -484,6 +484,10 @@
                         <i data-lucide="git-compare-arrows" class="w-4 h-4"></i>
                         <span id="minimal-pair-label">Contrast</span>
                     </button>
+                    <button id="visual-guide-btn" class="lab-action-btn" type="button">
+                        <i data-lucide="scan-face" class="w-4 h-4"></i>
+                        <span id="visual-guide-label">Visual</span>
+                    </button>
                 </div>
 
                 <div id="pronunciation-lab-body" class="pronunciation-lab-body">
@@ -589,9 +593,61 @@
             </div>
         </div>
 
-    </div>
+        <div id="visual-guide-modal" class="settings-modal hidden" aria-hidden="true">
+            <div id="visual-guide-backdrop" class="settings-backdrop"></div>
+            <div class="settings-sheet visual-guide-sheet">
+                <div class="settings-sheet-header">
+                    <div>
+                        <p id="visual-guide-title" class="settings-title">Visual Pronunciation Guide</p>
+                        <p id="visual-guide-subtitle" class="settings-subtitle">See how the mouth and tongue should move for this sound.</p>
+                    </div>
+                    <button id="close-visual-guide" type="button" class="settings-close-btn" aria-label="Close visual guide">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
 
-    <script type="module" src="js/app.js?v=20260324c"></script>
+                <div class="visual-guide-stack">
+                    <div class="visual-guide-preview-card">
+                        <div class="visual-guide-head">
+                            <div>
+                                <p id="visual-guide-target-label" class="lab-card-label">Target</p>
+                                <p id="visual-guide-target" class="visual-guide-target">word</p>
+                            </div>
+                            <div id="visual-guide-profile" class="pronunciation-lab-chip">Open vowel</div>
+                        </div>
+                        <div id="visual-guide-svg-wrap" class="visual-guide-svg-wrap"></div>
+                    </div>
+
+                    <div class="coach-focus-card">
+                        <p id="visual-guide-focus-label" class="lab-card-label">What to do</p>
+                        <p id="visual-guide-focus" class="coach-focus-text">Open the mouth gently and keep the tongue relaxed.</p>
+                    </div>
+
+                    <div class="coach-detail-list">
+                        <div class="coach-detail-row">
+                            <p id="visual-guide-lips-label" class="lab-card-label">Lips</p>
+                            <p id="visual-guide-lips" class="coach-detail-text">Relaxed</p>
+                        </div>
+                        <div class="coach-detail-row">
+                            <p id="visual-guide-tongue-label" class="lab-card-label">Tongue</p>
+                            <p id="visual-guide-tongue" class="coach-detail-text">Middle and relaxed</p>
+                        </div>
+                        <div class="coach-detail-row">
+                            <p id="visual-guide-air-label" class="lab-card-label">Air</p>
+                            <p id="visual-guide-air" class="coach-detail-text">Smooth and steady</p>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="visual-guide-done" type="button" class="settings-done-btn">
+                    <span id="visual-guide-done-label">Done</span>
+                </button>
+            </div>
+        </div>
+
+      </div>
+
+    <script type="module" src="js/app.js?v=20260324d"></script>
 </body>
 
 </html>

@@ -134,6 +134,7 @@ export class UIManager {
         this.shadowLabel = document.getElementById('shadow-label');
         this.listenQuizLabel = document.getElementById('listen-quiz-label');
         this.minimalPairLabel = document.getElementById('minimal-pair-label');
+        this.visualGuideLabel = document.getElementById('visual-guide-label');
         this.listenQuizPanel = document.getElementById('listen-quiz-panel');
         this.listenQuizQuestion = document.getElementById('listen-quiz-question');
         this.listenQuizResult = document.getElementById('listen-quiz-result');
@@ -141,6 +142,26 @@ export class UIManager {
         this.pronunciationLab = document.getElementById('pronunciation-lab');
         this.pronunciationLabActions = document.getElementById('pronunciation-lab-actions');
         this.pronunciationLabBody = document.getElementById('pronunciation-lab-body');
+        this.visualGuideBtn = document.getElementById('visual-guide-btn');
+        this.visualGuideModal = document.getElementById('visual-guide-modal');
+        this.visualGuideBackdrop = document.getElementById('visual-guide-backdrop');
+        this.closeVisualGuideBtn = document.getElementById('close-visual-guide');
+        this.visualGuideDoneBtn = document.getElementById('visual-guide-done');
+        this.visualGuideDoneLabel = document.getElementById('visual-guide-done-label');
+        this.visualGuideTitle = document.getElementById('visual-guide-title');
+        this.visualGuideSubtitle = document.getElementById('visual-guide-subtitle');
+        this.visualGuideTargetLabel = document.getElementById('visual-guide-target-label');
+        this.visualGuideTarget = document.getElementById('visual-guide-target');
+        this.visualGuideProfile = document.getElementById('visual-guide-profile');
+        this.visualGuideSvgWrap = document.getElementById('visual-guide-svg-wrap');
+        this.visualGuideFocusLabel = document.getElementById('visual-guide-focus-label');
+        this.visualGuideFocus = document.getElementById('visual-guide-focus');
+        this.visualGuideLipsLabel = document.getElementById('visual-guide-lips-label');
+        this.visualGuideLips = document.getElementById('visual-guide-lips');
+        this.visualGuideTongueLabel = document.getElementById('visual-guide-tongue-label');
+        this.visualGuideTongue = document.getElementById('visual-guide-tongue');
+        this.visualGuideAirLabel = document.getElementById('visual-guide-air-label');
+        this.visualGuideAir = document.getElementById('visual-guide-air');
 
         this.card = document.getElementById('drill-card');
         this.cardFront = document.getElementById('card-front');
@@ -205,6 +226,10 @@ export class UIManager {
         if (this.shadowBtn) this.shadowBtn.onclick = () => this.callbacks.onShadow();
         if (this.listenQuizBtn) this.listenQuizBtn.onclick = () => this.callbacks.onStartListeningQuiz();
         if (this.minimalPairBtn) this.minimalPairBtn.onclick = () => this.callbacks.onPlayMinimalPair();
+        if (this.visualGuideBtn) this.visualGuideBtn.onclick = () => this.callbacks.onOpenVisualGuide?.();
+        if (this.closeVisualGuideBtn) this.closeVisualGuideBtn.onclick = () => this.closeVisualGuide();
+        if (this.visualGuideDoneBtn) this.visualGuideDoneBtn.onclick = () => this.closeVisualGuide();
+        if (this.visualGuideBackdrop) this.visualGuideBackdrop.onclick = () => this.closeVisualGuide();
         this.practiceStyleButtons.forEach(btn => {
             btn.onclick = () => this.callbacks.onChangePracticeStyle(btn.id.replace('style-', ''));
         });
@@ -212,6 +237,7 @@ export class UIManager {
             if (event.key === 'Escape') {
                 this.closeSettings();
                 this.closeTeacherTools();
+                this.closeVisualGuide();
             }
         });
     }
@@ -305,6 +331,15 @@ export class UIManager {
         if (this.shadowLabel) this.shadowLabel.innerText = text.shadowMode || 'Shadow';
         if (this.listenQuizLabel) this.listenQuizLabel.innerText = text.listenQuiz || 'Listen';
         if (this.minimalPairLabel) this.minimalPairLabel.innerText = text.minimalPairAction || 'Contrast';
+        if (this.visualGuideLabel) this.visualGuideLabel.innerText = text.visualGuideAction || 'Visual';
+        if (this.visualGuideTitle) this.visualGuideTitle.innerText = text.visualGuideTitle || 'Visual Pronunciation Guide';
+        if (this.visualGuideSubtitle) this.visualGuideSubtitle.innerText = text.visualGuideSubtitle || 'See how the mouth and tongue should move for this sound.';
+        if (this.visualGuideTargetLabel) this.visualGuideTargetLabel.innerText = text.visualGuideTargetLabel || 'Target';
+        if (this.visualGuideFocusLabel) this.visualGuideFocusLabel.innerText = text.visualGuideFocusLabel || 'What to do';
+        if (this.visualGuideLipsLabel) this.visualGuideLipsLabel.innerText = text.visualGuideLipsLabel || 'Lips';
+        if (this.visualGuideTongueLabel) this.visualGuideTongueLabel.innerText = text.visualGuideTongueLabel || 'Tongue';
+        if (this.visualGuideAirLabel) this.visualGuideAirLabel.innerText = text.visualGuideAirLabel || 'Air';
+        if (this.visualGuideDoneLabel) this.visualGuideDoneLabel.innerText = text.settingsDone || 'Done';
         if (this.listenQuizQuestion) this.listenQuizQuestion.innerText = text.listenQuizQuestion || 'Which one did you hear?';
         const classicBtn = document.getElementById('style-classic');
         const coachBtn = document.getElementById('style-coach');
@@ -352,6 +387,21 @@ export class UIManager {
         if (!this.teacherModal || this.teacherModal.classList.contains('hidden')) return;
         this.teacherModal.classList.add('hidden');
         this.teacherModal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+    }
+
+    openVisualGuide() {
+        if (!this.visualGuideModal) return;
+        this.visualGuideModal.classList.remove('hidden');
+        this.visualGuideModal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    closeVisualGuide() {
+        if (!this.visualGuideModal || this.visualGuideModal.classList.contains('hidden')) return;
+        this.visualGuideModal.classList.add('hidden');
+        this.visualGuideModal.setAttribute('aria-hidden', 'true');
         document.body.style.overflow = '';
     }
 
@@ -408,6 +458,9 @@ export class UIManager {
         if (name !== 'start') {
             this.closeSettings();
             this.closeTeacherTools();
+        }
+        if (name !== 'game') {
+            this.closeVisualGuide();
         }
         if (typeof lucide !== 'undefined') lucide.createIcons();
     }
@@ -522,6 +575,10 @@ export class UIManager {
         if (!this.masteryChip || !this.mouthTip || !this.intonationTip || !this.minimalPairText || !this.syllableHighlight) {
             return;
         }
+        if (this.visualGuideBtn) {
+            const shouldShowVisual = Boolean(data.visualGuideAvailable) && this.practiceStyle !== 'listening';
+            this.visualGuideBtn.classList.toggle('hidden', !shouldShowVisual);
+        }
         this.masteryChip.innerText = data.masteryLabel || `${this.text.mastery || 'Mastery'} 0%`;
         this.mouthTip.innerText = data.mouthTip || this.text.defaultMouthTip || 'Watch the shape of your mouth and keep the sound smooth.';
         this.intonationTip.innerText = data.intonationTip || this.text.defaultRhythmTip || 'Keep the phrase even and clear.';
@@ -584,6 +641,9 @@ export class UIManager {
         if (!this.screens.game) return;
         this.screens.game.classList.remove('game-style-classic', 'game-style-coach', 'game-style-speaking', 'game-style-listening');
         this.screens.game.classList.add(`game-style-${style}`);
+        if (style === 'listening') {
+            this.closeVisualGuide();
+        }
         this.updatePracticeStyleButtons(style);
     }
 
@@ -976,6 +1036,80 @@ export class UIManager {
             pill.innerText = label;
             this.assignmentBannerPills.appendChild(pill);
         });
+    }
+
+    renderVisualGuide(guide = {}) {
+        if (!this.visualGuideTarget || !this.visualGuideSvgWrap) return;
+        this.visualGuideTarget.innerText = guide.target || '';
+        if (this.visualGuideProfile) {
+            this.visualGuideProfile.innerText = guide.profileLabel || (this.text.visualGuideAction || 'Visual');
+        }
+        if (this.visualGuideFocus) {
+            this.visualGuideFocus.innerText = guide.instruction || this.text.defaultMouthTip || 'Watch the shape of your mouth and keep the sound smooth.';
+        }
+        if (this.visualGuideLips) {
+            this.visualGuideLips.innerText = guide.lipsLabel || '';
+        }
+        if (this.visualGuideTongue) {
+            this.visualGuideTongue.innerText = guide.tongueLabel || '';
+        }
+        if (this.visualGuideAir) {
+            this.visualGuideAir.innerText = guide.airLabel || '';
+        }
+        this.visualGuideSvgWrap.innerHTML = this.buildVisualGuideSvg(guide);
+        this.openVisualGuide();
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    buildVisualGuideSvg(guide = {}) {
+        const escapeSvgText = (value = '') => String(value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+        const lips = guide.lips || 'neutral';
+        const tongue = guide.tongue || 'front';
+        const caption = escapeSvgText(guide.caption || '');
+        const profile = escapeSvgText(guide.profileLabel || '');
+        const ariaLabel = escapeSvgText(guide.target || '');
+        const toneArrow = guide.showToneArrow
+            ? `<path d="M172 160 C188 136, 202 110, 214 78" fill="none" stroke="#22c55e" stroke-width="6" stroke-linecap="round" stroke-dasharray="10 10" />
+               <path d="M208 80 L214 66 L224 78" fill="none" stroke="#22c55e" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />`
+            : '';
+        const teeth = guide.showTeeth
+            ? `<rect x="94" y="150" width="66" height="16" rx="7" fill="#f8fafc" opacity="0.96" />
+               <rect x="95" y="169" width="64" height="12" rx="6" fill="#f8fafc" opacity="0.9" />`
+            : '';
+        const tongueBetween = guide.showBetweenTeeth
+            ? `<path d="M120 168 C124 160, 132 156, 142 157 C146 162, 144 172, 137 178 C128 178, 122 174, 120 168 Z" fill="#fb7185" opacity="0.92" class="visual-tongue is-between" />`
+            : '';
+
+        return `
+            <svg class="visual-guide-svg" viewBox="0 0 260 220" role="img" aria-label="${ariaLabel}">
+                <defs>
+                    <linearGradient id="visualFaceGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#fde68a" />
+                        <stop offset="100%" stop-color="#fdba74" />
+                    </linearGradient>
+                </defs>
+                <ellipse cx="126" cy="112" rx="88" ry="78" fill="url(#visualFaceGradient)" class="visual-face" />
+                <path d="M78 95 C88 88, 96 86, 106 88" fill="none" stroke="#7c2d12" stroke-width="5" stroke-linecap="round" />
+                <path d="M138 88 C148 86, 158 88, 168 95" fill="none" stroke="#7c2d12" stroke-width="5" stroke-linecap="round" />
+                <circle cx="98" cy="108" r="7" fill="#1f2937" />
+                <circle cx="154" cy="108" r="7" fill="#1f2937" />
+                <path d="M176 84 C205 98, 224 126, 224 158" fill="none" stroke="#94a3b8" stroke-width="5" stroke-linecap="round" stroke-dasharray="4 10" />
+                ${teeth}
+                <ellipse cx="126" cy="170" rx="28" ry="16" fill="#7f1d1d" opacity="0.92" class="visual-lips is-${lips}" />
+                <path d="M106 176 C112 150, 138 144, 152 156 C161 164, 159 181, 144 190 C126 192, 111 188, 106 176 Z" fill="#fb7185" opacity="0.88" class="visual-tongue is-${tongue}" />
+                ${tongueBetween}
+                <path d="M194 164 C214 164, 230 162, 242 156" fill="none" stroke="#38bdf8" stroke-width="6" stroke-linecap="round" stroke-dasharray="8 10" class="visual-air-arrow" />
+                <path d="M238 156 L246 152 L242 162" fill="none" stroke="#38bdf8" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" class="visual-air-arrow" />
+                ${toneArrow}
+                <text x="28" y="30" fill="#334155" font-size="12" font-weight="700" letter-spacing="1.2">${profile}</text>
+                <text x="28" y="204" fill="#475569" font-size="11" font-weight="600">${caption}</text>
+            </svg>
+        `;
     }
 
     updateSettingsSummary() {

@@ -105,6 +105,7 @@ class App {
             onShadow: () => this.startShadowing(),
             onStartListeningQuiz: () => this.startListeningQuiz(),
             onPlayMinimalPair: () => this.playMinimalPair(),
+            onOpenVisualGuide: () => this.openVisualGuide(),
             onChooseListeningOption: (index) => this.chooseListeningOption(index),
             onChangePracticeStyle: (style) => this.setPracticeStyle(style),
             onChangeVoice: (voiceName) => this.setVoiceChoice(voiceName),
@@ -605,6 +606,14 @@ class App {
             shadowMode: getUIText(language, 'shadowMode'),
             listenQuiz: getUIText(language, 'listenQuiz'),
             minimalPairAction: getUIText(language, 'minimalPairAction'),
+            visualGuideAction: getUIText(language, 'visualGuideAction'),
+            visualGuideTitle: getUIText(language, 'visualGuideTitle'),
+            visualGuideSubtitle: getUIText(language, 'visualGuideSubtitle'),
+            visualGuideTargetLabel: getUIText(language, 'visualGuideTargetLabel'),
+            visualGuideFocusLabel: getUIText(language, 'visualGuideFocusLabel'),
+            visualGuideLipsLabel: getUIText(language, 'visualGuideLipsLabel'),
+            visualGuideTongueLabel: getUIText(language, 'visualGuideTongueLabel'),
+            visualGuideAirLabel: getUIText(language, 'visualGuideAirLabel'),
             listenQuizQuestion: getUIText(language, 'listenQuizQuestion'),
             listenCorrect: getUIText(language, 'listenCorrect'),
             listenWrong: getUIText(language, 'listenWrong'),
@@ -1025,6 +1034,236 @@ class App {
         return this.ui.text.defaultMouthTip || 'Watch the shape of your mouth and keep the sound smooth.';
     }
 
+    getVisualGuide(item) {
+        const target = this.getDisplayText(item);
+        const text = target.toLowerCase();
+        const pronunciation = typeof item === 'object' ? `${item.sound || ''} ${item.pronunciation || ''}`.toLowerCase() : text;
+        const guide = {
+            target,
+            profileLabel: 'Open vowel',
+            instruction: this.getMouthTip(item),
+            lips: 'neutral',
+            tongue: 'front',
+            lipsLabel: 'Relaxed and lightly open.',
+            tongueLabel: 'Rest near the front-middle of the mouth.',
+            airLabel: 'Let the air move out smoothly.',
+            caption: 'Watch the motion, then copy it slowly.'
+        };
+
+        if (this.targetLanguage === 'en') {
+            if (/th/.test(text)) {
+                return {
+                    ...guide,
+                    profileLabel: 'TH sound',
+                    lips: 'neutral',
+                    tongue: 'between',
+                    lipsLabel: 'Keep the lips loose, not rounded.',
+                    tongueLabel: 'Place the tongue lightly between the teeth.',
+                    airLabel: 'Push a gentle stream of air over the tongue.',
+                    caption: 'Do not bite the tongue. Let the sound flow out.',
+                    showTeeth: true,
+                    showBetweenTeeth: true
+                };
+            }
+            if (/ee|ea|e\b|i\b/.test(text)) {
+                return {
+                    ...guide,
+                    profileLabel: 'Long E',
+                    lips: 'spread',
+                    tongue: 'high',
+                    lipsLabel: 'Stretch the lips slightly into a smile.',
+                    tongueLabel: 'Lift the tongue high toward the front.',
+                    airLabel: 'Keep the sound bright and steady.',
+                    caption: 'Hold the sound a little longer: eee.'
+                };
+            }
+            if (/r/.test(text)) {
+                return {
+                    ...guide,
+                    profileLabel: 'English R',
+                    lips: 'rounded',
+                    tongue: 'back',
+                    lipsLabel: 'Round the lips a little.',
+                    tongueLabel: 'Pull the tongue back without touching the roof.',
+                    airLabel: 'Keep the sound smooth, not tapped.',
+                    caption: 'Avoid a rolled or tapped R.'
+                };
+            }
+        }
+
+        if (this.targetLanguage === 'fr') {
+            if (/r/.test(text)) {
+                return {
+                    ...guide,
+                    profileLabel: 'French R',
+                    lips: 'neutral',
+                    tongue: 'back',
+                    lipsLabel: 'Keep the lips soft and relaxed.',
+                    tongueLabel: 'Pull the back of the tongue up toward the throat.',
+                    airLabel: 'Let the air brush gently in the back.',
+                    caption: 'Think of a gentle throat sound, not a tongue roll.'
+                };
+            }
+            if (/ou|u\b/.test(text) || /rounded/.test(pronunciation)) {
+                return {
+                    ...guide,
+                    profileLabel: 'Rounded vowel',
+                    lips: 'rounded',
+                    tongue: 'front',
+                    lipsLabel: 'Round the lips into a small circle.',
+                    tongueLabel: 'Keep the tongue forward inside the mouth.',
+                    airLabel: 'Keep the vowel pure and steady.',
+                    caption: 'Rounded lips plus a front tongue shape.'
+                };
+            }
+            if (/nasal|an|on|in/.test(`${pronunciation} ${text}`)) {
+                return {
+                    ...guide,
+                    profileLabel: 'Nasal vowel',
+                    lips: 'open',
+                    tongue: 'back',
+                    lipsLabel: 'Open the mouth softly.',
+                    tongueLabel: 'Keep the tongue relaxed and slightly back.',
+                    airLabel: 'Let some air resonate through the nose.',
+                    caption: 'Do not pronounce a strong final N sound.'
+                };
+            }
+        }
+
+        if (this.targetLanguage === 'zh') {
+            if (/x|q|j/.test(pronunciation)) {
+                return {
+                    ...guide,
+                    profileLabel: 'Front hiss',
+                    lips: 'spread',
+                    tongue: 'high',
+                    lipsLabel: 'Keep the lips slightly spread.',
+                    tongueLabel: 'Lift the tongue high near the hard palate.',
+                    airLabel: 'Use a narrow stream of air.',
+                    caption: 'Keep the sound thin and focused.'
+                };
+            }
+            if (/zh|sh|ch/.test(pronunciation)) {
+                return {
+                    ...guide,
+                    profileLabel: 'Retroflex sound',
+                    lips: 'rounded',
+                    tongue: 'tip-up',
+                    lipsLabel: 'Round the lips a little.',
+                    tongueLabel: 'Curl the tongue tip slightly upward.',
+                    airLabel: 'Send the air forward in one stream.',
+                    caption: 'Lift the tip without pressing too hard.'
+                };
+            }
+            if (/[1-5]/.test(pronunciation)) {
+                return {
+                    ...guide,
+                    profileLabel: 'Tone shape',
+                    lips: 'neutral',
+                    tongue: 'front',
+                    lipsLabel: 'Keep the mouth stable during the tone.',
+                    tongueLabel: 'Hold the tongue relaxed while pitch changes.',
+                    airLabel: 'Use a smooth voice line through the whole syllable.',
+                    caption: 'Follow the green line to feel the tone movement.',
+                    showToneArrow: true
+                };
+            }
+        }
+
+        if (this.targetLanguage === 'ky') {
+            if (/[өү]/.test(text)) {
+                return {
+                    ...guide,
+                    profileLabel: 'Rounded vowel',
+                    lips: 'rounded',
+                    tongue: 'front',
+                    lipsLabel: 'Round the lips and keep them steady.',
+                    tongueLabel: 'Keep the tongue forward and high.',
+                    airLabel: 'Hold one clean vowel shape.',
+                    caption: 'Do not let the vowel drift to another sound.'
+                };
+            }
+            if (/ң/.test(text)) {
+                return {
+                    ...guide,
+                    profileLabel: 'NG ending',
+                    lips: 'neutral',
+                    tongue: 'back',
+                    lipsLabel: 'Keep the lips relaxed.',
+                    tongueLabel: 'Lift the back of the tongue at the end.',
+                    airLabel: 'Let the sound finish in the nose.',
+                    caption: 'Close the sound in the back, not with N at the front.'
+                };
+            }
+            if (/р/.test(text)) {
+                return {
+                    ...guide,
+                    profileLabel: 'Kyrgyz R',
+                    lips: 'neutral',
+                    tongue: 'tip-up',
+                    lipsLabel: 'Keep the lips open and relaxed.',
+                    tongueLabel: 'Tap the tongue tip quickly at the top.',
+                    airLabel: 'Use a quick burst for the tap.',
+                    caption: 'Make it light and clear, not heavy.'
+                };
+            }
+        }
+
+        if (this.targetLanguage === 'ru') {
+            if (/р/.test(text)) {
+                return {
+                    ...guide,
+                    profileLabel: 'Russian R',
+                    lips: 'neutral',
+                    tongue: 'tip-up',
+                    lipsLabel: 'Keep the lips relaxed.',
+                    tongueLabel: 'Tap the tongue tip quickly against the ridge.',
+                    airLabel: 'Use a small burst to make the tongue vibrate.',
+                    caption: 'A light tap is enough. Do not drag the sound.'
+                };
+            }
+            if (/ь|мяг/.test(`${pronunciation} ${text}`)) {
+                return {
+                    ...guide,
+                    profileLabel: 'Soft consonant',
+                    lips: 'neutral',
+                    tongue: 'high',
+                    lipsLabel: 'Keep the lips loose.',
+                    tongueLabel: 'Lift the middle of the tongue toward the palate.',
+                    airLabel: 'Release the consonant gently into the vowel.',
+                    caption: 'The middle of the tongue creates the soft feeling.'
+                };
+            }
+            if (/ё|ю|я/.test(text)) {
+                return {
+                    ...guide,
+                    profileLabel: 'Open stressed vowel',
+                    lips: 'open',
+                    tongue: 'front',
+                    lipsLabel: 'Open the mouth clearly for the vowel.',
+                    tongueLabel: 'Move the tongue forward into the stressed vowel.',
+                    airLabel: 'Give the stressed syllable more energy.',
+                    caption: 'Open more on the stressed part of the word.'
+                };
+            }
+        }
+
+        if (/a|а/.test(text)) {
+            return {
+                ...guide,
+                profileLabel: 'Open vowel',
+                lips: 'open',
+                tongue: 'front',
+                lipsLabel: 'Open the mouth a little wider.',
+                tongueLabel: 'Keep the tongue low and relaxed.',
+                airLabel: 'Let the vowel ring clearly.',
+                caption: 'Use a clear open shape.'
+            };
+        }
+
+        return guide;
+    }
+
     getIntonationTip(item) {
         const text = this.getDisplayText(item);
         if (!text) {
@@ -1110,6 +1349,7 @@ class App {
             activeSyllable: -1,
             mouthTip: this.getMouthTip(item),
             intonationTip: this.getIntonationTip(item),
+            visualGuideAvailable: Boolean(item),
             minimalPairText: minimalPair
                 ? `${this.getDisplayText(item)} / ${this.getDisplayText(minimalPair)}`
                 : (this.ui.text.noMinimalPair || 'No contrast partner yet.'),
@@ -1129,6 +1369,12 @@ class App {
                 }
                 : { visible: false }
         };
+    }
+
+    openVisualGuide() {
+        const item = this.getCurrentItem();
+        if (!item) return;
+        this.ui.renderVisualGuide(this.getVisualGuide(item));
     }
 
     updatePracticeLab(activeSyllable = -1) {
