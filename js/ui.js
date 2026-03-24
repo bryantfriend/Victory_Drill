@@ -35,6 +35,7 @@ export class UIManager {
         this.categoryCount = document.getElementById('category-count');
         this.categoryEmpty = document.getElementById('category-empty');
         this.openSettingsBtn = document.getElementById('open-settings');
+        this.openTeacherBtn = document.getElementById('open-teacher-tools');
         this.openSettingsInlineBtn = document.getElementById('open-settings-inline');
         this.settingsModal = document.getElementById('settings-modal');
         this.settingsBackdrop = document.getElementById('settings-backdrop');
@@ -48,6 +49,39 @@ export class UIManager {
         this.settingsSummaryTitle = document.getElementById('settings-summary-title');
         this.settingsSummarySubtitle = document.getElementById('settings-summary-subtitle');
         this.settingsSummaryPills = document.getElementById('settings-summary-pills');
+        this.teacherModal = document.getElementById('teacher-modal');
+        this.teacherBackdrop = document.getElementById('teacher-backdrop');
+        this.closeTeacherBtn = document.getElementById('close-teacher');
+        this.teacherDoneBtn = document.getElementById('teacher-done');
+        this.teacherTriggerLabel = document.getElementById('teacher-trigger-label');
+        this.teacherTitle = document.getElementById('teacher-title');
+        this.teacherSubtitle = document.getElementById('teacher-subtitle');
+        this.teacherHomeworkLabel = document.getElementById('teacher-homework-label');
+        this.teacherHomeworkTitle = document.getElementById('teacher-homework-title');
+        this.teacherCategoryLabel = document.getElementById('teacher-category-label');
+        this.teacherCategorySelect = document.getElementById('teacher-category-select');
+        this.teacherTaskLabel = document.getElementById('teacher-task-label');
+        this.teacherTaskSelect = document.getElementById('teacher-task-select');
+        this.teacherLimitLabel = document.getElementById('teacher-limit-label');
+        this.teacherLimitSelect = document.getElementById('teacher-limit-select');
+        this.teacherRepeatLabel = document.getElementById('teacher-repeat-label');
+        this.teacherRepeatSelect = document.getElementById('teacher-repeat-select');
+        this.teacherGoalLabel = document.getElementById('teacher-goal-label');
+        this.teacherGoalSelect = document.getElementById('teacher-goal-select');
+        this.teacherSpeakingLabel = document.getElementById('teacher-speaking-label');
+        this.teacherSpeakingHint = document.getElementById('teacher-speaking-hint');
+        this.teacherSpeakingBtn = document.getElementById('teacher-speaking-btn');
+        this.teacherSummaryLabel = document.getElementById('teacher-summary-label');
+        this.teacherSummaryPills = document.getElementById('teacher-summary-pills');
+        this.teacherSummaryHint = document.getElementById('teacher-summary-hint');
+        this.teacherLinkLabel = document.getElementById('teacher-link-label');
+        this.teacherLinkOutput = document.getElementById('teacher-link-output');
+        this.teacherLinkHint = document.getElementById('teacher-link-hint');
+        this.teacherQrLabel = document.getElementById('teacher-qr-label');
+        this.teacherQrHint = document.getElementById('teacher-qr-hint');
+        this.teacherQrCode = document.getElementById('teacher-qr-code');
+        this.copyTeacherLinkBtn = document.getElementById('copy-teacher-link');
+        this.teacherDoneLabel = document.getElementById('teacher-done-label');
         this.voiceLabel = document.getElementById('voice-label');
         this.voiceSelect = document.getElementById('voice-select');
         this.speechSpeedLabel = document.getElementById('speech-speed-label');
@@ -72,6 +106,10 @@ export class UIManager {
         this.practiceStyleLabel = document.getElementById('practice-style-label');
         this.timeDisplay = document.getElementById('time-display');
         this.scoreDisplay = document.getElementById('score-display');
+        this.assignmentBanner = document.getElementById('assignment-banner');
+        this.assignmentBannerLabel = document.getElementById('assignment-banner-label');
+        this.assignmentBannerTitle = document.getElementById('assignment-banner-title');
+        this.assignmentBannerPills = document.getElementById('assignment-banner-pills');
         this.finalScore = document.getElementById('final-score');
         this.difficultSummary = document.getElementById('difficult-summary');
         this.speechFeedback = document.getElementById('speech-feedback');
@@ -136,10 +174,29 @@ export class UIManager {
         if (this.categoryPrevBtn) this.categoryPrevBtn.onclick = () => this.scrollCategories(-1);
         if (this.categoryNextBtn) this.categoryNextBtn.onclick = () => this.scrollCategories(1);
         if (this.openSettingsBtn) this.openSettingsBtn.onclick = () => this.openSettings();
+        if (this.openTeacherBtn) this.openTeacherBtn.onclick = () => {
+            this.openTeacherTools();
+            this.callbacks.onOpenTeacherTools?.(this.teacherCategorySelect?.value || '');
+        };
         if (this.openSettingsInlineBtn) this.openSettingsInlineBtn.onclick = () => this.openSettings();
         if (this.closeSettingsBtn) this.closeSettingsBtn.onclick = () => this.closeSettings();
         if (this.settingsDoneBtn) this.settingsDoneBtn.onclick = () => this.closeSettings();
         if (this.settingsBackdrop) this.settingsBackdrop.onclick = () => this.closeSettings();
+        if (this.closeTeacherBtn) this.closeTeacherBtn.onclick = () => this.closeTeacherTools();
+        if (this.teacherDoneBtn) this.teacherDoneBtn.onclick = () => this.closeTeacherTools();
+        if (this.teacherBackdrop) this.teacherBackdrop.onclick = () => this.closeTeacherTools();
+        if (this.teacherCategorySelect) this.teacherCategorySelect.onchange = () => this.callbacks.onOpenTeacherTools?.(this.teacherCategorySelect.value);
+        if (this.teacherHomeworkTitle) this.teacherHomeworkTitle.oninput = () => this.callbacks.onOpenTeacherTools?.(this.teacherCategorySelect?.value || '');
+        if (this.teacherTaskSelect) this.teacherTaskSelect.onchange = () => this.callbacks.onOpenTeacherTools?.(this.teacherCategorySelect?.value || '');
+        if (this.teacherLimitSelect) this.teacherLimitSelect.onchange = () => this.callbacks.onOpenTeacherTools?.(this.teacherCategorySelect?.value || '');
+        if (this.teacherRepeatSelect) this.teacherRepeatSelect.onchange = () => this.callbacks.onOpenTeacherTools?.(this.teacherCategorySelect?.value || '');
+        if (this.teacherGoalSelect) this.teacherGoalSelect.onchange = () => this.callbacks.onOpenTeacherTools?.(this.teacherCategorySelect?.value || '');
+        if (this.teacherSpeakingBtn) this.teacherSpeakingBtn.onclick = () => {
+            const nextValue = !this.teacherSpeakingBtn.classList.contains('is-on');
+            this.updateTeacherSpeakingToggle(nextValue);
+            this.callbacks.onOpenTeacherTools?.(this.teacherCategorySelect?.value || '');
+        };
+        if (this.copyTeacherLinkBtn) this.copyTeacherLinkBtn.onclick = () => this.copyTeacherLink();
         if (this.voiceSelect) this.voiceSelect.onchange = () => this.callbacks.onChangeVoice(this.voiceSelect.value);
         if (this.speechSpeedRange) this.speechSpeedRange.oninput = () => this.callbacks.onChangeSpeechRate(Number(this.speechSpeedRange.value));
         if (this.autoPlayBtn) this.autoPlayBtn.onclick = () => this.callbacks.onToggleAutoPlay();
@@ -154,6 +211,7 @@ export class UIManager {
         document.addEventListener('keydown', (event) => {
             if (event.key === 'Escape') {
                 this.closeSettings();
+                this.closeTeacherTools();
             }
         });
     }
@@ -165,7 +223,7 @@ export class UIManager {
         document.getElementById('app-title').innerText = text.appTitle;
         const versionEl = document.getElementById('app-version');
         if (versionEl) {
-            versionEl.innerText = 'Build 2026.03.24c';
+            versionEl.innerText = 'Build 2026.03.24d';
         }
         document.getElementById('language-prompt').innerText = text.languagePrompt;
         document.getElementById('target-language-prompt').innerText = text.targetLanguagePrompt;
@@ -174,10 +232,35 @@ export class UIManager {
         if (this.setupStepMode) this.setupStepMode.innerText = text.setupStepMode || 'Step 2 · Practice Type';
         if (this.setupStepCategory) this.setupStepCategory.innerText = text.setupStepCategory || 'Step 3 · Choose Category';
         if (this.settingsTriggerLabel) this.settingsTriggerLabel.innerText = text.settingsButton || 'Settings';
+        if (this.teacherTriggerLabel) this.teacherTriggerLabel.innerText = text.teacherToolsButton || 'Teacher';
         if (this.settingsInlineLabel) this.settingsInlineLabel.innerText = text.settingsOpenInline || 'Open Settings';
         if (this.settingsTitle) this.settingsTitle.innerText = text.settingsTitle || 'Settings';
         if (this.settingsSubtitle) this.settingsSubtitle.innerText = text.settingsSubtitle || 'Fine-tune how practice feels before you start.';
         if (this.settingsDoneLabel) this.settingsDoneLabel.innerText = text.settingsDone || 'Done';
+        if (this.teacherTitle) this.teacherTitle.innerText = text.teacherToolsTitle || 'Teacher Assignment';
+        if (this.teacherSubtitle) this.teacherSubtitle.innerText = text.teacherToolsSubtitle || 'Create a lesson QR code from the current setup.';
+        if (this.teacherHomeworkLabel) this.teacherHomeworkLabel.innerText = text.teacherHomeworkLabel || 'Homework title';
+        if (this.teacherHomeworkTitle) this.teacherHomeworkTitle.placeholder = text.teacherHomeworkPlaceholder || 'Week 1 pronunciation homework';
+        if (this.teacherCategoryLabel) this.teacherCategoryLabel.innerText = text.teacherCategoryLabel || 'Category for assignment';
+        if (this.teacherTaskLabel) this.teacherTaskLabel.innerText = text.teacherTaskLabel || 'Assignment focus';
+        if (this.teacherLimitLabel) this.teacherLimitLabel.innerText = text.teacherLimitLabel || 'Cards to complete';
+        if (this.teacherRepeatLabel) this.teacherRepeatLabel.innerText = text.teacherRepeatLabel || 'Repeats per card';
+        if (this.teacherGoalLabel) this.teacherGoalLabel.innerText = text.teacherGoalLabel || 'Completion goal';
+        if (this.teacherSpeakingLabel) this.teacherSpeakingLabel.innerText = text.teacherSpeakingLabel || 'Require speaking';
+        if (this.teacherSpeakingHint) this.teacherSpeakingHint.innerText = text.teacherSpeakingHint || 'Students must use the microphone during this homework.';
+        if (this.teacherSummaryLabel) this.teacherSummaryLabel.innerText = text.teacherSummaryLabel || 'Assignment summary';
+        if (this.teacherSummaryHint) this.teacherSummaryHint.innerText = text.teacherSummaryHint || 'This assignment also uses your current timer, support, voice, and speed settings.';
+        if (this.teacherLinkLabel) this.teacherLinkLabel.innerText = text.teacherLinkLabel || 'Assignment link';
+        if (this.teacherLinkHint) this.teacherLinkHint.innerText = text.teacherLinkHint || 'Students who open this link go straight into the assigned lesson.';
+        if (this.teacherQrLabel) this.teacherQrLabel.innerText = text.teacherQrLabel || 'QR code';
+        if (this.teacherQrHint) this.teacherQrHint.innerText = text.teacherQrHint || 'Scan this on a student phone to open the assignment.';
+        if (this.copyTeacherLinkBtn) this.copyTeacherLinkBtn.innerText = text.copy || 'Copy';
+        if (this.teacherDoneLabel) this.teacherDoneLabel.innerText = text.settingsDone || 'Done';
+        if (this.assignmentBannerLabel) this.assignmentBannerLabel.innerText = text.assignmentBannerLabel || 'Assigned Homework';
+        this.renderTeacherTaskOptions();
+        this.renderTeacherLimitOptions();
+        this.renderTeacherRepeatOptions();
+        this.renderTeacherGoalOptions();
         if (this.settingsSummaryTitle) this.settingsSummaryTitle.innerText = text.settingsSummaryTitle || 'Quick Setup';
         if (this.settingsSummarySubtitle) this.settingsSummarySubtitle.innerText = text.settingsSummarySubtitle || 'Open settings to change support, timer, or practice style.';
         if (this.voiceLabel) this.voiceLabel.innerText = text.voiceLabel || 'Voice';
@@ -257,6 +340,21 @@ export class UIManager {
         document.body.style.overflow = '';
     }
 
+    openTeacherTools() {
+        if (!this.teacherModal) return;
+        this.teacherModal.classList.remove('hidden');
+        this.teacherModal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    closeTeacherTools() {
+        if (!this.teacherModal || this.teacherModal.classList.contains('hidden')) return;
+        this.teacherModal.classList.add('hidden');
+        this.teacherModal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+    }
+
     setTargetLanguage(language) {
         this.targetLanguage = language;
     }
@@ -309,6 +407,7 @@ export class UIManager {
         this.screens[name].classList.remove('hidden');
         if (name !== 'start') {
             this.closeSettings();
+            this.closeTeacherTools();
         }
         if (typeof lucide !== 'undefined') lucide.createIcons();
     }
@@ -529,6 +628,7 @@ export class UIManager {
             ...cat,
             color: colors[index % colors.length]
         }));
+        this.renderTeacherCategories(this.allCategories);
         this.categorySearch.value = '';
         this.applyCategoryFilter();
     }
@@ -675,6 +775,207 @@ export class UIManager {
 
         this.voiceSelect.value = selectedVoice || '';
         this.updateSettingsSummary();
+    }
+
+    renderTeacherCategories(categories) {
+        if (!this.teacherCategorySelect) return;
+        const previous = this.teacherCategorySelect.value;
+        this.teacherCategorySelect.innerHTML = '';
+        categories.forEach(category => {
+            const option = document.createElement('option');
+            option.value = category.key;
+            option.innerText = category.label;
+            this.teacherCategorySelect.appendChild(option);
+        });
+        const nextValue = categories.some(category => category.key === previous)
+            ? previous
+            : (categories[0]?.key || '');
+        this.teacherCategorySelect.value = nextValue;
+    }
+
+    renderTeacherTaskOptions() {
+        if (!this.teacherTaskSelect) return;
+        const previous = this.teacherTaskSelect.value || 'pronunciation';
+        const options = [
+            { value: 'vocab', label: this.text.teacherTaskVocab || 'Vocabulary review' },
+            { value: 'pronunciation', label: this.text.teacherTaskPronunciation || 'Pronunciation coach' },
+            { value: 'speaking', label: this.text.teacherTaskSpeaking || 'Speaking check' },
+            { value: 'listening', label: this.text.teacherTaskListening || 'Listening quiz' },
+            { value: 'mixed', label: this.text.teacherTaskMixed || 'Mixed practice' }
+        ];
+        this.teacherTaskSelect.innerHTML = '';
+        options.forEach(({ value, label }) => {
+            const option = document.createElement('option');
+            option.value = value;
+            option.innerText = label;
+            this.teacherTaskSelect.appendChild(option);
+        });
+        this.teacherTaskSelect.value = options.some(option => option.value === previous) ? previous : 'pronunciation';
+    }
+
+    renderTeacherLimitOptions() {
+        if (!this.teacherLimitSelect) return;
+        const previous = this.teacherLimitSelect.value || '0';
+        const options = [
+            { value: '0', label: this.text.teacherLimitAll || 'Whole category' },
+            { value: '6', label: `6 ${this.text.teacherLimitCards || 'cards'}` },
+            { value: '10', label: `10 ${this.text.teacherLimitCards || 'cards'}` },
+            { value: '15', label: `15 ${this.text.teacherLimitCards || 'cards'}` },
+            { value: '20', label: `20 ${this.text.teacherLimitCards || 'cards'}` }
+        ];
+        this.teacherLimitSelect.innerHTML = '';
+        options.forEach(({ value, label }) => {
+            const option = document.createElement('option');
+            option.value = value;
+            option.innerText = label;
+            this.teacherLimitSelect.appendChild(option);
+        });
+        this.teacherLimitSelect.value = options.some(option => option.value === previous) ? previous : '0';
+    }
+
+    renderTeacherRepeatOptions() {
+        if (!this.teacherRepeatSelect) return;
+        const previous = this.teacherRepeatSelect.value || '1';
+        const times = this.text.teacherRepeatTimes || 'times';
+        const options = [
+            { value: '1', label: `1 ${times}` },
+            { value: '2', label: `2 ${times}` },
+            { value: '3', label: `3 ${times}` }
+        ];
+        this.teacherRepeatSelect.innerHTML = '';
+        options.forEach(({ value, label }) => {
+            const option = document.createElement('option');
+            option.value = value;
+            option.innerText = label;
+            this.teacherRepeatSelect.appendChild(option);
+        });
+        this.teacherRepeatSelect.value = options.some(option => option.value === previous) ? previous : '1';
+    }
+
+    renderTeacherGoalOptions() {
+        if (!this.teacherGoalSelect) return;
+        const previous = this.teacherGoalSelect.value || 'finish';
+        const options = [
+            { value: 'finish', label: this.text.teacherGoalFinish || 'Finish the lesson' },
+            { value: '80', label: this.text.teacherGoal80 || 'Reach 80%' },
+            { value: '90', label: this.text.teacherGoal90 || 'Reach 90%' },
+            { value: '100', label: this.text.teacherGoal100 || 'Reach 100%' }
+        ];
+        this.teacherGoalSelect.innerHTML = '';
+        options.forEach(({ value, label }) => {
+            const option = document.createElement('option');
+            option.value = value;
+            option.innerText = label;
+            this.teacherGoalSelect.appendChild(option);
+        });
+        this.teacherGoalSelect.value = options.some(option => option.value === previous) ? previous : 'finish';
+    }
+
+    getTeacherAssignmentOptions() {
+        return {
+            title: (this.teacherHomeworkTitle?.value || '').trim(),
+            task: this.teacherTaskSelect?.value || 'pronunciation',
+            limit: Number(this.teacherLimitSelect?.value || 0),
+            repeat: Number(this.teacherRepeatSelect?.value || 1),
+            goal: this.teacherGoalSelect?.value || 'finish',
+            speaking: this.teacherSpeakingBtn?.classList.contains('is-on') || false
+        };
+    }
+
+    setTeacherAssignmentOptions(options = {}) {
+        if (this.teacherHomeworkTitle) this.teacherHomeworkTitle.value = options.title || '';
+        if (this.teacherTaskSelect && options.task) this.teacherTaskSelect.value = options.task;
+        if (this.teacherLimitSelect && options.limit !== undefined) this.teacherLimitSelect.value = `${options.limit}`;
+        if (this.teacherRepeatSelect && options.repeat !== undefined) this.teacherRepeatSelect.value = `${options.repeat}`;
+        if (this.teacherGoalSelect && options.goal) this.teacherGoalSelect.value = options.goal;
+        this.updateTeacherSpeakingToggle(Boolean(options.speaking));
+    }
+
+    updateTeacherSpeakingToggle(enabled) {
+        if (!this.teacherSpeakingBtn) return;
+        this.teacherSpeakingBtn.classList.toggle('is-on', enabled);
+        this.teacherSpeakingBtn.innerText = enabled ? (this.text.on || 'On') : (this.text.off || 'Off');
+        this.teacherSpeakingBtn.classList.toggle('bg-emerald-500', enabled);
+        this.teacherSpeakingBtn.classList.toggle('hover:bg-emerald-600', enabled);
+        this.teacherSpeakingBtn.classList.toggle('border-emerald-700', enabled);
+        this.teacherSpeakingBtn.classList.toggle('text-white', enabled);
+        this.teacherSpeakingBtn.classList.toggle('bg-slate-300', !enabled);
+        this.teacherSpeakingBtn.classList.toggle('hover:bg-slate-400', !enabled);
+        this.teacherSpeakingBtn.classList.toggle('border-slate-500', !enabled);
+        this.teacherSpeakingBtn.classList.toggle('text-slate-700', !enabled);
+        this.teacherSpeakingBtn.style.setProperty('--shadow-color', enabled ? '#047857' : '#64748b');
+    }
+
+    renderTeacherSummary(pills = []) {
+        if (!this.teacherSummaryPills) return;
+        this.teacherSummaryPills.innerHTML = '';
+        pills.forEach(label => {
+            const pill = document.createElement('div');
+            pill.className = 'settings-summary-pill';
+            pill.innerText = label;
+            this.teacherSummaryPills.appendChild(pill);
+        });
+    }
+
+    renderTeacherAssignment({ url = '', title = '', summary = [] } = {}) {
+        if (this.teacherLinkOutput) {
+            this.teacherLinkOutput.value = url;
+            this.teacherLinkOutput.title = title || url;
+        }
+        this.renderTeacherSummary(summary);
+        if (!this.teacherQrCode) return;
+        this.teacherQrCode.innerHTML = '';
+        if (!url) {
+            return;
+        }
+        if (typeof QRCode !== 'undefined') {
+            new QRCode(this.teacherQrCode, {
+                text: url,
+                width: 220,
+                height: 220
+            });
+            return;
+        }
+        const fallback = document.createElement('div');
+        fallback.className = 'teacher-qr-fallback';
+        fallback.innerText = this.text.teacherQrFallback || 'QR preview is not available in this browser. Use the link above.';
+        this.teacherQrCode.appendChild(fallback);
+    }
+
+    async copyTeacherLink() {
+        const value = this.teacherLinkOutput?.value;
+        if (!value) return;
+        try {
+            if (navigator.clipboard?.writeText) {
+                await navigator.clipboard.writeText(value);
+                this.copyTeacherLinkBtn.innerText = this.text.copied || 'Copied';
+                setTimeout(() => {
+                    if (this.copyTeacherLinkBtn) {
+                        this.copyTeacherLinkBtn.innerText = this.text.copy || 'Copy';
+                    }
+                }, 1400);
+            }
+        } catch (error) {
+            console.warn('Could not copy teacher link', error);
+        }
+    }
+
+    updateAssignmentBanner(assignment) {
+        if (!this.assignmentBanner || !this.assignmentBannerTitle || !this.assignmentBannerPills) return;
+        if (!assignment) {
+            this.assignmentBanner.classList.add('hidden');
+            this.assignmentBannerPills.innerHTML = '';
+            return;
+        }
+        this.assignmentBanner.classList.remove('hidden');
+        this.assignmentBannerTitle.innerText = assignment.title || (this.text.assignmentDefaultTitle || 'Assigned practice');
+        this.assignmentBannerPills.innerHTML = '';
+        (assignment.pills || []).forEach(label => {
+            const pill = document.createElement('div');
+            pill.className = 'assignment-banner-pill';
+            pill.innerText = label;
+            this.assignmentBannerPills.appendChild(pill);
+        });
     }
 
     updateSettingsSummary() {

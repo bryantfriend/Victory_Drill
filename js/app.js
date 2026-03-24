@@ -31,6 +31,8 @@ class App {
         this.activeSyllableTimer = null;
         this.shadowTimeout = null;
         this.listeningQuiz = null;
+        this.isApplyingAssignment = false;
+        this.activeAssignment = null;
 
         this.russianAlphabetVariations = [
             "Следующая буква {n}. Она дает звук {s}.",
@@ -108,11 +110,13 @@ class App {
             onChangeVoice: (voiceName) => this.setVoiceChoice(voiceName),
             onChangeSpeechRate: (rate) => this.setSpeechRate(rate),
             onToggleAutoPlay: () => this.toggleAutoPlay(),
-            onToggleSplashVideo: () => this.toggleSplashVideo()
+            onToggleSplashVideo: () => this.toggleSplashVideo(),
+            onOpenTeacherTools: (categoryKey) => this.updateTeacherAssignment(categoryKey)
         });
 
         this.loadSettings();
         this.init();
+        this.applyAssignmentFromUrl();
         this.handleSplash();
     }
 
@@ -272,6 +276,216 @@ class App {
         this.ui.updateSpeechSpeed(this.speechRate);
     }
 
+    getAssignmentState(categoryKey = '') {
+        const category = categoryKey || this.currentCategory || this.ui.teacherCategorySelect?.value || this.ui.allCategories?.[0]?.key || '';
+        const options = this.ui.getTeacherAssignmentOptions?.() || {};
+        const task = options.task || 'pronunciation';
+        const speaking = Boolean(options.speaking || task === 'speaking');
+        const styleMap = {
+            vocab: 'classic',
+            pronunciation: 'coach',
+            speaking: 'speaking',
+            listening: 'listening',
+            mixed: this.practiceStyle
+        };
+        return {
+            base: this.baseLanguage,
+            target: this.targetLanguage,
+            mode: this.mode,
+            category,
+            time: this.selectedTime,
+            style: speaking ? 'speaking' : (styleMap[task] || this.practiceStyle),
+            pronunciation: this.showPronunciation ? '1' : '0',
+            meanings: this.showMeanings ? '1' : '0',
+            autoplay: this.autoPlayAudio ? '1' : '0',
+            rate: this.speechRate.toFixed(2),
+            voice: this.voiceChoices[this.targetLanguage] || '',
+            splash: this.showSplashVideo ? '1' : '0',
+            title: options.title || '',
+            task,
+            limit: Math.max(0, Number(options.limit) || 0),
+            repeat: Math.max(1, Number(options.repeat) || 1),
+            goal: options.goal || 'finish',
+            speaking: speaking ? '1' : '0',
+            start: '1'
+        };
+    }
+
+    buildAssignmentUrl(categoryKey = '') {
+        const state = this.getAssignmentState(categoryKey);
+        const url = new URL(window.location.href);
+        url.search = '';
+        url.hash = '';
+        url.searchParams.set('assign', '1');
+        url.searchParams.set('base', state.base);
+        url.searchParams.set('target', state.target);
+        url.searchParams.set('mode', state.mode);
+        url.searchParams.set('cat', state.category);
+        url.searchParams.set('time', `${state.time}`);
+        url.searchParams.set('style', state.style);
+        url.searchParams.set('pron', state.pronunciation);
+        url.searchParams.set('mean', state.meanings);
+        url.searchParams.set('auto', state.autoplay);
+        url.searchParams.set('rate', state.rate);
+        if (state.voice) {
+            url.searchParams.set('voice', state.voice);
+        }
+        url.searchParams.set('splash', state.splash);
+        if (state.title) {
+            url.searchParams.set('title', state.title);
+        }
+        url.searchParams.set('task', state.task);
+        url.searchParams.set('limit', `${state.limit}`);
+        url.searchParams.set('repeat', `${state.repeat}`);
+        url.searchParams.set('goal', state.goal);
+        url.searchParams.set('speak', state.speaking);
+        url.searchParams.set('start', state.start);
+        return url.toString();
+    }
+
+    getTeacherTaskLabel(task) {
+        const map = {
+            vocab: getUIText(this.baseLanguage, 'teacherTaskVocab') || 'Vocabulary review',
+            pronunciation: getUIText(this.baseLanguage, 'teacherTaskPronunciation') || 'Pronunciation coach',
+            speaking: getUIText(this.baseLanguage, 'teacherTaskSpeaking') || 'Speaking check',
+            listening: getUIText(this.baseLanguage, 'teacherTaskListening') || 'Listening quiz',
+            mixed: getUIText(this.baseLanguage, 'teacherTaskMixed') || 'Mixed practice'
+        };
+        return map[task] || map.pronunciation;
+    }
+
+    getTeacherGoalLabel(goal) {
+        const map = {
+            finish: getUIText(this.baseLanguage, 'teacherGoalFinish') || 'Finish the lesson',
+            '80': getUIText(this.baseLanguage, 'teacherGoal80') || 'Reach 80%',
+            '90': getUIText(this.baseLanguage, 'teacherGoal90') || 'Reach 90%',
+            '100': getUIText(this.baseLanguage, 'teacherGoal100') || 'Reach 100%'
+        };
+        return map[goal] || map.finish;
+    }
+
+    buildTeacherSummary(state, categoryLabel) {
+        const summary = [
+            `${getUIText(this.baseLanguage, 'teacherCategoryLabel') || 'Category'}: ${categoryLabel}`,
+            `${getUIText(this.baseLanguage, 'teacherTaskLabel') || 'Assignment focus'}: ${this.getTeacherTaskLabel(state.task)}`
+        ];
+        const limitLabel = state.limit > 0
+            ? `${state.limit} ${getUIText(this.baseLanguage, 'teacherLimitCards') || 'cards'}`
+            : (getUIText(this.baseLanguage, 'teacherLimitAll') || 'Whole category');
+        summary.push(`${getUIText(this.baseLanguage, 'teacherLimitLabel') || 'Cards to complete'}: ${limitLabel}`);
+        summary.push(`${getUIText(this.baseLanguage, 'teacherRepeatLabel') || 'Repeats per card'}: ${state.repeat} ${getUIText(this.baseLanguage, 'teacherRepeatTimes') || 'times'}`);
+        summary.push(`${getUIText(this.baseLanguage, 'teacherGoalLabel') || 'Completion goal'}: ${this.getTeacherGoalLabel(state.goal)}`);
+        if (state.speaking === '1') {
+            summary.push(getUIText(this.baseLanguage, 'teacherSpeakingRequiredPill') || 'Speaking required');
+        }
+        return summary;
+    }
+
+    getAssignmentBannerData() {
+        if (!this.activeAssignment) return null;
+        const pills = [
+            this.getTeacherTaskLabel(this.activeAssignment.task),
+            this.getTeacherGoalLabel(this.activeAssignment.goal)
+        ];
+        if (this.activeAssignment.limit > 0) {
+            pills.push(`${this.activeAssignment.limit} ${getUIText(this.baseLanguage, 'teacherLimitCards') || 'cards'}`);
+        }
+        if (this.activeAssignment.repeat > 1) {
+            pills.push(`${this.activeAssignment.repeat}x ${getUIText(this.baseLanguage, 'teacherRepeatShort') || 'repeat'}`);
+        }
+        if (this.activeAssignment.speaking) {
+            pills.push(getUIText(this.baseLanguage, 'teacherSpeakingRequiredPill') || 'Speaking required');
+        }
+        return {
+            title: this.activeAssignment.title || (getUIText(this.baseLanguage, 'assignmentDefaultTitle') || 'Assigned practice'),
+            pills
+        };
+    }
+
+    updateTeacherAssignment(categoryKey = '') {
+        const activeCategory = categoryKey || this.ui.teacherCategorySelect?.value || this.currentCategory || this.ui.allCategories?.[0]?.key || '';
+        if (!activeCategory) {
+            this.ui.renderTeacherAssignment({ url: '', title: '' });
+            return;
+        }
+        const categoryLabel = this.ui.allCategories?.find(category => category.key === activeCategory)?.label || activeCategory;
+        const assignmentState = this.getAssignmentState(activeCategory);
+        const title = assignmentState.title || `${this.targetLanguage} · ${categoryLabel}`;
+        this.ui.renderTeacherAssignment({
+            url: this.buildAssignmentUrl(activeCategory),
+            title,
+            summary: this.buildTeacherSummary(assignmentState, categoryLabel)
+        });
+    }
+
+    applyAssignmentFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('assign') !== '1') return;
+
+        const base = params.get('base');
+        const target = params.get('target');
+        const mode = params.get('mode');
+        const category = params.get('cat');
+        const time = Number(params.get('time'));
+        const style = params.get('style');
+        const rate = Number(params.get('rate'));
+        const voice = params.get('voice') || '';
+        const title = params.get('title') || '';
+        const task = params.get('task') || 'pronunciation';
+        const limit = Number(params.get('limit'));
+        const repeat = Number(params.get('repeat'));
+        const goal = params.get('goal') || 'finish';
+        const speaking = params.get('speak') === '1';
+        const shouldStart = params.get('start') === '1';
+
+        this.isApplyingAssignment = true;
+        if (base && LANGUAGES.some(language => language.code === base)) this.setLanguage(base);
+        if (target && TARGET_LANGUAGES.some(language => language.code === target)) this.setTargetLanguage(target);
+        if (mode && this.modeConfig[mode]) this.setMode(mode);
+        if (!Number.isNaN(time) && [60, 120, -1].includes(time)) this.setTimer(time);
+        if (style && ['classic', 'coach', 'speaking', 'listening'].includes(style)) this.setPracticeStyle(style);
+        if (!Number.isNaN(rate) && rate >= 0.7 && rate <= 1.2) this.setSpeechRate(rate);
+        if (params.has('pron')) {
+            this.showPronunciation = params.get('pron') === '1';
+            this.ui.updatePronunciationToggle(this.showPronunciation);
+        }
+        if (params.has('mean')) {
+            this.showMeanings = params.get('mean') === '1';
+            this.ui.updateMeaningToggle(this.showMeanings);
+        }
+        if (params.has('auto')) {
+            this.autoPlayAudio = params.get('auto') === '1';
+            this.ui.updateAutoPlayToggle(this.autoPlayAudio);
+        }
+        if (params.has('splash')) {
+            this.showSplashVideo = params.get('splash') === '1';
+            this.ui.updateSplashToggle(this.showSplashVideo);
+        }
+        if (target) {
+            this.voiceChoices[target] = voice;
+            this.voice.setPreferredVoice(voice);
+            this.refreshVoiceOptions();
+        }
+        this.activeAssignment = {
+            title,
+            task,
+            limit: !Number.isNaN(limit) ? Math.max(0, limit) : 0,
+            repeat: !Number.isNaN(repeat) ? Math.max(1, repeat) : 1,
+            goal,
+            speaking
+        };
+        this.ui.setTeacherAssignmentOptions?.(this.activeAssignment);
+        this.isApplyingAssignment = false;
+        this.ui.updateAssignmentBanner(this.getAssignmentBannerData());
+        this.saveSettings();
+
+        if (category && shouldStart) {
+            setTimeout(() => {
+                this.startGame(category);
+            }, 50);
+        }
+    }
+
     loadSettings() {
         try {
             const raw = localStorage.getItem('victory-drill-settings');
@@ -291,6 +505,7 @@ class App {
     }
 
     saveSettings() {
+        if (this.isApplyingAssignment) return;
         try {
             localStorage.setItem('victory-drill-settings', JSON.stringify({
                 selectedTime: this.selectedTime,
@@ -411,21 +626,60 @@ class App {
             settingsSplashShort: getUIText(language, 'settingsSplashShort'),
             pronunciationShort: getUIText(language, 'pronunciationShort'),
             meaningShort: getUIText(language, 'meaningShort'),
-            setupStepLanguages: getUIText(language, 'setupStepLanguages'),
-            setupStepMode: getUIText(language, 'setupStepMode'),
-            setupStepCategory: getUIText(language, 'setupStepCategory'),
-            on: getUIText(language, 'on'),
-            off: getUIText(language, 'off')
-        });
+              setupStepLanguages: getUIText(language, 'setupStepLanguages'),
+              setupStepMode: getUIText(language, 'setupStepMode'),
+              setupStepCategory: getUIText(language, 'setupStepCategory'),
+              on: getUIText(language, 'on'),
+              off: getUIText(language, 'off'),
+              teacherToolsButton: getUIText(language, 'teacherToolsButton'),
+              teacherToolsTitle: getUIText(language, 'teacherToolsTitle'),
+              teacherToolsSubtitle: getUIText(language, 'teacherToolsSubtitle'),
+              teacherHomeworkLabel: getUIText(language, 'teacherHomeworkLabel'),
+              teacherHomeworkPlaceholder: getUIText(language, 'teacherHomeworkPlaceholder'),
+              teacherCategoryLabel: getUIText(language, 'teacherCategoryLabel'),
+              teacherTaskLabel: getUIText(language, 'teacherTaskLabel'),
+              teacherTaskVocab: getUIText(language, 'teacherTaskVocab'),
+              teacherTaskPronunciation: getUIText(language, 'teacherTaskPronunciation'),
+              teacherTaskSpeaking: getUIText(language, 'teacherTaskSpeaking'),
+              teacherTaskListening: getUIText(language, 'teacherTaskListening'),
+              teacherTaskMixed: getUIText(language, 'teacherTaskMixed'),
+              teacherLimitLabel: getUIText(language, 'teacherLimitLabel'),
+              teacherLimitAll: getUIText(language, 'teacherLimitAll'),
+              teacherLimitCards: getUIText(language, 'teacherLimitCards'),
+              teacherRepeatLabel: getUIText(language, 'teacherRepeatLabel'),
+              teacherRepeatTimes: getUIText(language, 'teacherRepeatTimes'),
+              teacherRepeatShort: getUIText(language, 'teacherRepeatShort'),
+              teacherGoalLabel: getUIText(language, 'teacherGoalLabel'),
+              teacherGoalFinish: getUIText(language, 'teacherGoalFinish'),
+              teacherGoal80: getUIText(language, 'teacherGoal80'),
+              teacherGoal90: getUIText(language, 'teacherGoal90'),
+              teacherGoal100: getUIText(language, 'teacherGoal100'),
+              teacherSpeakingLabel: getUIText(language, 'teacherSpeakingLabel'),
+              teacherSpeakingHint: getUIText(language, 'teacherSpeakingHint'),
+              teacherSpeakingRequiredPill: getUIText(language, 'teacherSpeakingRequiredPill'),
+              teacherSummaryLabel: getUIText(language, 'teacherSummaryLabel'),
+              teacherSummaryHint: getUIText(language, 'teacherSummaryHint'),
+              teacherLinkLabel: getUIText(language, 'teacherLinkLabel'),
+              teacherLinkHint: getUIText(language, 'teacherLinkHint'),
+              teacherQrLabel: getUIText(language, 'teacherQrLabel'),
+              teacherQrHint: getUIText(language, 'teacherQrHint'),
+              teacherQrFallback: getUIText(language, 'teacherQrFallback'),
+              assignmentBannerLabel: getUIText(language, 'assignmentBannerLabel'),
+              assignmentDefaultTitle: getUIText(language, 'assignmentDefaultTitle'),
+              copy: getUIText(language, 'copy'),
+              copied: getUIText(language, 'copied')
+          });
         this.ui.updatePronunciationToggle(this.showPronunciation);
         this.ui.updateMeaningToggle(this.showMeanings);
         this.ui.updateAutoPlayToggle(this.autoPlayAudio);
         this.ui.updateSplashToggle(this.showSplashVideo);
         this.ui.updateSpeechSpeed(this.speechRate);
-        this.ui.setPracticeStyle(this.practiceStyle);
-        this.refreshVoiceOptions();
-        this.renderCategories();
-        if (this.currentList.length) {
+          this.ui.setPracticeStyle(this.practiceStyle);
+          this.refreshVoiceOptions();
+          this.renderCategories();
+          this.updateTeacherAssignment();
+          this.ui.updateAssignmentBanner(this.getAssignmentBannerData());
+          if (this.currentList.length) {
             this.ui.setInitialContent(this.getCurrentItem());
             this.ui.updateDifficultSummary(this.difficultItems.length);
             this.ui.updateDifficultButton(this.isCurrentItemDifficult());
@@ -447,6 +701,7 @@ class App {
         this.currentList = [];
         this.difficultItems = [];
         this.renderCategories();
+        this.updateTeacherAssignment();
         this.ui.showScreen('start');
     }
 
@@ -454,6 +709,7 @@ class App {
         this.mode = mode;
         this.ui.updateModeButtons(mode);
         this.renderCategories();
+        this.updateTeacherAssignment();
     }
 
     setPracticeStyle(style) {
@@ -612,7 +868,20 @@ class App {
 
     getCategoryList(category) {
         this.currentCategory = category;
-        return [...getCategoryItems(this.targetLanguage, this.getModeConfig().contentMode, category)];
+        let list = [...getCategoryItems(this.targetLanguage, this.getModeConfig().contentMode, category)];
+        if (this.activeAssignment?.limit > 0) {
+            list = list.slice(0, this.activeAssignment.limit);
+        }
+        if (this.activeAssignment?.repeat > 1 && list.length) {
+            const repeated = [];
+            list.forEach(item => {
+                for (let i = 0; i < this.activeAssignment.repeat; i++) {
+                    repeated.push(item);
+                }
+            });
+            list = repeated;
+        }
+        return list;
     }
 
     startRound(list, preserveDifficult = false) {
@@ -639,6 +908,7 @@ class App {
         this.ui.updatePauseUI(false);
         this.ui.updateDifficultSummary(this.difficultItems.length);
         this.ui.updateDifficultButton(this.isCurrentItemDifficult());
+        this.ui.updateAssignmentBanner(this.getAssignmentBannerData());
         this.ui.setInitialContent(firstItem);
         this.updatePracticeLab();
         this.ui.showScreen('game');
@@ -1111,6 +1381,7 @@ class App {
         this.timer.stop();
         this.practiceSourceList = null;
         this.listeningQuiz = null;
+        this.ui.updateAssignmentBanner(this.getAssignmentBannerData());
         this.ui.showScreen('start');
     }
 

@@ -17,6 +17,7 @@ body {
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
+    flex-wrap: wrap;
 }
 
 .setup-section {
@@ -55,6 +56,11 @@ body {
     font-size: 0.82rem;
     font-weight: 900;
     box-shadow: 0 8px 20px rgba(99, 102, 241, 0.08);
+}
+
+.teacher-trigger {
+    color: #0f766e;
+    border-color: rgba(94, 234, 212, 0.75);
 }
 
 .settings-summary-card {
@@ -143,6 +149,133 @@ body {
     color: #4338ca;
     font-size: 0.8rem;
     font-weight: 900;
+}
+
+.teacher-link-row {
+    display: flex;
+    gap: 0.65rem;
+    align-items: center;
+}
+
+.teacher-grid {
+    display: grid;
+    gap: 0.9rem;
+}
+
+.teacher-grid-two {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.teacher-text-input::placeholder {
+    color: #94a3b8;
+}
+
+.teacher-toggle-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: center;
+}
+
+.assignment-banner {
+    border-radius: 1.45rem;
+    border: 1px solid rgba(16, 185, 129, 0.22);
+    background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.97), rgba(236, 253, 245, 0.92));
+    box-shadow:
+        0 16px 34px rgba(16, 185, 129, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.85);
+    padding: 0.95rem 1rem;
+}
+
+.assignment-banner-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: flex-start;
+}
+
+.assignment-banner-label {
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #047857;
+}
+
+.assignment-banner-title {
+    margin-top: 0.22rem;
+    font-size: 1rem;
+    line-height: 1.35;
+    font-weight: 900;
+    color: #14532d;
+}
+
+.assignment-banner-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin-top: 0.75rem;
+}
+
+.assignment-banner-pill {
+    border-radius: 999px;
+    background: rgba(209, 250, 229, 0.9);
+    border: 1px solid rgba(52, 211, 153, 0.45);
+    color: #065f46;
+    padding: 0.42rem 0.72rem;
+    font-size: 0.78rem;
+    font-weight: 800;
+}
+
+.teacher-link-output {
+    flex: 1;
+    min-width: 0;
+}
+
+.teacher-copy-btn {
+    flex-shrink: 0;
+    border-radius: 1rem;
+    background: linear-gradient(180deg, #14b8a6, #0f766e);
+    color: #f0fdfa;
+    font-weight: 900;
+    padding: 0.85rem 1rem;
+    box-shadow: 0 10px 24px rgba(15, 118, 110, 0.18);
+}
+
+.teacher-qr-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 15rem;
+    border-radius: 1.25rem;
+    background: linear-gradient(180deg, rgba(248,250,252,0.98), rgba(238,242,255,0.94));
+    border: 1px dashed rgba(148, 163, 184, 0.55);
+}
+
+.teacher-qr-code {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.teacher-qr-code img,
+.teacher-qr-code canvas {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.9rem;
+    background: white;
+    padding: 0.75rem;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+}
+
+.teacher-qr-fallback {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #475569;
+    line-height: 1.5;
+    text-align: center;
+    max-width: 20rem;
 }
 
 .settings-modal {
@@ -1265,6 +1398,20 @@ body {
         justify-content: center;
     }
 
+    .teacher-link-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .teacher-grid-two {
+        grid-template-columns: 1fr;
+    }
+
+    .teacher-toggle-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
     .settings-summary-header {
         flex-direction: column;
     }
@@ -1424,6 +1571,11 @@ body {
     .speech-feedback-panel {
         margin-top: 0.9rem;
         padding: 0.9rem 0.85rem;
+    }
+
+    .assignment-banner {
+        margin-top: 0.2rem;
+        padding: 0.85rem;
     }
 
     .pronunciation-lab-panel {

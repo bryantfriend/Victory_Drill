@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="css/style.css?v=20260324c">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 
 <body class="bg-indigo-50 text-slate-800 flex items-center justify-center min-h-screen p-4 select-none">
@@ -63,8 +64,12 @@
                     <i data-lucide="sliders-horizontal" class="w-5 h-5"></i>
                     <span id="settings-trigger-label">Settings</span>
                 </button>
+                <button id="open-teacher-tools" type="button" class="settings-trigger teacher-trigger">
+                    <i data-lucide="graduation-cap" class="w-5 h-5"></i>
+                    <span id="teacher-trigger-label">Teacher</span>
+                </button>
             </div>
-            <p id="app-version" class="text-xs font-bold uppercase tracking-[0.2em] text-indigo-400">Build 2026.03.24c</p>
+                <p id="app-version" class="text-xs font-bold uppercase tracking-[0.2em] text-indigo-400">Build 2026.03.24d</p>
 
             <div class="setup-section">
                 <p id="setup-step-languages" class="setup-step-label">Step 1 · Languages</p>
@@ -270,10 +275,122 @@
             </div>
         </div>
 
+        <div id="teacher-modal" class="settings-modal hidden" aria-hidden="true">
+            <div id="teacher-backdrop" class="settings-backdrop"></div>
+            <div class="settings-sheet">
+                <div class="settings-sheet-header">
+                    <div>
+                        <p id="teacher-title" class="settings-title">Teacher Assignment</p>
+                        <p id="teacher-subtitle" class="settings-subtitle">Create a lesson QR code from the current setup.</p>
+                    </div>
+                    <button id="close-teacher" type="button" class="settings-close-btn" aria-label="Close teacher tools">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+
+                <div class="settings-stack">
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-indigo-100">
+                        <p id="teacher-homework-label" class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-3">Homework title</p>
+                        <input id="teacher-homework-title" type="text" class="settings-select teacher-text-input" placeholder="Week 1 pronunciation homework">
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-indigo-100">
+                        <p id="teacher-category-label" class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-3">Category for assignment</p>
+                        <select id="teacher-category-select" class="settings-select"></select>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-indigo-100">
+                        <div class="teacher-grid teacher-grid-two">
+                            <div>
+                                <p id="teacher-task-label" class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-3">Assignment focus</p>
+                                <select id="teacher-task-select" class="settings-select">
+                                    <option value="vocab">Vocabulary review</option>
+                                    <option value="pronunciation">Pronunciation coach</option>
+                                    <option value="speaking">Speaking check</option>
+                                    <option value="listening">Listening quiz</option>
+                                    <option value="mixed">Mixed practice</option>
+                                </select>
+                            </div>
+                            <div>
+                                <p id="teacher-limit-label" class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-3">Cards to complete</p>
+                                <select id="teacher-limit-select" class="settings-select">
+                                    <option value="0">Whole category</option>
+                                    <option value="6">6 cards</option>
+                                    <option value="10">10 cards</option>
+                                    <option value="15">15 cards</option>
+                                    <option value="20">20 cards</option>
+                                </select>
+                            </div>
+                            <div>
+                                <p id="teacher-repeat-label" class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-3">Repeats per card</p>
+                                <select id="teacher-repeat-select" class="settings-select">
+                                    <option value="1">1 time</option>
+                                    <option value="2">2 times</option>
+                                    <option value="3">3 times</option>
+                                </select>
+                            </div>
+                            <div>
+                                <p id="teacher-goal-label" class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-3">Completion goal</p>
+                                <select id="teacher-goal-select" class="settings-select">
+                                    <option value="finish">Finish the lesson</option>
+                                    <option value="80">Reach 80%</option>
+                                    <option value="90">Reach 90%</option>
+                                    <option value="100">Reach 100%</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="teacher-toggle-row mt-4">
+                            <div>
+                                <p id="teacher-speaking-label" class="text-sm font-bold text-slate-500 uppercase tracking-wide">Require speaking</p>
+                                <p id="teacher-speaking-hint" class="text-sm text-slate-400 mt-1">Students must use the microphone during this homework.</p>
+                            </div>
+                            <button id="teacher-speaking-btn" type="button" class="btn-3d bg-slate-300 hover:bg-slate-400 text-slate-700 font-bold py-2 px-4 rounded-xl border-b-4 border-slate-500" style="--shadow-color: #64748b;">Off</button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-indigo-100">
+                        <p id="teacher-summary-label" class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-3">Assignment summary</p>
+                        <div id="teacher-summary-pills" class="settings-summary-pills"></div>
+                        <p id="teacher-summary-hint" class="text-sm text-slate-400 mt-3">This assignment also uses your current timer, support, voice, and speed settings.</p>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-indigo-100">
+                        <p id="teacher-link-label" class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-3">Assignment link</p>
+                        <div class="teacher-link-row">
+                            <input id="teacher-link-output" type="text" readonly class="settings-select teacher-link-output">
+                            <button id="copy-teacher-link" type="button" class="teacher-copy-btn">Copy</button>
+                        </div>
+                        <p id="teacher-link-hint" class="text-sm text-slate-400 mt-2">Students who open this link go straight into the assigned lesson.</p>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-indigo-100">
+                        <p id="teacher-qr-label" class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-3">QR code</p>
+                        <div id="teacher-qr-wrap" class="teacher-qr-wrap">
+                            <div id="teacher-qr-code" class="teacher-qr-code"></div>
+                        </div>
+                        <p id="teacher-qr-hint" class="text-sm text-slate-400 mt-3">Scan this on a student phone to open the assignment.</p>
+                    </div>
+                </div>
+
+                <button id="teacher-done" type="button" class="settings-done-btn">
+                    <span id="teacher-done-label">Done</span>
+                </button>
+            </div>
+        </div>
+
         <!-- Game Screen -->
         <div id="game-screen" class="hidden relative game-shell rounded-[2rem] px-4 py-5 md:px-6 md:py-6">
             <div class="game-shell-glow game-shell-glow-a"></div>
             <div class="game-shell-glow game-shell-glow-b"></div>
+            <div id="assignment-banner" class="assignment-banner hidden relative z-10 mb-4">
+                <div class="assignment-banner-head">
+                    <div>
+                        <p id="assignment-banner-label" class="assignment-banner-label">Assigned Homework</p>
+                        <p id="assignment-banner-title" class="assignment-banner-title">Homework</p>
+                    </div>
+                </div>
+                <div id="assignment-banner-pills" class="assignment-banner-pills"></div>
+            </div>
             <!-- Header Controls -->
             <div class="relative z-10 game-header flex justify-between items-center mb-6">
                 <button id="exit-game"
