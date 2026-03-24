@@ -1,23 +1,23 @@
 const VOICE_PREFERENCES = {
     'ru-RU': {
         fallbackLangs: ['ru-RU', 'ru', 'uk-UA'],
-        preferredNames: ['Microsoft Irina', 'Microsoft Svetlana', 'Google русский', 'Google Russian', 'Russian']
+        preferredNames: ['Microsoft Irina', 'Microsoft Svetlana', 'Microsoft Pavel', 'Google русский', 'Google Russian', 'Russian']
     },
     'en-US': {
         fallbackLangs: ['en-US', 'en-GB', 'en-AU', 'en'],
-        preferredNames: ['Microsoft Aria', 'Microsoft Jenny', 'Google US English', 'Google UK English', 'Samantha', 'English']
+        preferredNames: ['Microsoft Aria', 'Microsoft Jenny', 'Microsoft Guy', 'Google US English', 'Google UK English', 'Samantha', 'English']
     },
     'ky-KG': {
         fallbackLangs: ['ky-KG', 'ky', 'kk-KZ', 'tr-TR', 'ru-RU'],
         preferredNames: ['Kyrgyz', 'Кыргыз', 'Kazakh', 'Turkish', 'Russian']
     },
     'zh-CN': {
-        fallbackLangs: ['zh-CN', 'zh-Hans', 'cmn-CN', 'zh'],
-        preferredNames: ['Microsoft Xiaoxiao', 'Microsoft Yunxi', 'Google 普通话', 'Google Mandarin', 'Chinese']
+        fallbackLangs: ['zh-CN', 'cmn-CN', 'zh-SG', 'zh-Hans', 'zh-TW', 'zh'],
+        preferredNames: ['Microsoft Xiaoxiao', 'Microsoft Yunxi', 'Microsoft Xiaoyi', 'Microsoft Yunyang', 'Google 普通话', 'Google Mandarin', 'Ting-Ting', 'Chinese']
     },
     'fr-FR': {
         fallbackLangs: ['fr-FR', 'fr-CA', 'fr'],
-        preferredNames: ['Microsoft Denise', 'Microsoft Hortense', 'Google français', 'Google French', 'French']
+        preferredNames: ['Microsoft Denise', 'Microsoft Hortense', 'Microsoft Remy', 'Google français', 'Google French', 'French']
     }
 };
 
@@ -188,7 +188,7 @@ export class VoiceManager {
             'ru-RU': 0.86,
             'en-US': 0.9,
             'ky-KG': 0.84,
-            'zh-CN': 0.78,
+            'zh-CN': 0.74,
             'fr-FR': 0.86
         };
 

@@ -108,3 +108,5 @@ Original prompt: Ok, let's skip that bug for now. Please update each language so
 - Added new supplemental letter/sound practice packs for blends, vowel combos, special consonants, pinyin initials, and pinyin finals.
 - Added a new visual pronunciation guide button with an animated SVG mouth/tongue helper modal.
 - Added language-aware visual articulation hints for Russian, English, Kyrgyz, Chinese, and French sounds.
+- Adjusted Chinese speech playback so letter/tone cards speak the actual Han character for more reliable tones.
+- Tuned multilingual voice preferences and slowed Chinese speech slightly for clearer pronunciation.

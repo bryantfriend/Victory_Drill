@@ -942,6 +942,10 @@ class App {
 
         if (item.speak) return item.speak;
 
+        if (this.targetLanguage === 'zh' && item.kind === 'letter' && item.w) {
+            return item.w;
+        }
+
         // Handle alphabet items with conversational phrasing variety
         if (this.targetLanguage === 'ru' && item.l && item.n !== undefined && item.s !== undefined) {
             if (item.s) {
