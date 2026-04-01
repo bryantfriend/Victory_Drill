@@ -1169,6 +1169,8 @@ const frenchContent = {
     }
 };
 
+russianContent.modes.words.push(...CONTENT_BONUSES.ru.words);
+russianContent.modes.phrases.push(...(CONTENT_BONUSES.ru.phrases || []));
 englishContent.modes.words.push(...CONTENT_BONUSES.en.words);
 englishContent.modes.phrases.push(...CONTENT_BONUSES.en.phrases);
 englishContent.modes.letters.push(...(CONTENT_BONUSES.en.letters || []));

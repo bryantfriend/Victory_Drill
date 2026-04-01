@@ -23,6 +23,7 @@ class App {
         this.currentIndex = 0;
         this.score = 0;
         this.difficultItems = [];
+        this.savedItems = [];
         this.practiceSourceList = null;
         this.isPaused = false;
         this.isFlipped = false;
@@ -93,6 +94,7 @@ class App {
             onPrevItem: () => this.prevItem(),
             onRepeatItem: () => this.repeatItem(),
             onToggleDifficult: () => this.toggleDifficultItem(),
+            onToggleSaved: () => this.toggleSavedItem(),
             onTogglePause: () => this.togglePause(),
             onExit: () => this.exitToMenu(),
             onReplay: () => this.startGame(this.currentCategory),
@@ -112,10 +114,14 @@ class App {
             onChangeSpeechRate: (rate) => this.setSpeechRate(rate),
             onToggleAutoPlay: () => this.toggleAutoPlay(),
             onToggleSplashVideo: () => this.toggleSplashVideo(),
-            onOpenTeacherTools: (categoryKey) => this.updateTeacherAssignment(categoryKey)
+            onOpenTeacherTools: (categoryKey) => this.updateTeacherAssignment(categoryKey),
+            onOpenSavedItems: () => this.openSavedItems(),
+            onPracticeSaved: (languageCode, kind) => this.startSavedPractice(languageCode, kind),
+            onRemoveSaved: (storageKey) => this.removeSavedItem(storageKey)
         });
 
         this.loadSettings();
+        this.loadSavedItems();
         this.init();
         this.applyAssignmentFromUrl();
         this.handleSplash();
@@ -505,6 +511,19 @@ class App {
         }
     }
 
+    loadSavedItems() {
+        try {
+            const raw = localStorage.getItem('victory-drill-saved');
+            if (!raw) return;
+            const saved = JSON.parse(raw);
+            if (Array.isArray(saved)) {
+                this.savedItems = saved;
+            }
+        } catch (error) {
+            console.warn('Could not load saved items', error);
+        }
+    }
+
     saveSettings() {
         if (this.isApplyingAssignment) return;
         try {
@@ -520,6 +539,14 @@ class App {
             }));
         } catch (error) {
             console.warn('Could not save settings', error);
+        }
+    }
+
+    saveSavedItems() {
+        try {
+            localStorage.setItem('victory-drill-saved', JSON.stringify(this.savedItems));
+        } catch (error) {
+            console.warn('Could not save saved items', error);
         }
     }
 
@@ -675,6 +702,18 @@ class App {
               teacherQrFallback: getUIText(language, 'teacherQrFallback'),
               assignmentBannerLabel: getUIText(language, 'assignmentBannerLabel'),
               assignmentDefaultTitle: getUIText(language, 'assignmentDefaultTitle'),
+              savedButton: getUIText(language, 'savedButton'),
+              savedTitle: getUIText(language, 'savedTitle'),
+              savedSubtitle: getUIText(language, 'savedSubtitle'),
+              savedEmpty: getUIText(language, 'savedEmpty'),
+              savedLetters: getUIText(language, 'savedLetters'),
+              savedWords: getUIText(language, 'savedWords'),
+              savedPhrases: getUIText(language, 'savedPhrases'),
+              savedPractice: getUIText(language, 'savedPractice'),
+              savedRemove: getUIText(language, 'savedRemove'),
+              savedItemsLabel: getUIText(language, 'savedItemsLabel'),
+              saveItem: getUIText(language, 'saveItem'),
+              unsaveItem: getUIText(language, 'unsaveItem'),
               copy: getUIText(language, 'copy'),
               copied: getUIText(language, 'copied')
           });
@@ -688,10 +727,12 @@ class App {
           this.renderCategories();
           this.updateTeacherAssignment();
           this.ui.updateAssignmentBanner(this.getAssignmentBannerData());
+          this.ui.renderSavedItems(this.getSavedGroups());
           if (this.currentList.length) {
             this.ui.setInitialContent(this.getCurrentItem());
             this.ui.updateDifficultSummary(this.difficultItems.length);
             this.ui.updateDifficultButton(this.isCurrentItemDifficult());
+            this.ui.updateSavedButton(this.isCurrentItemSaved());
             this.updatePracticeLab();
         }
     }
@@ -711,6 +752,7 @@ class App {
         this.difficultItems = [];
         this.renderCategories();
         this.updateTeacherAssignment();
+        this.ui.renderSavedItems(this.getSavedGroups());
         this.ui.showScreen('start');
     }
 
@@ -877,6 +919,12 @@ class App {
 
     getCategoryList(category) {
         this.currentCategory = category;
+        if (typeof category === 'string' && category.startsWith('__saved__:')) {
+            const [, languageCode, kind] = category.split(':');
+            return this.savedItems
+                .filter(entry => entry.targetLanguage === languageCode && entry.kind === kind)
+                .map(entry => JSON.parse(JSON.stringify(entry.item)));
+        }
         let list = [...getCategoryItems(this.targetLanguage, this.getModeConfig().contentMode, category)];
         if (this.activeAssignment?.limit > 0) {
             list = list.slice(0, this.activeAssignment.limit);
@@ -917,6 +965,7 @@ class App {
         this.ui.updatePauseUI(false);
         this.ui.updateDifficultSummary(this.difficultItems.length);
         this.ui.updateDifficultButton(this.isCurrentItemDifficult());
+        this.ui.updateSavedButton(this.isCurrentItemSaved());
         this.ui.updateAssignmentBanner(this.getAssignmentBannerData());
         this.ui.setInitialContent(firstItem);
         this.updatePracticeLab();
@@ -1518,6 +1567,7 @@ class App {
         this.ui.updateCard(nextItem, this.isFlipped);
         this.isFlipped = !this.isFlipped;
         this.ui.updateDifficultButton(this.isCurrentItemDifficult());
+        this.ui.updateSavedButton(this.isCurrentItemSaved());
         this.updatePracticeLab();
         if (this.practiceStyle === 'listening') {
             this.startListeningQuiz();
@@ -1537,6 +1587,7 @@ class App {
         this.ui.updateCard(prevItem, this.isFlipped);
         this.isFlipped = !this.isFlipped;
         this.ui.updateDifficultButton(this.isCurrentItemDifficult());
+        this.ui.updateSavedButton(this.isCurrentItemSaved());
         this.updatePracticeLab();
         if (this.practiceStyle === 'listening') {
             this.startListeningQuiz();
@@ -1565,6 +1616,109 @@ class App {
         if (item.t) return `word:${item.t}`;
         if (item.l) return `letter:${item.l}`;
         return JSON.stringify(item);
+    }
+
+    getItemKind(item) {
+        if (typeof item === 'string' || item?.kind === 'phrase') return 'phrases';
+        if (item?.l) return 'letters';
+        return 'words';
+    }
+
+    getSavedStorageKey(targetLanguage, item) {
+        return `${targetLanguage}:${this.getItemKey(item)}`;
+    }
+
+    createSavedEntry(item) {
+        return {
+            storageKey: this.getSavedStorageKey(this.targetLanguage, item),
+            targetLanguage: this.targetLanguage,
+            kind: this.getItemKind(item),
+            label: this.getDisplayText(item),
+            item: JSON.parse(JSON.stringify(item))
+        };
+    }
+
+    isCurrentItemSaved() {
+        const item = this.getCurrentItem();
+        if (!item) return false;
+        const storageKey = this.getSavedStorageKey(this.targetLanguage, item);
+        return this.savedItems.some(entry => entry.storageKey === storageKey);
+    }
+
+    toggleSavedItem() {
+        if (this.isPaused) return;
+        const item = this.getCurrentItem();
+        if (!item) return;
+
+        const storageKey = this.getSavedStorageKey(this.targetLanguage, item);
+        const existingIndex = this.savedItems.findIndex(entry => entry.storageKey === storageKey);
+        if (existingIndex >= 0) {
+            this.savedItems.splice(existingIndex, 1);
+        } else {
+            this.savedItems.unshift(this.createSavedEntry(item));
+        }
+
+        this.saveSavedItems();
+        this.ui.updateSavedButton(this.isCurrentItemSaved());
+        this.ui.renderSavedItems(this.getSavedGroups());
+    }
+
+    removeSavedItem(storageKey) {
+        this.savedItems = this.savedItems.filter(entry => entry.storageKey !== storageKey);
+        this.saveSavedItems();
+        this.ui.renderSavedItems(this.getSavedGroups());
+        this.ui.updateSavedButton(this.isCurrentItemSaved());
+    }
+
+    getSavedGroups() {
+        const languageMap = Object.fromEntries(TARGET_LANGUAGES.map(language => [language.code, language.label]));
+        const sectionLabels = {
+            letters: this.ui.text.savedLetters || 'Saved Letters',
+            words: this.ui.text.savedWords || 'Saved Words',
+            phrases: this.ui.text.savedPhrases || 'Saved Phrases'
+        };
+
+        return TARGET_LANGUAGES
+            .map(language => {
+                const items = this.savedItems.filter(entry => entry.targetLanguage === language.code);
+                return {
+                    code: language.code,
+                    label: languageMap[language.code] || language.code,
+                    sections: ['letters', 'words', 'phrases'].map(kind => ({
+                        kind,
+                        label: sectionLabels[kind],
+                        items: items.filter(entry => entry.kind === kind)
+                    }))
+                };
+            })
+            .filter(group => group.sections.some(section => section.items.length));
+    }
+
+    openSavedItems() {
+        this.ui.renderSavedItems(this.getSavedGroups());
+        this.ui.openSavedItems();
+    }
+
+    startSavedPractice(languageCode, kind) {
+        const saved = this.savedItems
+            .filter(entry => entry.targetLanguage === languageCode && entry.kind === kind)
+            .map(entry => JSON.parse(JSON.stringify(entry.item)));
+        if (!saved.length) return;
+
+        if (this.targetLanguage !== languageCode) {
+            this.setTargetLanguage(languageCode);
+        }
+
+        const modeMap = {
+            letters: 'letters',
+            words: 'topic-words',
+            phrases: 'topic-phrases'
+        };
+        this.setMode(modeMap[kind] || 'letters');
+        this.currentCategory = `__saved__:${languageCode}:${kind}`;
+        this.practiceSourceList = [...saved];
+        this.startRound(saved, false);
+        this.ui.closeSavedItems();
     }
 
     isCurrentItemDifficult() {

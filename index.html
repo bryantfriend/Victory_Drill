@@ -64,6 +64,10 @@
                     <i data-lucide="sliders-horizontal" class="w-5 h-5"></i>
                     <span id="settings-trigger-label">Settings</span>
                 </button>
+                <button id="open-saved-items" type="button" class="settings-trigger saved-trigger">
+                    <i data-lucide="heart" class="w-5 h-5"></i>
+                    <span id="saved-trigger-label">Saved</span>
+                </button>
                 <button id="open-teacher-tools" type="button" class="settings-trigger teacher-trigger">
                     <i data-lucide="graduation-cap" class="w-5 h-5"></i>
                     <span id="teacher-trigger-label">Teacher</span>
@@ -378,6 +382,28 @@
             </div>
         </div>
 
+        <div id="saved-modal" class="settings-modal hidden" aria-hidden="true">
+            <div id="saved-backdrop" class="settings-backdrop"></div>
+            <div class="settings-sheet">
+                <div class="settings-sheet-header">
+                    <div>
+                        <p id="saved-title" class="settings-title">Saved Practice</p>
+                        <p id="saved-subtitle" class="settings-subtitle">Review the letters, words, and phrases you want to practice again.</p>
+                    </div>
+                    <button id="close-saved" type="button" class="settings-close-btn" aria-label="Close saved items">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+
+                <div id="saved-empty" class="saved-empty hidden">You have not saved any items yet.</div>
+                <div id="saved-groups" class="saved-groups"></div>
+
+                <button id="saved-done" type="button" class="settings-done-btn">
+                    <span id="saved-done-label">Done</span>
+                </button>
+            </div>
+        </div>
+
         <!-- Game Screen -->
         <div id="game-screen" class="hidden relative game-shell rounded-[2rem] px-4 py-5 md:px-6 md:py-6">
             <div class="game-shell-glow game-shell-glow-a"></div>
@@ -533,6 +559,11 @@
                     class="btn-3d w-14 h-14 bg-amber-100 hover:bg-amber-200 text-amber-700 rounded-full flex items-center justify-center border-b-4 border-amber-300"
                     style="--shadow-color: #f59e0b;">
                     <i id="difficult-icon" data-lucide="bookmark-plus" class="w-6 h-6"></i>
+                </button>
+                <button id="save-item-btn"
+                    class="btn-3d w-14 h-14 bg-rose-100 hover:bg-rose-200 text-rose-700 rounded-full flex items-center justify-center border-b-4 border-rose-300"
+                    style="--shadow-color: #fb7185;">
+                    <i data-lucide="heart" class="w-6 h-6"></i>
                 </button>
                 <button id="record-btn"
                     class="record-btn btn-3d w-14 h-14 bg-sky-100 hover:bg-sky-200 text-sky-700 rounded-full flex items-center justify-center border-b-4 border-sky-300"

@@ -35,6 +35,7 @@ export class UIManager {
         this.categoryCount = document.getElementById('category-count');
         this.categoryEmpty = document.getElementById('category-empty');
         this.openSettingsBtn = document.getElementById('open-settings');
+        this.openSavedBtn = document.getElementById('open-saved-items');
         this.openTeacherBtn = document.getElementById('open-teacher-tools');
         this.openSettingsInlineBtn = document.getElementById('open-settings-inline');
         this.settingsModal = document.getElementById('settings-modal');
@@ -82,6 +83,16 @@ export class UIManager {
         this.teacherQrCode = document.getElementById('teacher-qr-code');
         this.copyTeacherLinkBtn = document.getElementById('copy-teacher-link');
         this.teacherDoneLabel = document.getElementById('teacher-done-label');
+        this.savedModal = document.getElementById('saved-modal');
+        this.savedBackdrop = document.getElementById('saved-backdrop');
+        this.closeSavedBtn = document.getElementById('close-saved');
+        this.savedDoneBtn = document.getElementById('saved-done');
+        this.savedTriggerLabel = document.getElementById('saved-trigger-label');
+        this.savedTitle = document.getElementById('saved-title');
+        this.savedSubtitle = document.getElementById('saved-subtitle');
+        this.savedEmpty = document.getElementById('saved-empty');
+        this.savedGroups = document.getElementById('saved-groups');
+        this.savedDoneLabel = document.getElementById('saved-done-label');
         this.voiceLabel = document.getElementById('voice-label');
         this.voiceSelect = document.getElementById('voice-select');
         this.speechSpeedLabel = document.getElementById('speech-speed-label');
@@ -171,6 +182,7 @@ export class UIManager {
         // Buttons
         this.prevBtn = document.getElementById('prev-btn');
         this.markDifficultBtn = document.getElementById('mark-difficult-btn');
+        this.saveItemBtn = document.getElementById('save-item-btn');
         this.recordBtn = document.getElementById('record-btn');
         this.playBtn = document.getElementById('play-btn');
         this.nextBtn = document.getElementById('next-btn');
@@ -185,6 +197,7 @@ export class UIManager {
         if (this.card) this.card.onclick = () => this.callbacks.onNextItem();
         if (this.prevBtn) this.prevBtn.onclick = (e) => { e.stopPropagation(); this.callbacks.onPrevItem(); };
         if (this.markDifficultBtn) this.markDifficultBtn.onclick = (e) => { e.stopPropagation(); this.callbacks.onToggleDifficult(); };
+        if (this.saveItemBtn) this.saveItemBtn.onclick = (e) => { e.stopPropagation(); this.callbacks.onToggleSaved?.(); };
         if (this.recordBtn) this.recordBtn.onclick = (e) => { e.stopPropagation(); this.callbacks.onRecord(); };
         if (this.playBtn) this.playBtn.onclick = (e) => { e.stopPropagation(); this.callbacks.onRepeatItem(); };
         if (this.nextBtn) this.nextBtn.onclick = (e) => { e.stopPropagation(); this.callbacks.onNextItem(); };
@@ -195,6 +208,7 @@ export class UIManager {
         if (this.categoryPrevBtn) this.categoryPrevBtn.onclick = () => this.scrollCategories(-1);
         if (this.categoryNextBtn) this.categoryNextBtn.onclick = () => this.scrollCategories(1);
         if (this.openSettingsBtn) this.openSettingsBtn.onclick = () => this.openSettings();
+        if (this.openSavedBtn) this.openSavedBtn.onclick = () => this.callbacks.onOpenSavedItems?.();
         if (this.openTeacherBtn) this.openTeacherBtn.onclick = () => {
             this.openTeacherTools();
             this.callbacks.onOpenTeacherTools?.(this.teacherCategorySelect?.value || '');
@@ -203,6 +217,9 @@ export class UIManager {
         if (this.closeSettingsBtn) this.closeSettingsBtn.onclick = () => this.closeSettings();
         if (this.settingsDoneBtn) this.settingsDoneBtn.onclick = () => this.closeSettings();
         if (this.settingsBackdrop) this.settingsBackdrop.onclick = () => this.closeSettings();
+        if (this.closeSavedBtn) this.closeSavedBtn.onclick = () => this.closeSavedItems();
+        if (this.savedDoneBtn) this.savedDoneBtn.onclick = () => this.closeSavedItems();
+        if (this.savedBackdrop) this.savedBackdrop.onclick = () => this.closeSavedItems();
         if (this.closeTeacherBtn) this.closeTeacherBtn.onclick = () => this.closeTeacherTools();
         if (this.teacherDoneBtn) this.teacherDoneBtn.onclick = () => this.closeTeacherTools();
         if (this.teacherBackdrop) this.teacherBackdrop.onclick = () => this.closeTeacherTools();
@@ -236,6 +253,7 @@ export class UIManager {
         document.addEventListener('keydown', (event) => {
             if (event.key === 'Escape') {
                 this.closeSettings();
+                this.closeSavedItems();
                 this.closeTeacherTools();
                 this.closeVisualGuide();
             }
@@ -258,11 +276,16 @@ export class UIManager {
         if (this.setupStepMode) this.setupStepMode.innerText = text.setupStepMode || 'Step 2 · Practice Type';
         if (this.setupStepCategory) this.setupStepCategory.innerText = text.setupStepCategory || 'Step 3 · Choose Category';
         if (this.settingsTriggerLabel) this.settingsTriggerLabel.innerText = text.settingsButton || 'Settings';
+        if (this.savedTriggerLabel) this.savedTriggerLabel.innerText = text.savedButton || 'Saved';
         if (this.teacherTriggerLabel) this.teacherTriggerLabel.innerText = text.teacherToolsButton || 'Teacher';
         if (this.settingsInlineLabel) this.settingsInlineLabel.innerText = text.settingsOpenInline || 'Open Settings';
         if (this.settingsTitle) this.settingsTitle.innerText = text.settingsTitle || 'Settings';
         if (this.settingsSubtitle) this.settingsSubtitle.innerText = text.settingsSubtitle || 'Fine-tune how practice feels before you start.';
         if (this.settingsDoneLabel) this.settingsDoneLabel.innerText = text.settingsDone || 'Done';
+        if (this.savedTitle) this.savedTitle.innerText = text.savedTitle || 'Saved Practice';
+        if (this.savedSubtitle) this.savedSubtitle.innerText = text.savedSubtitle || 'Review the letters, words, and phrases you want to practice again.';
+        if (this.savedEmpty) this.savedEmpty.innerText = text.savedEmpty || 'You have not saved any items yet.';
+        if (this.savedDoneLabel) this.savedDoneLabel.innerText = text.settingsDone || 'Done';
         if (this.teacherTitle) this.teacherTitle.innerText = text.teacherToolsTitle || 'Teacher Assignment';
         if (this.teacherSubtitle) this.teacherSubtitle.innerText = text.teacherToolsSubtitle || 'Create a lesson QR code from the current setup.';
         if (this.teacherHomeworkLabel) this.teacherHomeworkLabel.innerText = text.teacherHomeworkLabel || 'Homework title';
@@ -357,6 +380,7 @@ export class UIManager {
         this.renderVoiceOptions([], this.voiceSelect?.value || '');
         this.updateSettingsSummary();
         this.updateRecordButton(false, true);
+        this.updateSavedButton(false);
         if (typeof lucide !== 'undefined') lucide.createIcons();
     }
 
@@ -387,6 +411,21 @@ export class UIManager {
         if (!this.teacherModal || this.teacherModal.classList.contains('hidden')) return;
         this.teacherModal.classList.add('hidden');
         this.teacherModal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+    }
+
+    openSavedItems() {
+        if (!this.savedModal) return;
+        this.savedModal.classList.remove('hidden');
+        this.savedModal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    closeSavedItems() {
+        if (!this.savedModal || this.savedModal.classList.contains('hidden')) return;
+        this.savedModal.classList.add('hidden');
+        this.savedModal.setAttribute('aria-hidden', 'true');
         document.body.style.overflow = '';
     }
 
@@ -457,6 +496,7 @@ export class UIManager {
         this.screens[name].classList.remove('hidden');
         if (name !== 'start') {
             this.closeSettings();
+            this.closeSavedItems();
             this.closeTeacherTools();
         }
         if (name !== 'game') {
@@ -494,6 +534,24 @@ export class UIManager {
 
         const iconName = isMarked ? 'bookmark-check' : 'bookmark-plus';
         this.markDifficultBtn.innerHTML = `<i data-lucide="${iconName}" class="w-6 h-6"></i>`;
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    updateSavedButton(isSaved) {
+        if (!this.saveItemBtn) return;
+        this.saveItemBtn.classList.toggle('bg-rose-100', !isSaved);
+        this.saveItemBtn.classList.toggle('hover:bg-rose-200', !isSaved);
+        this.saveItemBtn.classList.toggle('text-rose-700', !isSaved);
+        this.saveItemBtn.classList.toggle('border-rose-300', !isSaved);
+        this.saveItemBtn.classList.toggle('bg-rose-500', isSaved);
+        this.saveItemBtn.classList.toggle('hover:bg-rose-600', isSaved);
+        this.saveItemBtn.classList.toggle('text-white', isSaved);
+        this.saveItemBtn.classList.toggle('border-rose-700', isSaved);
+        this.saveItemBtn.style.setProperty('--shadow-color', isSaved ? '#be123c' : '#fb7185');
+        this.saveItemBtn.title = isSaved
+            ? (this.text.unsaveItem || 'Remove from saved')
+            : (this.text.saveItem || 'Save this item');
+        this.saveItemBtn.innerHTML = `<i data-lucide="${isSaved ? 'heart-off' : 'heart'}" class="w-6 h-6"></i>`;
         if (typeof lucide !== 'undefined') lucide.createIcons();
     }
 
@@ -718,6 +776,73 @@ export class UIManager {
         this.categoryCount.innerText = `${filtered.length} ${this.text.categoryCountLabel || 'categories'}`;
         this.categoryEmpty.classList.toggle('hidden', filtered.length !== 0);
         this.updateCategoryRailState(filtered.length);
+    }
+
+    renderSavedItems(groups = []) {
+        if (!this.savedGroups || !this.savedEmpty) return;
+        this.savedGroups.innerHTML = '';
+        const hasItems = groups.some(group => (group.sections || []).some(section => (section.items || []).length));
+        this.savedEmpty.classList.toggle('hidden', hasItems);
+        if (!hasItems) return;
+
+        groups.forEach(group => {
+            const languageCard = document.createElement('section');
+            languageCard.className = 'saved-language-card';
+
+            const languageTitle = document.createElement('h3');
+            languageTitle.className = 'saved-language-title';
+            languageTitle.innerText = group.label;
+            languageCard.appendChild(languageTitle);
+
+            group.sections.forEach(section => {
+                if (!section.items?.length) return;
+
+                const sectionWrap = document.createElement('div');
+                sectionWrap.className = 'saved-section';
+
+                const header = document.createElement('div');
+                header.className = 'saved-section-header';
+
+                const titleWrap = document.createElement('div');
+                const title = document.createElement('p');
+                title.className = 'saved-section-title';
+                title.innerText = section.label;
+                const count = document.createElement('p');
+                count.className = 'saved-section-count';
+                count.innerText = `${section.items.length} ${this.text.savedItemsLabel || 'saved items'}`;
+                titleWrap.appendChild(title);
+                titleWrap.appendChild(count);
+
+                const practiceBtn = document.createElement('button');
+                practiceBtn.type = 'button';
+                practiceBtn.className = 'saved-practice-btn';
+                practiceBtn.innerText = this.text.savedPractice || 'Practice';
+                practiceBtn.onclick = () => this.callbacks.onPracticeSaved?.(group.code, section.kind);
+
+                header.appendChild(titleWrap);
+                header.appendChild(practiceBtn);
+                sectionWrap.appendChild(header);
+
+                const list = document.createElement('div');
+                list.className = 'saved-chip-list';
+                section.items.forEach(item => {
+                    const chip = document.createElement('button');
+                    chip.type = 'button';
+                    chip.className = 'saved-chip';
+                    chip.onclick = () => this.callbacks.onRemoveSaved?.(item.storageKey);
+                    chip.innerHTML = `
+                        <span class="saved-chip-label">${item.label}</span>
+                        <span class="saved-chip-remove">${this.text.savedRemove || 'Remove'}</span>
+                    `;
+                    list.appendChild(chip);
+                });
+
+                sectionWrap.appendChild(list);
+                languageCard.appendChild(sectionWrap);
+            });
+
+            this.savedGroups.appendChild(languageCard);
+        });
     }
 
     scrollCategories(direction) {

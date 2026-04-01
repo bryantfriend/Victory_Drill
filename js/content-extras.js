@@ -25,7 +25,162 @@ const letter = (l, n, s, w, glosses, extras = {}) => ({
 
 const category = (key, labels, items) => ({ key, labels, items });
 
+const JOB_CATEGORY_LABEL = {
+    en: 'Jobs',
+    zh: '职业词汇',
+    ky: 'Кесиптер',
+    ru: 'Профессии',
+    fr: 'Metiers'
+};
+
+const JOB_WORDS = [
+    { en: 'teacher', zh: '老师', ky: 'мугалим', ru: 'учитель', fr: 'professeur' },
+    { en: 'doctor', zh: '医生', ky: 'дарыгер', ru: 'врач', fr: 'medecin' },
+    { en: 'nurse', zh: '护士', ky: 'медайым', ru: 'медсестра', fr: 'infirmiere' },
+    { en: 'driver', zh: '司机', ky: 'айдоочу', ru: 'водитель', fr: 'chauffeur' },
+    { en: 'cook', zh: '厨师', ky: 'ашпозчу', ru: 'повар', fr: 'cuisinier' },
+    { en: 'police officer', zh: '警察', ky: 'милиционер', ru: 'полицейский', fr: 'policier' },
+    { en: 'firefighter', zh: '消防员', ky: 'орт очуруучу', ru: 'пожарный', fr: 'pompier' },
+    { en: 'farmer', zh: '农民', ky: 'дыйкан', ru: 'фермер', fr: 'agriculteur' },
+    { en: 'builder', zh: '建筑工人', ky: 'куруучу', ru: 'строитель', fr: 'constructeur' },
+    { en: 'engineer', zh: '工程师', ky: 'инженер', ru: 'инженер', fr: 'ingenieur' },
+    { en: 'artist', zh: '艺术家', ky: 'суротчу', ru: 'художник', fr: 'artiste' },
+    { en: 'singer', zh: '歌手', ky: 'ырчы', ru: 'певец', fr: 'chanteur' },
+    { en: 'dancer', zh: '舞蹈演员', ky: 'бийчи', ru: 'танцор', fr: 'danseur' },
+    { en: 'pilot', zh: '飞行员', ky: 'учкуч', ru: 'пилот', fr: 'pilote' },
+    { en: 'mechanic', zh: '机械师', ky: 'механик', ru: 'механик', fr: 'mecanicien' },
+    { en: 'baker', zh: '面包师', ky: 'наабайчы', ru: 'пекарь', fr: 'boulanger' },
+    { en: 'waiter', zh: '服务员', ky: 'официант', ru: 'официант', fr: 'serveur' },
+    { en: 'cashier', zh: '收银员', ky: 'кассир', ru: 'кассир', fr: 'caissier' },
+    { en: 'dentist', zh: '牙医', ky: 'тиш доктур', ru: 'стоматолог', fr: 'dentiste' },
+    { en: 'actor', zh: '演员', ky: 'актёр', ru: 'актер', fr: 'acteur' },
+    { en: 'musician', zh: '音乐家', ky: 'музыкант', ru: 'музыкант', fr: 'musicien' },
+    { en: 'scientist', zh: '科学家', ky: 'илимпоз', ru: 'ученый', fr: 'scientifique' },
+    { en: 'programmer', zh: '程序员', ky: 'программист', ru: 'программист', fr: 'programmeur' },
+    { en: 'photographer', zh: '摄影师', ky: 'суротчу', ru: 'фотограф', fr: 'photographe' },
+    { en: 'tailor', zh: '裁缝', ky: 'тигуучу', ru: 'портной', fr: 'tailleur' },
+    { en: 'cleaner', zh: '清洁工', ky: 'тазалоочу', ru: 'уборщик', fr: 'nettoyeur' },
+    { en: 'painter', zh: '油漆工', ky: 'боёкчу', ru: 'маляр', fr: 'peintre' },
+    { en: 'translator', zh: '翻译员', ky: 'котормочу', ru: 'переводчик', fr: 'traducteur' },
+    { en: 'journalist', zh: '记者', ky: 'журналист', ru: 'журналист', fr: 'journaliste' },
+    { en: 'librarian', zh: '图书管理员', ky: 'китепканачы', ru: 'библиотекарь', fr: 'bibliothecaire' }
+];
+
+const createJobsCategory = (languageKey, categoryKeyPrefix) => category(
+    `${categoryKeyPrefix}-jobs-words`,
+    JOB_CATEGORY_LABEL,
+    JOB_WORDS.map(job => word(
+        job[languageKey],
+        meanings(job.en, job.zh, job.ky, job.ru, job.fr)
+    ))
+);
+
+const createSharedWordCategory = (languageKey, categoryKey, labels, rows) => category(
+    categoryKey,
+    labels,
+    rows.map(entry => word(
+        entry[languageKey],
+        meanings(entry.en, entry.zh, entry.ky, entry.ru, entry.fr),
+        entry.extras?.[languageKey] || {}
+    ))
+);
+
+const createSharedPhraseCategory = (languageKey, categoryKey, labels, rows) => category(
+    categoryKey,
+    labels,
+    rows.map(entry => phrase(
+        entry[languageKey],
+        meanings(entry.en, entry.zh, entry.ky, entry.ru, entry.fr),
+        entry.extras?.[languageKey] || {}
+    ))
+);
+
+const NUMBERS_CATEGORY_LABEL = {
+    en: 'Numbers',
+    zh: '数字词汇',
+    ky: 'Сандар',
+    ru: 'Числа',
+    fr: 'Nombres'
+};
+
+const SHAPES_CATEGORY_LABEL = {
+    en: 'Shapes',
+    zh: '形状词汇',
+    ky: 'Формалар',
+    ru: 'Фигуры',
+    fr: 'Formes'
+};
+
+const IDIOMS_CATEGORY_LABEL = {
+    en: 'Idioms',
+    zh: '习语短语',
+    ky: 'Идиомалар',
+    ru: 'Идиомы',
+    fr: 'Expressions'
+};
+
+const NUMBER_WORDS = [
+    { en: 'zero', zh: '零', ky: 'нөл', ru: 'ноль', fr: 'zero' },
+    { en: 'one', zh: '一', ky: 'бир', ru: 'один', fr: 'un' },
+    { en: 'two', zh: '二', ky: 'эки', ru: 'два', fr: 'deux' },
+    { en: 'three', zh: '三', ky: 'үч', ru: 'три', fr: 'trois' },
+    { en: 'four', zh: '四', ky: 'төрт', ru: 'четыре', fr: 'quatre' },
+    { en: 'five', zh: '五', ky: 'беш', ru: 'пять', fr: 'cinq' },
+    { en: 'six', zh: '六', ky: 'алты', ru: 'шесть', fr: 'six' },
+    { en: 'seven', zh: '七', ky: 'жети', ru: 'семь', fr: 'sept' },
+    { en: 'eight', zh: '八', ky: 'сегиз', ru: 'восемь', fr: 'huit' },
+    { en: 'nine', zh: '九', ky: 'тогуз', ru: 'девять', fr: 'neuf' },
+    { en: 'ten', zh: '十', ky: 'он', ru: 'десять', fr: 'dix' },
+    { en: 'eleven', zh: '十一', ky: 'он бир', ru: 'одиннадцать', fr: 'onze' },
+    { en: 'twelve', zh: '十二', ky: 'он эки', ru: 'двенадцать', fr: 'douze' },
+    { en: 'thirteen', zh: '十三', ky: 'он үч', ru: 'тринадцать', fr: 'treize' },
+    { en: 'fourteen', zh: '十四', ky: 'он төрт', ru: 'четырнадцать', fr: 'quatorze' },
+    { en: 'fifteen', zh: '十五', ky: 'он беш', ru: 'пятнадцать', fr: 'quinze' },
+    { en: 'sixteen', zh: '十六', ky: 'он алты', ru: 'шестнадцать', fr: 'seize' },
+    { en: 'seventeen', zh: '十七', ky: 'он жети', ru: 'семнадцать', fr: 'dix-sept' },
+    { en: 'eighteen', zh: '十八', ky: 'он сегиз', ru: 'восемнадцать', fr: 'dix-huit' },
+    { en: 'nineteen', zh: '十九', ky: 'он тогуз', ru: 'девятнадцать', fr: 'dix-neuf' },
+    { en: 'twenty', zh: '二十', ky: 'жыйырма', ru: 'двадцать', fr: 'vingt' }
+];
+
+const SHAPE_WORDS = [
+    { en: 'circle', zh: '圆形', ky: 'тегерек', ru: 'круг', fr: 'cercle' },
+    { en: 'square', zh: '正方形', ky: 'чарчы', ru: 'квадрат', fr: 'carre' },
+    { en: 'triangle', zh: '三角形', ky: 'үчбурчтук', ru: 'треугольник', fr: 'triangle' },
+    { en: 'rectangle', zh: '长方形', ky: 'тик төртбурчтук', ru: 'прямоугольник', fr: 'rectangle' },
+    { en: 'star', zh: '星形', ky: 'жылдыз', ru: 'звезда', fr: 'etoile' },
+    { en: 'heart', zh: '心形', ky: 'жүрөк', ru: 'сердце', fr: 'coeur' },
+    { en: 'oval', zh: '椭圆形', ky: 'сүйрү', ru: 'овал', fr: 'ovale' },
+    { en: 'diamond', zh: '菱形', ky: 'ромб', ru: 'ромб', fr: 'losange' },
+    { en: 'cube', zh: '立方体', ky: 'куб', ru: 'куб', fr: 'cube' },
+    { en: 'sphere', zh: '球体', ky: 'шар', ru: 'шар', fr: 'sphere' },
+    { en: 'cylinder', zh: '圆柱体', ky: 'цилиндр', ru: 'цилиндр', fr: 'cylindre' },
+    { en: 'cone', zh: '圆锥体', ky: 'конус', ru: 'конус', fr: 'cone' },
+    { en: 'line', zh: '线', ky: 'сызык', ru: 'линия', fr: 'ligne' },
+    { en: 'spiral', zh: '螺旋', ky: 'айланма', ru: 'спираль', fr: 'spirale' }
+];
+
+const IDIOM_PHRASES = [
+    { en: 'Practice makes perfect', zh: '熟能生巧', ky: 'Кайталоо устат кылат', ru: 'Повторение мать учения', fr: 'C est en forgeant qu on devient forgeron' },
+    { en: 'Better late than never', zh: '迟做总比不做好', ky: 'Эч качандан көрө кеч болсо да жакшы', ru: 'Лучше поздно, чем никогда', fr: 'Mieux vaut tard que jamais' },
+    { en: 'Time is money', zh: '时间就是金钱', ky: 'Убакыт акча', ru: 'Время деньги', fr: 'Le temps c est de l argent' },
+    { en: 'Knowledge is power', zh: '知识就是力量', ky: 'Билим күч', ru: 'Знание сила', fr: 'Le savoir, c est le pouvoir' },
+    { en: 'Actions speak louder than words', zh: '事实胜于雄辩', ky: 'Иш сөздөн күчтүү', ru: 'Дела говорят громче слов', fr: 'Les actes valent mieux que les mots' },
+    { en: 'Every cloud has a silver lining', zh: '黑暗中总有一线光明', ky: 'Ар кыйынчылыктын артында жакшылык бар', ru: 'Нет худа без добра', fr: 'Apres la pluie, le beau temps' },
+    { en: 'Where there is a will, there is a way', zh: '有志者事竟成', ky: 'Каалоо болсо, жол табылат', ru: 'Где есть желание, там есть путь', fr: 'Quand on veut, on peut' },
+    { en: 'Two heads are better than one', zh: '三个臭皮匠，顶个诸葛亮', ky: 'Эки баш бирден жакшы', ru: 'Одна голова хорошо, а две лучше', fr: 'Deux avis valent mieux qu un' },
+    { en: 'Rome was not built in a day', zh: '罗马不是一天建成的', ky: 'Рим бир күндө курулган эмес', ru: 'Москва не сразу строилась', fr: 'Rome ne s est pas faite en un jour' },
+    { en: 'Easy come, easy go', zh: '来得容易，去得也快', ky: 'Оңой келген оңой кетет', ru: 'Легко пришло, легко ушло', fr: 'Ce qui vient vite repart vite' },
+    { en: 'Honesty is the best policy', zh: '诚实为上策', ky: 'Чынчылдык эң жакшы жол', ru: 'Честность лучшая политика', fr: 'L honnetete est la meilleure politique' },
+    { en: 'Slow and steady wins the race', zh: '稳扎稳打才能赢', ky: 'Жай жана туруктуу адам утат', ru: 'Тише едешь, дальше будешь', fr: 'Rien ne sert de courir, il faut partir a point' }
+];
+
 export const CONTENT_BONUSES = {
+    ru: {
+        letters: [],
+        words: [],
+        phrases: []
+    },
     en: {
         letters: [
             category('english-consonant-blends', { en: 'Consonant Blends', zh: '辅音连缀', ky: 'Үнсүз айкаштары', ru: 'Сочетания согласных', fr: 'Groupes de consonnes' }, [
@@ -507,3 +662,24 @@ export const CONTENT_BONUSES = {
         ]
     }
 };
+
+CONTENT_BONUSES.ru.words.push(createJobsCategory('ru', 'russian'));
+CONTENT_BONUSES.ru.words.push(createSharedWordCategory('ru', 'russian-numbers-words', NUMBERS_CATEGORY_LABEL, NUMBER_WORDS));
+CONTENT_BONUSES.ru.words.push(createSharedWordCategory('ru', 'russian-shapes-words', SHAPES_CATEGORY_LABEL, SHAPE_WORDS));
+CONTENT_BONUSES.ru.phrases.push(createSharedPhraseCategory('ru', 'russian-idioms-phrases', IDIOMS_CATEGORY_LABEL, IDIOM_PHRASES));
+CONTENT_BONUSES.en.words.push(createJobsCategory('en', 'english'));
+CONTENT_BONUSES.en.words.push(createSharedWordCategory('en', 'english-numbers-words', NUMBERS_CATEGORY_LABEL, NUMBER_WORDS));
+CONTENT_BONUSES.en.words.push(createSharedWordCategory('en', 'english-shapes-words', SHAPES_CATEGORY_LABEL, SHAPE_WORDS));
+CONTENT_BONUSES.en.phrases.push(createSharedPhraseCategory('en', 'english-idioms-phrases', IDIOMS_CATEGORY_LABEL, IDIOM_PHRASES));
+CONTENT_BONUSES.ky.words.push(createJobsCategory('ky', 'kyrgyz'));
+CONTENT_BONUSES.ky.words.push(createSharedWordCategory('ky', 'kyrgyz-numbers-words', NUMBERS_CATEGORY_LABEL, NUMBER_WORDS));
+CONTENT_BONUSES.ky.words.push(createSharedWordCategory('ky', 'kyrgyz-shapes-words', SHAPES_CATEGORY_LABEL, SHAPE_WORDS));
+CONTENT_BONUSES.ky.phrases.push(createSharedPhraseCategory('ky', 'kyrgyz-idioms-phrases', IDIOMS_CATEGORY_LABEL, IDIOM_PHRASES));
+CONTENT_BONUSES.zh.words.push(createJobsCategory('zh', 'chinese'));
+CONTENT_BONUSES.zh.words.push(createSharedWordCategory('zh', 'chinese-numbers-words', NUMBERS_CATEGORY_LABEL, NUMBER_WORDS));
+CONTENT_BONUSES.zh.words.push(createSharedWordCategory('zh', 'chinese-shapes-words', SHAPES_CATEGORY_LABEL, SHAPE_WORDS));
+CONTENT_BONUSES.zh.phrases.push(createSharedPhraseCategory('zh', 'chinese-idioms-phrases', IDIOMS_CATEGORY_LABEL, IDIOM_PHRASES));
+CONTENT_BONUSES.fr.words.push(createJobsCategory('fr', 'french'));
+CONTENT_BONUSES.fr.words.push(createSharedWordCategory('fr', 'french-numbers-words', NUMBERS_CATEGORY_LABEL, NUMBER_WORDS));
+CONTENT_BONUSES.fr.words.push(createSharedWordCategory('fr', 'french-shapes-words', SHAPES_CATEGORY_LABEL, SHAPE_WORDS));
+CONTENT_BONUSES.fr.phrases.push(createSharedPhraseCategory('fr', 'french-idioms-phrases', IDIOMS_CATEGORY_LABEL, IDIOM_PHRASES));
