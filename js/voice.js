@@ -221,6 +221,42 @@ export class VoiceManager {
             }));
     }
 
+    stop() {
+        this.synth.cancel();
+    }
+
+    speakWithLanguage(lang, text, rate = null, handlers = {}) {
+        if (!text) return;
+
+        if (!this.voices.length) {
+            this._initVoices();
+        }
+
+        this.synth.cancel();
+
+        const selection = this._findVoiceSelection(lang);
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = selection.lang || lang;
+        utterance.rate = rate ?? this._getSpeechRate(lang);
+
+        if (selection.voice) {
+            utterance.voice = selection.voice;
+            utterance.lang = selection.voice.lang || selection.lang || lang;
+        }
+
+        if (handlers.onStart) {
+            utterance.onstart = handlers.onStart;
+        }
+        if (handlers.onEnd) {
+            utterance.onend = handlers.onEnd;
+        }
+        if (handlers.onError) {
+            utterance.onerror = handlers.onError;
+        }
+
+        this.synth.speak(utterance);
+    }
+
     speak(text, rate = null, handlers = {}) {
         if (!text) return;
 

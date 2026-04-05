@@ -1,5 +1,5 @@
 import { TARGET_LANGUAGES, getCategoryItems, learningContent } from './content.js';
-import { LANGUAGES, getCategoryLabel, getUIText } from './i18n.js';
+import { LANGUAGES, getCategoryLabel, getLanguageName, getUIText } from './i18n.js';
 import { RecognitionManager } from './recognition.js';
 import { VoiceManager } from './voice.js';
 import { Timer } from './timer.js';
@@ -17,6 +17,7 @@ class App {
         this.autoPlayAudio = true;
         this.showSplashVideo = true;
         this.speechRate = 1;
+        this.listeningPauseSeconds = 5;
         this.voiceChoices = {};
         this.currentCategory = null;
         this.currentList = [];
@@ -31,6 +32,8 @@ class App {
         this.itemStats = new Map();
         this.activeSyllableTimer = null;
         this.shadowTimeout = null;
+        this.listeningTimeout = null;
+        this.listeningSequenceToken = 0;
         this.listeningQuiz = null;
         this.isApplyingAssignment = false;
         this.activeAssignment = null;
@@ -114,6 +117,7 @@ class App {
             onChangePracticeStyle: (style) => this.setPracticeStyle(style),
             onChangeVoice: (voiceName) => this.setVoiceChoice(voiceName),
             onChangeSpeechRate: (rate) => this.setSpeechRate(rate),
+            onChangeListeningPause: (seconds) => this.setListeningPause(seconds),
             onToggleAutoPlay: () => this.toggleAutoPlay(),
             onToggleSplashVideo: () => this.toggleSplashVideo(),
             onOpenTeacherTools: (categoryKey) => this.updateTeacherAssignment(categoryKey),
@@ -293,6 +297,7 @@ class App {
         this.ui.updateAutoPlayToggle(this.autoPlayAudio);
         this.ui.updateSplashToggle(this.showSplashVideo);
         this.ui.updateSpeechSpeed(this.speechRate);
+        this.ui.updateListeningPause(this.listeningPauseSeconds);
     }
 
     getAssignmentState(categoryKey = '') {
@@ -517,6 +522,7 @@ class App {
             if (typeof saved.autoPlayAudio === 'boolean') this.autoPlayAudio = saved.autoPlayAudio;
             if (typeof saved.showSplashVideo === 'boolean') this.showSplashVideo = saved.showSplashVideo;
             if (typeof saved.speechRate === 'number') this.speechRate = saved.speechRate;
+            if (typeof saved.listeningPauseSeconds === 'number') this.listeningPauseSeconds = saved.listeningPauseSeconds;
             if (saved.voiceChoices && typeof saved.voiceChoices === 'object') this.voiceChoices = saved.voiceChoices;
         } catch (error) {
             console.warn('Could not load saved settings', error);
@@ -547,6 +553,7 @@ class App {
                 autoPlayAudio: this.autoPlayAudio,
                 showSplashVideo: this.showSplashVideo,
                 speechRate: this.speechRate,
+                listeningPauseSeconds: this.listeningPauseSeconds,
                 voiceChoices: this.voiceChoices
             }));
         } catch (error) {
@@ -593,6 +600,12 @@ class App {
             noImage: getUIText(language, 'noImage'),
             meaning: getUIText(language, 'meaning'),
             pronunciation: getUIText(language, 'pronunciation'),
+            tone: getUIText(language, 'tone'),
+            tone1: getUIText(language, 'tone1'),
+            tone2: getUIText(language, 'tone2'),
+            tone3: getUIText(language, 'tone3'),
+            tone4: getUIText(language, 'tone4'),
+            tone5: getUIText(language, 'tone5'),
             letterName: getUIText(language, 'letterName'),
             sound: getUIText(language, 'sound'),
             stress: getUIText(language, 'stress'),
@@ -616,6 +629,8 @@ class App {
             voiceAuto: getUIText(language, 'voiceAuto'),
             speechSpeedLabel: getUIText(language, 'speechSpeedLabel'),
             speechSpeedHint: getUIText(language, 'speechSpeedHint'),
+            listeningPauseLabel: getUIText(language, 'listeningPauseLabel'),
+            listeningPauseHint: getUIText(language, 'listeningPauseHint'),
             autoPlayLabel: getUIText(language, 'autoPlayLabel'),
             autoPlayHint: getUIText(language, 'autoPlayHint'),
             splashToggleLabel: getUIText(language, 'splashToggleLabel'),
@@ -661,6 +676,8 @@ class App {
             visualGuideLipsLabel: getUIText(language, 'visualGuideLipsLabel'),
             visualGuideTongueLabel: getUIText(language, 'visualGuideTongueLabel'),
             visualGuideAirLabel: getUIText(language, 'visualGuideAirLabel'),
+            listeningModePrompt: getUIText(language, 'listeningModePrompt'),
+            listeningMeaningLabel: getUIText(language, 'listeningMeaningLabel'),
             listenQuizQuestion: getUIText(language, 'listenQuizQuestion'),
             listenCorrect: getUIText(language, 'listenCorrect'),
             listenWrong: getUIText(language, 'listenWrong'),
@@ -742,6 +759,7 @@ class App {
         this.ui.updateAutoPlayToggle(this.autoPlayAudio);
         this.ui.updateSplashToggle(this.showSplashVideo);
         this.ui.updateSpeechSpeed(this.speechRate);
+        this.ui.updateListeningPause(this.listeningPauseSeconds);
           this.ui.setPracticeStyle(this.practiceStyle);
           this.refreshVoiceOptions();
           this.renderCategories();
@@ -758,6 +776,7 @@ class App {
     }
 
     setTargetLanguage(language) {
+        this.cancelListeningSequence();
         this.targetLanguage = language;
         const speechLang = learningContent[language]?.speechLang || 'ru-RU';
         this.voice.setLanguage(speechLang);
@@ -770,6 +789,7 @@ class App {
         this.currentCategory = null;
         this.currentList = [];
         this.difficultItems = [];
+        this.ui.setListeningPromptData(null);
         this.renderCategories();
         this.updateTeacherAssignment();
         this.ui.renderSavedItems(this.getSavedGroups());
@@ -789,9 +809,13 @@ class App {
         this.saveSettings();
         if (this.currentList.length) {
             if (style === 'listening') {
+                this.ui.setInitialContent(this.getCurrentItem());
                 this.startListeningQuiz();
             } else {
+                this.cancelListeningSequence();
                 this.listeningQuiz = null;
+                this.ui.setListeningPromptData(null);
+                this.ui.setInitialContent(this.getCurrentItem());
                 this.updatePracticeLab();
             }
         }
@@ -845,6 +869,16 @@ class App {
         this.speechRate = rate;
         this.ui.updateSpeechSpeed(rate);
         this.saveSettings();
+    }
+
+    setListeningPause(seconds) {
+        this.listeningPauseSeconds = Math.max(2, Math.min(10, seconds));
+        this.ui.updateListeningPause(this.listeningPauseSeconds);
+        this.saveSettings();
+        if (this.practiceStyle === 'listening' && this.currentList.length) {
+            this.ui.setInitialContent(this.getCurrentItem());
+            this.startListeningQuiz();
+        }
     }
 
     setVoiceChoice(voiceName) {
@@ -981,7 +1015,9 @@ class App {
             return;
         }
         this.shuffle(this.currentList);
+        this.cancelListeningSequence();
         this.listeningQuiz = null;
+        this.ui.setListeningPromptData(null);
 
         const firstItem = this.currentList[0];
         this.ui.updateScore(0);
@@ -1231,7 +1267,7 @@ class App {
                     caption: 'Lift the tip without pressing too hard.'
                 };
             }
-            if (/[1-5]/.test(pronunciation)) {
+            if (/[1-5āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ]/i.test(pronunciation)) {
                 return {
                     ...guide,
                     profileLabel: 'Tone shape',
@@ -1396,22 +1432,81 @@ class App {
         return scored[0]?.score > 0 ? scored[0].candidate : null;
     }
 
-    buildListeningOptions(item) {
-        const target = this.getDisplayText(item);
-        const distractors = this.currentList
-            .filter(candidate => this.getItemKey(candidate) !== this.getItemKey(item))
-            .map(candidate => this.getDisplayText(candidate))
-            .filter(Boolean)
-            .filter(text => text !== target)
-            .slice(0, 6);
-        const selected = [target];
-        while (selected.length < 3 && distractors.length) {
-            const next = distractors.splice(Math.floor(Math.random() * distractors.length), 1)[0];
-            if (!selected.includes(next)) selected.push(next);
+    getBaseSpeechLanguage() {
+        const map = {
+            en: 'en-US',
+            zh: 'zh-CN',
+            ky: 'ky-KG',
+            ru: 'ru-RU',
+            fr: 'fr-FR'
+        };
+        return map[this.baseLanguage] || 'en-US';
+    }
+
+    cancelListeningSequence() {
+        this.listeningSequenceToken += 1;
+        if (this.listeningTimeout) {
+            clearTimeout(this.listeningTimeout);
+            this.listeningTimeout = null;
         }
-        const options = [...selected];
-        this.shuffle(options);
-        return options;
+        this.voice.stop?.();
+    }
+
+    buildListeningPromptData(item) {
+        const itemKind = this.getItemKind(item);
+        const meaning = this.getListeningMeaning(item);
+        return {
+            prompt: this.ui.text.listeningModePrompt || 'Listen, say it during the pause, then listen again.',
+            meaning,
+            languageLabel: getLanguageName(this.targetLanguage, this.baseLanguage),
+            pauseLabel: `${this.listeningPauseSeconds.toFixed(1)}s`,
+            kind: itemKind
+        };
+    }
+
+    getListeningMeaning(item) {
+        if (!item) return '';
+        if (typeof item === 'object' && item.meanings) {
+            return item.meanings[this.baseLanguage] || item.meanings.en || item.meanings.ru || '';
+        }
+        return this.ui.getMeaning?.(item) || '';
+    }
+
+    buildListeningNarration(item) {
+        const meaning = this.getListeningMeaning(item);
+        const languageName = getLanguageName(this.targetLanguage, this.baseLanguage);
+        const itemKind = this.getItemKind(item);
+        const safeMeaning = meaning || this.getDisplayText(item);
+
+        const templates = {
+            en: {
+                words: `The word for ${safeMeaning} in ${languageName} is:`,
+                phrases: `The phrase for ${safeMeaning} in ${languageName} is:`,
+                letters: `In ${languageName}, listen to this sound:`
+            },
+            zh: {
+                words: `${safeMeaning}用${languageName}怎么说：`,
+                phrases: `${safeMeaning}这句话用${languageName}怎么说：`,
+                letters: `请听这个${languageName}发音：`
+            },
+            ky: {
+                words: `${safeMeaning} деген сөз ${languageName} тилинде мындай айтылат:`,
+                phrases: `${safeMeaning} деген сөз айкашы ${languageName} тилинде мындай айтылат:`,
+                letters: `${languageName} тилиндеги бул тыбышты уккула:`
+            },
+            ru: {
+                words: `Слово ${safeMeaning} по-${languageName} будет:`,
+                phrases: `Фраза ${safeMeaning} по-${languageName} звучит так:`,
+                letters: `Послушай этот звук на ${languageName} языке:`
+            },
+            fr: {
+                words: `Le mot pour ${safeMeaning} en ${languageName}, c est :`,
+                phrases: `L expression pour ${safeMeaning} en ${languageName}, c est :`,
+                letters: `En ${languageName}, ecoute ce son :`
+            }
+        };
+
+        return templates[this.baseLanguage]?.[itemKind] || templates.en.words;
     }
 
     buildPracticeLabData() {
@@ -1429,21 +1524,7 @@ class App {
             minimalPairText: minimalPair
                 ? `${this.getDisplayText(item)} / ${this.getDisplayText(minimalPair)}`
                 : (this.ui.text.noMinimalPair || 'No contrast partner yet.'),
-            listenQuiz: this.listeningQuiz
-                ? {
-                    visible: true,
-                    question: this.ui.text.listenQuizQuestion || 'Which one did you hear?',
-                    result: this.listeningQuiz.result || '',
-                    options: this.listeningQuiz.options.map((option, index) => ({
-                        label: option,
-                        state: this.listeningQuiz.revealed
-                            ? (option === this.listeningQuiz.correct
-                                ? 'correct'
-                                : (index === this.listeningQuiz.selectedIndex ? 'wrong' : ''))
-                            : ''
-                    }))
-                }
-                : { visible: false }
+            listenQuiz: { visible: false }
         };
     }
 
@@ -1521,33 +1602,47 @@ class App {
     startListeningQuiz() {
         if (this.isPaused || !this.currentList.length) return;
         const item = this.getCurrentItem();
-        const options = this.buildListeningOptions(item);
-        this.listeningQuiz = {
-            correct: this.getDisplayText(item),
-            options,
-            result: '',
-            revealed: false,
-            selectedIndex: -1
-        };
+        this.cancelListeningSequence();
+        this.listeningQuiz = null;
+        this.ui.setListeningPromptData(this.buildListeningPromptData(item));
+        this.ui.setInitialContent(item);
         this.updatePracticeLab();
-        this.voice.speak(this.getDisplayText(item), 0.88 * this.speechRate);
+
+        const token = ++this.listeningSequenceToken;
+        const narration = this.buildListeningNarration(item);
+        const targetText = this.getText(item);
+        const targetRate = 0.88 * this.speechRate;
+        const pauseMs = Math.round(this.listeningPauseSeconds * 1000);
+
+        const speakTarget = (onEnd = null) => {
+            if (token !== this.listeningSequenceToken || this.isPaused) return;
+            this.highlightSyllablesForPlayback(item, targetRate);
+            this.voice.speakWithLanguage(this.targetLanguage, targetText, targetRate, {
+                onEnd: () => {
+                    this.clearSyllableHighlightTimer();
+                    this.updatePracticeLab(-1);
+                    if (onEnd) onEnd();
+                }
+            });
+        };
+
+        this.voice.speakWithLanguage(this.baseLanguage, narration, 0.92, {
+            onEnd: () => {
+                if (token !== this.listeningSequenceToken || this.isPaused) return;
+                speakTarget(() => {
+                    this.listeningTimeout = setTimeout(() => {
+                        if (token !== this.listeningSequenceToken || this.isPaused) return;
+                        speakTarget();
+                    }, pauseMs);
+                });
+            }
+        });
         const stats = this.getItemStats(item);
         stats.listens += 1;
     }
 
-    chooseListeningOption(index) {
-        if (!this.listeningQuiz) return;
-        this.listeningQuiz.selectedIndex = index;
-        this.listeningQuiz.revealed = true;
-        const chosen = this.listeningQuiz.options[index];
-        const correct = chosen === this.listeningQuiz.correct;
-        this.listeningQuiz.result = correct
-            ? (this.ui.text.listenCorrect || 'Correct')
-            : (this.ui.text.listenWrong || 'Listen again');
-        if (!correct) {
-            this.voice.speak(this.listeningQuiz.correct, 0.88 * this.speechRate);
-        }
-        this.updatePracticeLab();
+    chooseListeningOption() {
+        return;
     }
 
     playMinimalPair() {
@@ -1577,7 +1672,9 @@ class App {
         if (this.isPaused) return;
 
         this.resetSpeechFeedback();
+        this.cancelListeningSequence();
         this.listeningQuiz = null;
+        this.ui.setListeningPromptData(null);
         this.currentIndex++;
         if (this.currentIndex >= this.currentList.length) {
             this.currentIndex = 0;
@@ -1603,7 +1700,9 @@ class App {
         if (this.isPaused || this.currentIndex === 0) return;
 
         this.resetSpeechFeedback();
+        this.cancelListeningSequence();
         this.listeningQuiz = null;
+        this.ui.setListeningPromptData(null);
         this.currentIndex--;
 
         const prevItem = this.currentList[this.currentIndex];
@@ -1621,6 +1720,10 @@ class App {
 
     repeatItem() {
         if (this.isPaused) return;
+        if (this.practiceStyle === 'listening') {
+            this.startListeningQuiz();
+            return;
+        }
         this.speakCurrentItem();
     }
 
@@ -1783,11 +1886,15 @@ class App {
             this.recognition.stop();
             clearTimeout(this.shadowTimeout);
             this.clearSyllableHighlightTimer();
+            this.cancelListeningSequence();
         }
         if (this.isPaused) {
             this.timer.stop();
         } else {
             this.timer.start(this.timer.seconds);
+            if (this.practiceStyle === 'listening' && this.currentList.length) {
+                this.startListeningQuiz();
+            }
         }
         this.ui.updatePauseUI(this.isPaused);
     }
@@ -1796,6 +1903,7 @@ class App {
         this.recognition.stop();
         clearTimeout(this.shadowTimeout);
         this.clearSyllableHighlightTimer();
+        this.cancelListeningSequence();
         this.ui.updateDifficultSummary(this.difficultItems.length);
         this.ui.showScreen('end');
     }
@@ -1804,10 +1912,12 @@ class App {
         this.recognition.stop();
         clearTimeout(this.shadowTimeout);
         this.clearSyllableHighlightTimer();
+        this.cancelListeningSequence();
         this.resetSpeechFeedback();
         this.timer.stop();
         this.practiceSourceList = null;
         this.listeningQuiz = null;
+        this.ui.setListeningPromptData(null);
         this.ui.updateAssignmentBanner(this.getAssignmentBannerData());
         this.ui.showScreen('start');
     }

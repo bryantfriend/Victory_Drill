@@ -1,4 +1,4 @@
-import { getWordMeaning } from './i18n.js';
+import { getLanguageName, getWordMeaning } from './i18n.js';
 
 export class UIManager {
     constructor(callbacks) {
@@ -6,6 +6,7 @@ export class UIManager {
         this.language = 'ru';
         this.targetLanguage = 'ru';
         this.practiceStyle = 'classic';
+        this.listeningPauseSeconds = 5;
         this.selectedTime = 60;
         this.text = {};
         this.showPronunciation = true;
@@ -111,6 +112,10 @@ export class UIManager {
         this.speechSpeedHint = document.getElementById('speech-speed-hint');
         this.speechSpeedRange = document.getElementById('speech-speed-range');
         this.speechSpeedValue = document.getElementById('speech-speed-value');
+        this.listeningPauseLabel = document.getElementById('listening-pause-label');
+        this.listeningPauseHint = document.getElementById('listening-pause-hint');
+        this.listeningPauseRange = document.getElementById('listening-pause-range');
+        this.listeningPauseValue = document.getElementById('listening-pause-value');
         this.autoPlayLabel = document.getElementById('auto-play-label');
         this.autoPlayHint = document.getElementById('auto-play-hint');
         this.autoPlayBtn = document.getElementById('auto-play-btn');
@@ -162,6 +167,7 @@ export class UIManager {
         this.listenQuizQuestion = document.getElementById('listen-quiz-question');
         this.listenQuizResult = document.getElementById('listen-quiz-result');
         this.listenQuizOptions = document.getElementById('listen-quiz-options');
+        this.listeningPromptData = null;
         this.pronunciationLab = document.getElementById('pronunciation-lab');
         this.pronunciationLabActions = document.getElementById('pronunciation-lab-actions');
         this.pronunciationLabBody = document.getElementById('pronunciation-lab-body');
@@ -249,6 +255,7 @@ export class UIManager {
         if (this.copyTeacherLinkBtn) this.copyTeacherLinkBtn.onclick = () => this.copyTeacherLink();
         if (this.voiceSelect) this.voiceSelect.onchange = () => this.callbacks.onChangeVoice(this.voiceSelect.value);
         if (this.speechSpeedRange) this.speechSpeedRange.oninput = () => this.callbacks.onChangeSpeechRate(Number(this.speechSpeedRange.value));
+        if (this.listeningPauseRange) this.listeningPauseRange.oninput = () => this.callbacks.onChangeListeningPause?.(Number(this.listeningPauseRange.value));
         if (this.autoPlayBtn) this.autoPlayBtn.onclick = () => this.callbacks.onToggleAutoPlay();
         if (this.splashToggleBtn) this.splashToggleBtn.onclick = () => this.callbacks.onToggleSplashVideo();
         if (this.slowPlayBtn) this.slowPlayBtn.onclick = () => this.callbacks.onSlowPlay();
@@ -288,7 +295,7 @@ export class UIManager {
         if (this.skipSplashLabel) this.skipSplashLabel.innerText = text.skip || 'Skip';
         const versionEl = document.getElementById('app-version');
         if (versionEl) {
-            versionEl.innerText = 'Build 2026.04.05a';
+            versionEl.innerText = 'Build 2026.04.05c';
         }
         document.getElementById('language-prompt').innerText = text.languagePrompt;
         document.getElementById('target-language-prompt').innerText = text.targetLanguagePrompt;
@@ -336,6 +343,8 @@ export class UIManager {
         if (this.voiceLabel) this.voiceLabel.innerText = text.voiceLabel || 'Voice';
         if (this.speechSpeedLabel) this.speechSpeedLabel.innerText = text.speechSpeedLabel || 'Speech speed';
         if (this.speechSpeedHint) this.speechSpeedHint.innerText = text.speechSpeedHint || 'Adjust how fast the model voice speaks';
+        if (this.listeningPauseLabel) this.listeningPauseLabel.innerText = text.listeningPauseLabel || 'Listening pause';
+        if (this.listeningPauseHint) this.listeningPauseHint.innerText = text.listeningPauseHint || 'Set how long students get to repeat before the model says it again';
         if (this.autoPlayLabel) this.autoPlayLabel.innerText = text.autoPlayLabel || 'Auto-play new cards';
         if (this.autoPlayHint) this.autoPlayHint.innerText = text.autoPlayHint || 'Play the word or phrase automatically when the card changes';
         if (this.splashToggleLabel) this.splashToggleLabel.innerText = text.splashToggleLabel || 'Opening video';
@@ -759,11 +768,33 @@ export class UIManager {
 
         const prompt = document.createElement('div');
         prompt.className = 'text-sm md:text-base font-semibold text-slate-500 leading-relaxed max-w-sm';
-        prompt.innerText = this.text.listenQuizQuestion || 'Which one did you hear?';
+        prompt.innerText = this.listeningPromptData?.prompt
+            || this.text.listeningModePrompt
+            || 'Listen, say it during the pause, then listen again.';
 
         wrap.appendChild(iconWrap);
         wrap.appendChild(title);
         wrap.appendChild(prompt);
+
+        if (this.listeningPromptData?.meaning) {
+            const meaningPill = document.createElement('div');
+            meaningPill.className = 'bg-white/80 border border-indigo-100 text-slate-700 rounded-full px-4 py-2 text-sm md:text-base font-semibold max-w-sm';
+            meaningPill.innerText = `${this.text.listeningMeaningLabel || this.text.meaning || 'Meaning'}: ${this.listeningPromptData.meaning}`;
+            wrap.appendChild(meaningPill);
+        }
+
+        if (this.listeningPromptData?.languageLabel || this.listeningPromptData?.pauseLabel) {
+            const helperRow = document.createElement('div');
+            helperRow.className = 'flex flex-wrap items-center justify-center gap-2 max-w-sm';
+
+            if (this.listeningPromptData?.languageLabel) {
+                helperRow.appendChild(this.createMetaPill(this.text.targetLanguagePrompt || 'Language', this.listeningPromptData.languageLabel));
+            }
+            if (this.listeningPromptData?.pauseLabel) {
+                helperRow.appendChild(this.createMetaPill(this.text.listeningPauseLabel || 'Listening pause', this.listeningPromptData.pauseLabel));
+            }
+            wrap.appendChild(helperRow);
+        }
         element.appendChild(wrap);
         if (typeof lucide !== 'undefined') lucide.createIcons();
     }
@@ -981,6 +1012,21 @@ export class UIManager {
             this.speechSpeedValue.innerText = `${rate.toFixed(2)}x`;
         }
         this.updateSettingsSummary();
+    }
+
+    updateListeningPause(seconds) {
+        this.listeningPauseSeconds = seconds;
+        if (this.listeningPauseRange) {
+            this.listeningPauseRange.value = `${seconds}`;
+        }
+        if (this.listeningPauseValue) {
+            this.listeningPauseValue.innerText = `${seconds.toFixed(1)}s`;
+        }
+        this.updateSettingsSummary();
+    }
+
+    setListeningPromptData(data) {
+        this.listeningPromptData = data || null;
     }
 
     renderVoiceOptions(voices, selectedVoice) {
@@ -1307,6 +1353,9 @@ export class UIManager {
             `${this.text.settingsAutoPlayShort || 'Auto-play'}: ${this.autoPlayBtn?.innerText || (this.text.on || 'On')}`,
             `${this.text.settingsSplashShort || 'Opening video'}: ${this.splashToggleBtn?.innerText || (this.text.on || 'On')}`
         ];
+        if (this.practiceStyle === 'listening') {
+            pills.splice(5, 0, `${this.text.listeningPauseLabel || 'Listening pause'}: ${this.listeningPauseRange ? `${Number(this.listeningPauseRange.value).toFixed(1)}s` : '5.0s'}`);
+        }
 
         this.settingsSummaryPills.innerHTML = '';
         pills.forEach(label => {
@@ -1454,6 +1503,39 @@ export class UIManager {
         return getWordMeaning(text, this.language);
     }
 
+    getChineseToneEntries(pronunciation = '') {
+        const normalized = (pronunciation || '').replace(/u:/gi, 'ü');
+        const tokens = normalized.match(/[A-Za-züÜāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜĀÁǍÀĒÉĚÈĪÍǏÌŌÓǑÒŪÚǓÙǕǗǙǛ]+[1-5]?/g) || [];
+        const toneMarks = {
+            ā: 1, ē: 1, ī: 1, ō: 1, ū: 1, ǖ: 1, Ā: 1, Ē: 1, Ī: 1, Ō: 1, Ū: 1, Ǖ: 1,
+            á: 2, é: 2, í: 2, ó: 2, ú: 2, ǘ: 2, Á: 2, É: 2, Í: 2, Ó: 2, Ú: 2, Ǘ: 2,
+            ǎ: 3, ě: 3, ǐ: 3, ǒ: 3, ǔ: 3, ǚ: 3, Ǎ: 3, Ě: 3, Ǐ: 3, Ǒ: 3, Ǔ: 3, Ǚ: 3,
+            à: 4, è: 4, ì: 4, ò: 4, ù: 4, ǜ: 4, À: 4, È: 4, Ì: 4, Ò: 4, Ù: 4, Ǜ: 4
+        };
+
+        return tokens.map((token) => {
+            const digitMatch = token.match(/([1-5])$/);
+            const tone = digitMatch
+                ? Number(digitMatch[1])
+                : Array.from(token).reduce((found, char) => found || toneMarks[char] || 0, 0) || 5;
+            return { syllable: token.replace(/[1-5]$/, ''), tone };
+        });
+    }
+
+    getChineseToneHint(content) {
+        if (this.targetLanguage !== 'zh' || !content) return '';
+        const pronunciation = this.getPronunciationHint(content);
+        const entries = this.getChineseToneEntries(pronunciation);
+        if (!entries.length) return '';
+        return entries
+            .map(({ syllable, tone }) => `${syllable} (${this.text[`tone${tone}`] || `${tone}`})`)
+            .join(' · ');
+    }
+
+    hasChineseToneMarkers(pronunciation = '') {
+        return this.getChineseToneEntries(pronunciation).length > 0;
+    }
+
     getPronunciationHint(content) {
         if (!content || typeof content !== 'object') return '';
         if (content.pronunciation) return content.pronunciation;
@@ -1594,6 +1676,10 @@ export class UIManager {
         if (this.showPronunciation && pronunciation) {
             stack.appendChild(this.createPronunciationCard(pronunciation));
         }
+        const toneHint = this.getChineseToneHint(typeof source === 'object' ? source : null);
+        if (toneHint) {
+            stack.appendChild(this.createMetaPill(this.text.tone || 'Tone', toneHint));
+        }
 
         const meaning = this.getMeaning(source);
         if (this.showMeanings && meaning) {
@@ -1635,6 +1721,10 @@ export class UIManager {
         const pronunciation = this.getPronunciationHint(content);
         if (this.showPronunciation && pronunciation) {
             stack.appendChild(this.createPronunciationCard(pronunciation));
+        }
+        const toneHint = this.getChineseToneHint(content);
+        if (toneHint) {
+            stack.appendChild(this.createMetaPill(this.text.tone || 'Tone', toneHint));
         }
 
         const meaning = this.getMeaning(content);
@@ -1728,6 +1818,10 @@ export class UIManager {
         const pronunciation = this.getPronunciationHint(content);
         if (this.showPronunciation && pronunciation) {
             textWrap.appendChild(this.createPronunciationCard(pronunciation));
+        }
+        const toneHint = this.getChineseToneHint(content);
+        if (toneHint) {
+            textWrap.appendChild(this.createMetaPill(this.text.tone || 'Tone', toneHint));
         }
 
         const meaning = this.getMeaning(content);

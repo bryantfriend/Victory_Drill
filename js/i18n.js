@@ -6,6 +6,14 @@ export const LANGUAGES = [
     { code: 'fr', label: 'Francais' }
 ];
 
+const LANGUAGE_NAMES = {
+    en: { en: 'English', zh: 'Chinese', ky: 'Kyrgyz', ru: 'Russian', fr: 'French' },
+    zh: { en: '英语', zh: '中文', ky: '吉尔吉斯语', ru: '俄语', fr: '法语' },
+    ky: { en: 'англисче', zh: 'кытайча', ky: 'кыргызча', ru: 'орусча', fr: 'французча' },
+    ru: { en: 'английский', zh: 'китайский', ky: 'кыргызский', ru: 'русский', fr: 'французский' },
+    fr: { en: 'anglais', zh: 'chinois', ky: 'kirghiz', ru: 'russe', fr: 'francais' }
+};
+
 const UI_STRINGS = {
     en: {
         appTitle: 'Language Victory',
@@ -44,6 +52,12 @@ const UI_STRINGS = {
         noImage: 'No image',
         meaning: 'Meaning',
         pronunciation: 'Pronunciation',
+        tone: 'Tone',
+        tone1: '1st tone',
+        tone2: '2nd tone',
+        tone3: '3rd tone',
+        tone4: '4th tone',
+        tone5: 'neutral tone',
         letterName: 'Letter name',
         sound: 'Sound',
         stress: 'Stress',
@@ -108,6 +122,8 @@ const UI_STRINGS = {
         visualGuideLipsLabel: 'Lips',
         visualGuideTongueLabel: 'Tongue',
         visualGuideAirLabel: 'Air',
+        listeningModePrompt: 'Listen, say it during the pause, then listen again.',
+        listeningMeaningLabel: 'Meaning',
         listenQuizQuestion: 'Which one did you hear?',
         listenCorrect: 'Correct',
         listenWrong: 'Listen again',
@@ -138,6 +154,8 @@ const UI_STRINGS = {
         voiceAuto: 'Automatic best voice',
         speechSpeedLabel: 'Speech speed',
         speechSpeedHint: 'Adjust how fast the model voice speaks',
+        listeningPauseLabel: 'Listening pause',
+        listeningPauseHint: 'Set how long students get to repeat before the model says it again',
         autoPlayLabel: 'Auto-play new cards',
         autoPlayHint: 'Play the word or phrase automatically when the card changes',
         splashToggleLabel: 'Opening video',
@@ -217,6 +235,12 @@ const UI_STRINGS = {
         noImage: '没有图片',
         meaning: '意思',
         pronunciation: '发音提示',
+        tone: '声调',
+        tone1: '第一声',
+        tone2: '第二声',
+        tone3: '第三声',
+        tone4: '第四声',
+        tone5: '轻声',
         letterName: '字母名称',
         sound: '发音',
         stress: '重音',
@@ -281,6 +305,8 @@ const UI_STRINGS = {
         visualGuideLipsLabel: '嘴唇',
         visualGuideTongueLabel: '舌头',
         visualGuideAirLabel: '气流',
+        listeningModePrompt: '先听一遍，在停顿时跟读，然后再听一遍。',
+        listeningMeaningLabel: '意思',
         listenQuizQuestion: '你听到了哪一个？',
         listenCorrect: '正确',
         listenWrong: '再听一次',
@@ -311,6 +337,8 @@ const UI_STRINGS = {
         voiceAuto: '自动选择最佳语音',
         speechSpeedLabel: '语速',
         speechSpeedHint: '调整示范语音的播放速度',
+        listeningPauseLabel: '听力停顿',
+        listeningPauseHint: '设置学生跟读后再次听到示范前的停顿时间',
         autoPlayLabel: '自动播放新卡片',
         autoPlayHint: '切换到新卡片时自动朗读单词或短语',
         splashToggleLabel: '开场视频',
@@ -364,6 +392,12 @@ const UI_STRINGS = {
         noImage: 'Сурот жок',
         meaning: 'Мааниси',
         pronunciation: 'Айтылышы',
+        tone: 'Тон',
+        tone1: '1-тон',
+        tone2: '2-тон',
+        tone3: '3-тон',
+        tone4: '4-тон',
+        tone5: 'нейтралдуу тон',
         letterName: 'Тамганын аты',
         sound: 'Тыбыш',
         stress: 'Басым',
@@ -428,6 +462,8 @@ const UI_STRINGS = {
         visualGuideLipsLabel: 'Эрин',
         visualGuideTongueLabel: 'Тил',
         visualGuideAirLabel: 'Аба',
+        listeningModePrompt: 'Адегенде ук, тыныгууда кайтала, анан дагы ук.',
+        listeningMeaningLabel: 'Мааниси',
         listenQuizQuestion: 'Кайсынысын уктуңуз?',
         listenCorrect: 'Туура',
         listenWrong: 'Дагы ук',
@@ -458,6 +494,8 @@ const UI_STRINGS = {
         voiceAuto: 'Эң ылайыктуу үндү автоматтык тандоо',
         speechSpeedLabel: 'Үндүн ылдамдыгы',
         speechSpeedHint: 'Үлгү үндүн канчалык ылдам сүйлөрүн өзгөртүңүз',
+        listeningPauseLabel: 'Угуу тыныгуусу',
+        listeningPauseHint: 'Окуучу кайталагандан кийин үлгү кайра угулганга чейинки тыныгууну коюңуз',
         autoPlayLabel: 'Жаңы карталарды автоматтык ойнотуу',
         autoPlayHint: 'Карточка алмашканда сөздү же фразаны автоматтык айтсын',
         splashToggleLabel: 'Кириш видеосу',
@@ -511,6 +549,12 @@ const UI_STRINGS = {
         noImage: 'Нет картинки',
         meaning: 'Значение',
         pronunciation: 'Произношение',
+        tone: 'Тон',
+        tone1: '1-й тон',
+        tone2: '2-й тон',
+        tone3: '3-й тон',
+        tone4: '4-й тон',
+        tone5: 'нейтральный тон',
         letterName: 'Название',
         sound: 'Звук',
         stress: 'Ударение',
@@ -575,6 +619,8 @@ const UI_STRINGS = {
         visualGuideLipsLabel: 'Губы',
         visualGuideTongueLabel: 'Язык',
         visualGuideAirLabel: 'Воздух',
+        listeningModePrompt: 'Сначала послушай, повтори во время паузы, потом послушай еще раз.',
+        listeningMeaningLabel: 'Значение',
         listenQuizQuestion: 'Что ты услышал?',
         listenCorrect: 'Верно',
         listenWrong: 'Послушай еще',
@@ -605,6 +651,8 @@ const UI_STRINGS = {
         voiceAuto: 'Автоматически лучший голос',
         speechSpeedLabel: 'Скорость речи',
         speechSpeedHint: 'Настройте скорость голоса модели',
+        listeningPauseLabel: 'Пауза для повторения',
+        listeningPauseHint: 'Сколько времени дать ученику на повторение перед вторым прослушиванием',
         autoPlayLabel: 'Автоматически озвучивать новые карточки',
         autoPlayHint: 'Сразу проигрывать слово или фразу при смене карточки',
         splashToggleLabel: 'Стартовое видео',
@@ -684,6 +732,12 @@ const UI_STRINGS = {
         noImage: 'Pas d image',
         meaning: 'Sens',
         pronunciation: 'Prononciation',
+        tone: 'Ton',
+        tone1: '1er ton',
+        tone2: '2e ton',
+        tone3: '3e ton',
+        tone4: '4e ton',
+        tone5: 'ton neutre',
         letterName: 'Nom de la lettre',
         sound: 'Son',
         stress: 'Accent',
@@ -748,6 +802,8 @@ const UI_STRINGS = {
         visualGuideLipsLabel: 'Levres',
         visualGuideTongueLabel: 'Langue',
         visualGuideAirLabel: 'Air',
+        listeningModePrompt: 'Ecoute, repete pendant la pause, puis ecoute encore.',
+        listeningMeaningLabel: 'Sens',
         listenQuizQuestion: 'Lequel avez-vous entendu ?',
         listenCorrect: 'Correct',
         listenWrong: 'Ecoutez encore',
@@ -778,6 +834,8 @@ const UI_STRINGS = {
         voiceAuto: 'Meilleure voix automatique',
         speechSpeedLabel: 'Vitesse de parole',
         speechSpeedHint: 'Ajustez la vitesse de la voix du modele',
+        listeningPauseLabel: 'Pause d ecoute',
+        listeningPauseHint: 'Definissez le temps laisse a l eleve pour repeter avant la seconde lecture',
         autoPlayLabel: 'Lire automatiquement les nouvelles cartes',
         autoPlayHint: 'Lire le mot ou la phrase automatiquement quand la carte change',
         splashToggleLabel: 'Video d ouverture',
@@ -1158,6 +1216,12 @@ export function getUIText(language, key) {
 
 export function getCategoryLabel(category, language) {
     return CATEGORY_LABELS[category]?.[language] || CATEGORY_LABELS[category]?.ru || category;
+}
+
+export function getLanguageName(languageCode, baseLanguage = 'en') {
+    return LANGUAGE_NAMES[baseLanguage]?.[languageCode]
+        || LANGUAGE_NAMES.en[languageCode]
+        || languageCode;
 }
 
 export function getWordMeaning(text, language) {

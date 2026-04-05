@@ -1,5 +1,85 @@
 const meanings = (en, zh, ky, ru, fr) => ({ en, zh, ky, ru, fr });
 
+const CHINESE_SHARED_PRONUNCIATIONS = {
+    '老师': 'lǎo shī',
+    '医生': 'yī shēng',
+    '护士': 'hù shi',
+    '司机': 'sī jī',
+    '厨师': 'chú shī',
+    '警察': 'jǐng chá',
+    '消防员': 'xiāo fáng yuán',
+    '农民': 'nóng mín',
+    '建筑工人': 'jiàn zhù gōng rén',
+    '工程师': 'gōng chéng shī',
+    '艺术家': 'yì shù jiā',
+    '歌手': 'gē shǒu',
+    '舞蹈演员': 'wǔ dǎo yǎn yuán',
+    '飞行员': 'fēi xíng yuán',
+    '机械师': 'jī xiè shī',
+    '面包师': 'miàn bāo shī',
+    '服务员': 'fú wù yuán',
+    '收银员': 'shōu yín yuán',
+    '牙医': 'yá yī',
+    '演员': 'yǎn yuán',
+    '音乐家': 'yīn yuè jiā',
+    '科学家': 'kē xué jiā',
+    '程序员': 'chéng xù yuán',
+    '摄影师': 'shè yǐng shī',
+    '裁缝': 'cái feng',
+    '清洁工': 'qīng jié gōng',
+    '油漆工': 'yóu qī gōng',
+    '翻译员': 'fān yì yuán',
+    '记者': 'jì zhě',
+    '图书管理员': 'tú shū guǎn lǐ yuán',
+    '零': 'líng',
+    '一': 'yī',
+    '二': 'èr',
+    '三': 'sān',
+    '四': 'sì',
+    '五': 'wǔ',
+    '六': 'liù',
+    '七': 'qī',
+    '八': 'bā',
+    '九': 'jiǔ',
+    '十': 'shí',
+    '十一': 'shí yī',
+    '十二': 'shí èr',
+    '十三': 'shí sān',
+    '十四': 'shí sì',
+    '十五': 'shí wǔ',
+    '十六': 'shí liù',
+    '十七': 'shí qī',
+    '十八': 'shí bā',
+    '十九': 'shí jiǔ',
+    '二十': 'èr shí',
+    '圆形': 'yuán xíng',
+    '正方形': 'zhèng fāng xíng',
+    '三角形': 'sān jiǎo xíng',
+    '长方形': 'cháng fāng xíng',
+    '星形': 'xīng xíng',
+    '心形': 'xīn xíng',
+    '椭圆形': 'tuǒ yuán xíng',
+    '菱形': 'líng xíng',
+    '立方体': 'lì fāng tǐ',
+    '球体': 'qiú tǐ',
+    '圆柱体': 'yuán zhù tǐ',
+    '圆锥体': 'yuán zhuī tǐ',
+    '线': 'xiàn',
+    '螺旋': 'luó xuán',
+    '熟能生巧': 'shú néng shēng qiǎo',
+    '迟做总比不做好': 'chí zuò zǒng bǐ bù zuò hǎo',
+    '时间就是金钱': 'shí jiān jiù shì jīn qián',
+    '知识就是力量': 'zhī shi jiù shì lì liàng',
+    '事实胜于雄辩': 'shì shí shèng yú xióng biàn',
+    '黑暗中总有一线光明': 'hēi àn zhōng zǒng yǒu yí xiàn guāng míng',
+    '有志者事竟成': 'yǒu zhì zhě shì jìng chéng',
+    '三个臭皮匠，顶个诸葛亮': 'sān gè chòu pí jiàng, dǐng gè Zhūgě Liàng',
+    '罗马不是一天建成的': 'Luó mǎ bú shì yì tiān jiàn chéng de',
+    '来得容易，去得也快': 'lái de róng yì, qù de yě kuài',
+    '诚实为上策': 'chéng shí wéi shàng cè',
+    '稳扎稳打才能赢': 'wěn zhā wěn dǎ cái néng yíng'
+};
+
 const word = (t, glosses, extras = {}) => ({
     t,
     meanings: glosses,
@@ -71,9 +151,18 @@ const createJobsCategory = (languageKey, categoryKeyPrefix) => category(
     JOB_CATEGORY_LABEL,
     JOB_WORDS.map(job => word(
         job[languageKey],
-        meanings(job.en, job.zh, job.ky, job.ru, job.fr)
+        meanings(job.en, job.zh, job.ky, job.ru, job.fr),
+        getSharedExtras(job, languageKey)
     ))
 );
+
+const getSharedExtras = (entry, languageKey) => {
+    const explicit = { ...(entry.extras?.[languageKey] || {}) };
+    if (languageKey === 'zh' && !explicit.pronunciation && CHINESE_SHARED_PRONUNCIATIONS[entry.zh]) {
+        explicit.pronunciation = CHINESE_SHARED_PRONUNCIATIONS[entry.zh];
+    }
+    return explicit;
+};
 
 const createSharedWordCategory = (languageKey, categoryKey, labels, rows) => category(
     categoryKey,
@@ -81,7 +170,7 @@ const createSharedWordCategory = (languageKey, categoryKey, labels, rows) => cat
     rows.map(entry => word(
         entry[languageKey],
         meanings(entry.en, entry.zh, entry.ky, entry.ru, entry.fr),
-        entry.extras?.[languageKey] || {}
+        getSharedExtras(entry, languageKey)
     ))
 );
 
@@ -91,7 +180,7 @@ const createSharedPhraseCategory = (languageKey, categoryKey, labels, rows) => c
     rows.map(entry => phrase(
         entry[languageKey],
         meanings(entry.en, entry.zh, entry.ky, entry.ru, entry.fr),
-        entry.extras?.[languageKey] || {}
+        getSharedExtras(entry, languageKey)
     ))
 );
 
