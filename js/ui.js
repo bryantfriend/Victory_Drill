@@ -11,6 +11,7 @@ export class UIManager {
         this.showPronunciation = true;
         this.showMeanings = true;
         this.allCategories = [];
+        this.categoryLayout = 'rail';
 
         // Screens
         this.screens = {
@@ -22,10 +23,21 @@ export class UIManager {
 
         // DOM Elements
         this.appContainer = document.getElementById('app-container');
+        this.languageGateScreen = document.getElementById('language-gate-screen');
+        this.appLanguageList = document.getElementById('app-language-list');
         this.splashVideo = document.getElementById('splash-video');
         this.splashOverlay = document.getElementById('splash-overlay');
         this.startSplashBtn = document.getElementById('start-splash');
         this.skipSplashBtn = document.getElementById('skip-splash');
+        this.splashBadge = document.getElementById('splash-badge');
+        this.splashTitle = document.getElementById('splash-title');
+        this.splashSubtitle = document.getElementById('splash-subtitle');
+        this.splashPillBase = document.getElementById('splash-pill-base');
+        this.splashPillTarget = document.getElementById('splash-pill-target');
+        this.splashPillSupport = document.getElementById('splash-pill-support');
+        this.startSplashLabel = document.getElementById('start-splash-label');
+        this.splashActionHint = document.getElementById('splash-action-hint');
+        this.skipSplashLabel = document.getElementById('skip-splash-label');
         this.languageList = document.getElementById('language-list');
         this.targetLanguageList = document.getElementById('target-language-list');
         this.categoryList = document.getElementById('category-list');
@@ -265,9 +277,18 @@ export class UIManager {
         this.text = text;
 
         document.getElementById('app-title').innerText = text.appTitle;
+        if (this.splashBadge) this.splashBadge.innerText = text.splashBadge || 'Pronunciation + Memory Practice';
+        if (this.splashTitle) this.splashTitle.innerText = text.appTitle || 'Language Victory';
+        if (this.splashSubtitle) this.splashSubtitle.innerText = text.splashSubtitle || 'Build confident pronunciation through letters, words, and useful everyday phrases.';
+        if (this.splashPillBase) this.splashPillBase.innerText = text.splashPillBase || '5 base languages';
+        if (this.splashPillTarget) this.splashPillTarget.innerText = text.splashPillTarget || '5 target languages';
+        if (this.splashPillSupport) this.splashPillSupport.innerText = text.splashPillSupport || 'Meaning + sound support';
+        if (this.startSplashLabel) this.startSplashLabel.innerText = text.splashStart || 'Start';
+        if (this.splashActionHint) this.splashActionHint.innerText = text.splashTapHint || 'Tap anywhere to continue';
+        if (this.skipSplashLabel) this.skipSplashLabel.innerText = text.skip || 'Skip';
         const versionEl = document.getElementById('app-version');
         if (versionEl) {
-            versionEl.innerText = 'Build 2026.03.24d';
+            versionEl.innerText = 'Build 2026.04.05a';
         }
         document.getElementById('language-prompt').innerText = text.languagePrompt;
         document.getElementById('target-language-prompt').innerText = text.targetLanguagePrompt;
@@ -453,6 +474,11 @@ export class UIManager {
         this.updateLanguageButtons(selectedLanguage);
     }
 
+    renderAppLanguages(languages, selectedLanguage) {
+        this.renderLanguageSelector(this.appLanguageList, 'app-language-btn', languages, selectedLanguage, (code) => this.callbacks.onChooseAppLanguage?.(code));
+        this.updateSelectorButtons(this.appLanguageList, selectedLanguage);
+    }
+
     renderTargetLanguages(languages, selectedLanguage) {
         this.renderLanguageSelector(this.targetLanguageList, 'target-language-btn', languages, selectedLanguage, (code) => this.callbacks.onChangeTargetLanguage(code));
         this.updateTargetLanguageButtons(selectedLanguage);
@@ -481,6 +507,7 @@ export class UIManager {
     }
 
     updateSelectorButtons(container, selectedLanguage) {
+        if (!container) return;
         container.querySelectorAll('button').forEach(btn => {
             const isSelected = btn.dataset.language === selectedLanguage;
             btn.classList.toggle('selected', isSelected);
@@ -489,6 +516,16 @@ export class UIManager {
             btn.classList.toggle('bg-slate-100', !isSelected);
             btn.classList.toggle('text-slate-700', !isSelected);
         });
+    }
+
+    showLanguageGate() {
+        if (!this.languageGateScreen) return;
+        this.languageGateScreen.classList.remove('hidden');
+    }
+
+    hideLanguageGate() {
+        if (!this.languageGateScreen) return;
+        this.languageGateScreen.classList.add('hidden');
     }
 
     showScreen(name) {
@@ -741,11 +778,12 @@ export class UIManager {
         this.updateSettingsSummary();
     }
 
-    renderCategories(categories, colors) {
+    renderCategories(categories, colors, options = {}) {
         this.allCategories = categories.map((cat, index) => ({
             ...cat,
             color: colors[index % colors.length]
         }));
+        this.categoryLayout = options.layout || 'rail';
         this.renderTeacherCategories(this.allCategories);
         this.categorySearch.value = '';
         this.applyCategoryFilter();
@@ -755,10 +793,12 @@ export class UIManager {
         const query = (this.categorySearch.value || '').trim().toLowerCase();
         const filtered = this.allCategories.filter(cat => cat.label.toLowerCase().includes(query));
         this.categoryList.innerHTML = '';
+        this.categoryList.classList.toggle('category-rail--board', this.categoryLayout === 'board');
         filtered.forEach(cat => {
             const color = cat.color;
             const btn = document.createElement('button');
             btn.className = `category-option btn-3d ${color.bg} ${color.hover} text-white font-bold py-3 px-4 rounded-2xl text-sm md:text-base border-b-6 flex items-center justify-between text-left transition-all`;
+            if (this.categoryLayout === 'board') btn.classList.add('category-option--board');
             btn.style.setProperty('--shadow-color', color.shadow);
             const tags = (cat.tags || [])
                 .map(tag => `<span class="category-option__tag category-option__tag--${tag.tone || 'default'}">${tag.label || tag}</span>`)
@@ -847,7 +887,7 @@ export class UIManager {
 
     scrollCategories(direction) {
         if (!this.categoryList) return;
-        const amount = Math.max(220, Math.round(this.categoryList.clientWidth * 0.75)) * direction;
+        const amount = Math.max(260, Math.round(this.categoryList.clientWidth * 0.94)) * direction;
         this.categoryList.scrollBy({ left: amount, behavior: 'smooth' });
     }
 

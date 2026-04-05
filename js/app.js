@@ -34,6 +34,7 @@ class App {
         this.listeningQuiz = null;
         this.isApplyingAssignment = false;
         this.activeAssignment = null;
+        this.startupReady = false;
 
         this.russianAlphabetVariations = [
             "Следующая буква {n}. Она дает звук {s}.",
@@ -88,6 +89,7 @@ class App {
             onSpeakWord: (item) => this.speakWord(item),
             onChangeMode: (mode) => this.setMode(mode),
             onChangeLanguage: (language) => this.setLanguage(language),
+            onChooseAppLanguage: (language) => this.chooseAppLanguage(language),
             onChangeTargetLanguage: (language) => this.setTargetLanguage(language),
             onSelectCategory: (cat) => this.startGame(cat),
             onNextItem: () => this.nextItem(),
@@ -124,6 +126,16 @@ class App {
         this.loadSavedItems();
         this.init();
         this.applyAssignmentFromUrl();
+        this.ui.renderAppLanguages(LANGUAGES, this.baseLanguage);
+        this.ui.showLanguageGate();
+    }
+
+    chooseAppLanguage(language) {
+        this.setLanguage(language);
+        this.ui.renderAppLanguages(LANGUAGES, language);
+        this.ui.hideLanguageGate();
+        if (this.startupReady) return;
+        this.startupReady = true;
         this.handleSplash();
     }
 
@@ -588,6 +600,14 @@ class App {
             wordCount: getUIText(language, 'wordCount'),
             readInChunks: getUIText(language, 'readInChunks'),
             noSound: getUIText(language, 'noSound'),
+            skip: getUIText(language, 'skip'),
+            splashBadge: getUIText(language, 'splashBadge'),
+            splashSubtitle: getUIText(language, 'splashSubtitle'),
+            splashPillBase: getUIText(language, 'splashPillBase'),
+            splashPillTarget: getUIText(language, 'splashPillTarget'),
+            splashPillSupport: getUIText(language, 'splashPillSupport'),
+            splashStart: getUIText(language, 'splashStart'),
+            splashTapHint: getUIText(language, 'splashTapHint'),
             pronunciationToggle: getUIText(language, 'pronunciationToggle'),
             pronunciationToggleHint: getUIText(language, 'pronunciationToggleHint'),
             meaningToggle: getUIText(language, 'meaningToggle'),
@@ -840,6 +860,7 @@ class App {
 
     renderCategories() {
         const { contentMode, categoryGroup } = this.getModeConfig();
+        const layout = categoryGroup === 'topics' ? 'board' : 'rail';
         const categories = (learningContent[this.targetLanguage]?.modes?.[contentMode] || [])
             .filter(category => !categoryGroup || this.getCategoryGroup(category.key) === categoryGroup)
             .map(category => ({
@@ -847,7 +868,7 @@ class App {
             label: category.labels?.[this.baseLanguage] || getCategoryLabel(category.key, this.baseLanguage),
             tags: this.getCategoryTags(contentMode, categoryGroup)
         }));
-        this.ui.renderCategories(categories, this.colors);
+        this.ui.renderCategories(categories, this.colors, { layout });
     }
 
     getCategoryTags(contentMode, categoryGroup) {
@@ -904,6 +925,8 @@ class App {
             'Мягкий',
             'Твердый',
             'Пары',
+            'Редукция',
+            'Ударение',
             'Ь в середине',
             'Удвоенные'
         ];

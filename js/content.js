@@ -1,5 +1,5 @@
 import { CONTENT_BONUSES } from './content-extras.js';
-import { alphabetData, wordsData, phrasesData } from './data.js';
+import { alphabetData, wordsData } from './data.js';
 
 const meanings = (en, zh, ky, ru, fr) => ({ en, zh, ky, ru, fr });
 
@@ -39,6 +39,9 @@ const starterLabel = {
     greetings: { en: 'Greetings', zh: '问候', ky: 'Саламдашуу', ru: 'Приветствия', fr: 'Salutations' },
     classroomPhrases: { en: 'Classroom Phrases', zh: '课堂短语', ky: 'Класс фразалары', ru: 'Фразы для урока', fr: 'Phrases de classe' },
     feelings: { en: 'Feelings', zh: '感受', ky: 'Сезимдер', ru: 'Чувства', fr: 'Sentiments' },
+    everydayPhrases: { en: 'Everyday Phrases', zh: '日常短语', ky: 'Күнүмдүк сүйлөмдөр', ru: 'Повседневные фразы', fr: 'Phrases du quotidien' },
+    familyPhrases: { en: 'Family Phrases', zh: '家庭短语', ky: 'Үй-бүлө фразалары', ru: 'Фразы о семье', fr: 'Phrases sur la famille' },
+    routinePhrases: { en: 'Routine Phrases', zh: '生活短语', ky: 'Күндөлүк фразалар', ru: 'Фразы о распорядке дня', fr: 'Phrases de routine' },
     tonePractice: { en: 'Tone Practice', zh: '声调练习', ky: 'Тон машыгуусу', ru: 'Практика тонов', fr: 'Pratique des tons' },
     commonCharacters: { en: 'Common Characters', zh: '常用汉字', ky: 'Көп колдонулган иероглифтер', ru: 'Частые иероглифы', fr: 'Caracteres courants' },
     usefulPhrases: { en: 'Useful Phrases', zh: '实用短语', ky: 'Пайдалуу фразалар', ru: 'Полезные фразы', fr: 'Phrases utiles' }
@@ -174,7 +177,7 @@ const russianContent = {
                 phrase('Слушайте внимательно.', meanings('Listen carefully.', '认真听。', 'жакшылап уккула.', 'слушайте внимательно.', 'ecoutez attentivement.')),
                 phrase('Напишите ответ.', meanings('Write the answer.', '写答案。', 'жоопту жазгыла.', 'напишите ответ.', 'ecrivez la reponse.'))
             ]),
-            category('russian-daily-phrases', starterLabel.dailyPhrases, [
+            category('russian-daily-phrases', starterLabel.everydayPhrases, [
                 phrase('Как тебя зовут?', meanings('What is your name?', '你叫什么名字？', 'атың ким?', 'как тебя зовут?', 'comment tu t appelles ?')),
                 phrase('Меня зовут Анна.', meanings('My name is Anna.', '我叫安娜。', 'менин атым Анна.', 'меня зовут Анна.', 'je m appelle Anna.')),
                 phrase('Как дела?', meanings('How are you?', '你好吗？', 'кандайсың?', 'как дела?', 'comment ca va ?')),
@@ -182,7 +185,7 @@ const russianContent = {
                 phrase('Я дома.', meanings('I am at home.', '我在家。', 'мен үйдөмүн.', 'я дома.', 'je suis a la maison.')),
                 phrase('Я иду в школу.', meanings('I am going to school.', '我去学校。', 'мен мектепке бара жатам.', 'я иду в школу.', 'je vais a l ecole.'))
             ]),
-            category('russian-family-phrases', starterLabel.familyWords, [
+            category('russian-family-phrases', starterLabel.familyPhrases, [
                 phrase('Это моя мама.', meanings('This is my mother.', '这是我的妈妈。', 'бул менин апам.', 'это моя мама.', 'c est ma maman.')),
                 phrase('Это мой папа.', meanings('This is my father.', '这是我的爸爸。', 'бул менин атам.', 'это мой папа.', 'c est mon papa.')),
                 phrase('У меня есть брат.', meanings('I have a brother.', '我有一个兄弟。', 'менин агам бар.', 'у меня есть брат.', 'j ai un frere.')),
@@ -238,7 +241,7 @@ const russianContent = {
                 phrase('Где касса?', meanings('Where is the cash desk?', '收银台在哪里？', 'касса кайда?', 'где касса?', 'ou est la caisse ?')),
                 phrase('Это слишком дорого.', meanings('This is too expensive.', '这个太贵了。', 'бул өтө кымбат.', 'это слишком дорого.', 'c est trop cher.'))
             ]),
-            category('russian-routine-phrases', starterLabel.dailyPhrases, [
+            category('russian-routine-phrases', starterLabel.routinePhrases, [
                 phrase('Я просыпаюсь рано.', meanings('I wake up early.', '我起得很早。', 'мен эрте турам.', 'я просыпаюсь рано.', 'je me reveille tot.')),
                 phrase('Я завтракаю дома.', meanings('I eat breakfast at home.', '我在家吃早餐。', 'мен үйдө эртең мененки тамак ичем.', 'я завтракаю дома.', 'je prends le petit-dejeuner a la maison.')),
                 phrase('Потом я иду в школу.', meanings('Then I go to school.', '然后我去学校。', 'андан кийин мен мектепке барам.', 'потом я иду в школу.', 'ensuite je vais a l ecole.')),
@@ -349,8 +352,7 @@ const russianContent = {
                 phrase('ПлАчу утром, но плачУ потом.', meanings('I cry in the morning, but I will pay later.', '我早上哭，但我之后会付款。', 'эртең менен ыйлайм, бирок кийин төлөйм.', 'ПлАчу утром, но плачУ потом.', 'je pleure le matin, mais je paierai plus tard.'), { pronunciation: 'PLA-chu vs pla-CHU' }),
                 phrase('СтОит дом, а стоИт он ровно.', meanings('The house stands, and it stands straight.', '房子立着，而且它站得很直。', 'үй турат жана тик турат.', 'СтОит дом, а стоИт он ровно.', 'la maison est debout, et elle tient droite.'), { pronunciation: 'STO-it vs sta-IT' }),
                 phrase('ПИли сок, а пилИ потом.', meanings('They drank juice, then sawed later.', '他们喝了果汁，然后后来锯东西。', 'алар шире ичишти, анан кийин араалашты.', 'ПИли сок, а пилИ потом.', 'ils ont bu du jus, puis ont scie plus tard.'), { pronunciation: 'PI-li vs pi-LI' })
-            ]),
-            ...Object.entries(phrasesData).map(([key, items]) => category(key, null, items.map(item => ({ t: item, kind: 'phrase' }))))
+            ])
         ]
     }
 };

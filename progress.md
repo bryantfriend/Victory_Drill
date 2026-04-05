@@ -113,3 +113,4 @@ Original prompt: Ok, let's skip that bug for now. Please update each language so
 - Added a new 30-word Jobs topic category for Russian, English, Kyrgyz, Chinese, and French.
 - Added a save-for-later system so students can bookmark letters, words, and phrases and reopen them from a saved practice library.
 - Added shared Numbers, Shapes, and Idioms categories across Russian, English, Kyrgyz, Chinese, and French.
+- Cleaned up phrase category duplication and grouping by removing legacy Russian phrase imports and tightening sound/topic phrase classification.

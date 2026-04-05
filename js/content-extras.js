@@ -523,7 +523,7 @@ export const CONTENT_BONUSES = {
                 phrase('这张纸是湿的', meanings('this sheet of paper is wet', '这张纸是湿的', 'бул кагаз нымдуу', 'этот лист бумаги мокрый', 'cette feuille est mouillee'), { pronunciation: 'zhe4 zhang1 zhi3 shi4 shi1 de' }),
                 phrase('我认识这位老师', meanings('I know this teacher', '我认识这位老师', 'мен бул мугалимди тааныйм', 'я знаю этого учителя', 'je connais ce professeur'), { pronunciation: 'wo3 ren4 shi zhe4 wei4 lao3 shi1' })
             ]),
-            category('chinese-third-tone-sandhi-phrases', { en: 'Third Tone Phrases', zh: '第三声短语', ky: 'Үчүнчү тон фразалар', ru: 'Фразы с третьим тоном', fr: 'Phrases au troisieme ton' }, [
+            category('chinese-third-tone-sandhi-phrases', { en: 'Third Tone Flow', zh: '第三声连读短语', ky: 'Үчүнчү тон агымы', ru: 'Фразы на течение третьего тона', fr: 'Phrases fluides au troisieme ton' }, [
                 phrase('我很好', meanings('I am very well', '我很好', 'мен абдан жакшымын', 'я очень хорошо', 'je vais tres bien'), { pronunciation: 'wo3 hen3 hao3; middle tone changes in flow' }),
                 phrase('你想买伞吗？', meanings('do you want to buy an umbrella?', '你想买伞吗？', 'кол чатыр сатып алгың келеби?', 'ты хочешь купить зонт?', 'veux-tu acheter un parapluie ?'), { pronunciation: 'ni3 xiang3 mai3 san3 ma; many third tones together' }),
                 phrase('小雨也很好', meanings('light rain is also nice', '小雨也很好', 'майда жамгыр да жакшы', 'небольшой дождь тоже хороший', 'la petite pluie est aussi agreable'), { pronunciation: 'xiao3 yu3 ye3 hen3 hao3' }),

@@ -6,13 +6,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Русская Победа</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="css/style.css?v=20260324d">
+    <link rel="stylesheet" href="css/style.css?v=20260405a">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 
 <body class="bg-indigo-50 text-slate-800 flex items-center justify-center min-h-screen p-4 select-none">
+
+    <div id="language-gate-screen" class="fixed inset-0 z-[120] flex items-center justify-center px-5 py-8">
+        <div class="language-gate-backdrop"></div>
+        <div class="language-gate-panel">
+            <div class="language-gate-orb language-gate-orb-a"></div>
+            <div class="language-gate-orb language-gate-orb-b"></div>
+            <div class="language-gate-head">
+                <p class="language-gate-kicker">Choose App Language</p>
+                <h1 class="language-gate-title">Select the language for the app</h1>
+                <p class="language-gate-subtitle">English · Francais · Русский · Кыргызча · 中文</p>
+            </div>
+            <div id="app-language-list" class="language-gate-list">
+                <!-- App language buttons will be inserted here by JavaScript -->
+            </div>
+        </div>
+    </div>
 
     <!-- Splash Screen -->
     <div id="splash-screen"
@@ -27,26 +43,26 @@
         </video>
         <div id="splash-overlay"
             class="absolute inset-0 flex flex-col items-center justify-center gap-5 z-[101] px-6 text-center">
-            <div class="splash-badge">Pronunciation + Memory Practice</div>
+            <div id="splash-badge" class="splash-badge">Pronunciation + Memory Practice</div>
             <div class="splash-panel">
-                <h2 class="text-white text-4xl md:text-6xl font-black tracking-tight">Language Victory</h2>
-                <p class="text-white/80 text-sm md:text-lg max-w-xl mx-auto">Build confident pronunciation through letters, words, and useful everyday phrases.</p>
+                <h2 id="splash-title" class="text-white text-4xl md:text-6xl font-black tracking-tight">Language Victory</h2>
+                <p id="splash-subtitle" class="text-white/80 text-sm md:text-lg max-w-xl mx-auto">Build confident pronunciation through letters, words, and useful everyday phrases.</p>
                 <div class="splash-pill-row">
-                    <div class="splash-pill">5 base languages</div>
-                    <div class="splash-pill">5 target languages</div>
-                    <div class="splash-pill">Meaning + sound support</div>
+                    <div id="splash-pill-base" class="splash-pill">5 base languages</div>
+                    <div id="splash-pill-target" class="splash-pill">5 target languages</div>
+                    <div id="splash-pill-support" class="splash-pill">Meaning + sound support</div>
                 </div>
             </div>
             <button id="start-splash" type="button"
                 class="btn-3d bg-white hover:bg-slate-100 text-slate-900 font-bold py-3 px-8 rounded-xl text-lg border-b-4 border-slate-300"
                 style="--shadow-color: #cbd5e1;">
-                Start
+                <span id="start-splash-label">Start</span>
             </button>
-            <p class="splash-action-hint">Tap anywhere to continue</p>
+            <p id="splash-action-hint" class="splash-action-hint">Tap anywhere to continue</p>
         </div>
         <button id="skip-splash" type="button"
             class="absolute bottom-10 right-10 text-white/50 hover:text-white text-sm font-bold uppercase tracking-widest transition-colors z-[101]">
-            Пропустить
+            <span id="skip-splash-label">Skip</span>
         </button>
     </div>
 
@@ -73,7 +89,7 @@
                     <span id="teacher-trigger-label">Teacher</span>
                 </button>
             </div>
-                <p id="app-version" class="text-xs font-bold uppercase tracking-[0.2em] text-indigo-400">Build 2026.03.24d</p>
+                <p id="app-version" class="text-xs font-bold uppercase tracking-[0.2em] text-indigo-400">Build 2026.04.05a</p>
 
             <div class="setup-section">
                 <p id="setup-step-languages" class="setup-step-label">Step 1 · Languages</p>
