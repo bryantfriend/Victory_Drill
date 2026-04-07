@@ -1,4 +1,4 @@
-import { getLanguageName, getWordMeaning } from './i18n.js';
+import { getLanguageName, getWordMeaning } from './i18n.js?v=20260407a';
 
 export class UIManager {
     constructor(callbacks) {
@@ -295,7 +295,7 @@ export class UIManager {
         if (this.skipSplashLabel) this.skipSplashLabel.innerText = text.skip || 'Skip';
         const versionEl = document.getElementById('app-version');
         if (versionEl) {
-            versionEl.innerText = 'Build 2026.04.05c';
+            versionEl.innerText = 'Build 2026.04.07a';
         }
         document.getElementById('language-prompt').innerText = text.languagePrompt;
         document.getElementById('target-language-prompt').innerText = text.targetLanguagePrompt;

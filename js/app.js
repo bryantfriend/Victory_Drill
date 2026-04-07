@@ -1,9 +1,9 @@
-import { TARGET_LANGUAGES, getCategoryItems, learningContent } from './content.js';
-import { LANGUAGES, getCategoryLabel, getLanguageName, getUIText } from './i18n.js';
-import { RecognitionManager } from './recognition.js';
-import { VoiceManager } from './voice.js';
-import { Timer } from './timer.js';
-import { UIManager } from './ui.js';
+import { TARGET_LANGUAGES, getCategoryItems, learningContent } from './content.js?v=20260407a';
+import { LANGUAGES, getCategoryLabel, getLanguageName, getUIText } from './i18n.js?v=20260407a';
+import { RecognitionManager } from './recognition.js?v=20260407a';
+import { VoiceManager } from './voice.js?v=20260407a';
+import { Timer } from './timer.js?v=20260407a';
+import { UIManager } from './ui.js?v=20260407a';
 
 class App {
     constructor() {

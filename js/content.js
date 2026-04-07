@@ -1,5 +1,5 @@
-import { CONTENT_BONUSES } from './content-extras.js';
-import { alphabetData, wordsData } from './data.js';
+import { CONTENT_BONUSES } from './content-extras.js?v=20260407a';
+import { alphabetData, wordsData } from './data.js?v=20260407a';
 
 const meanings = (en, zh, ky, ru, fr) => ({ en, zh, ky, ru, fr });
 
