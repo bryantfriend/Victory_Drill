@@ -130,9 +130,12 @@ class App {
         this.loadSavedItems();
         this.init();
         this.applyAssignmentFromUrl();
+        this.applyAppLanguageFromUrl();
         this.ui.renderAppLanguages(LANGUAGES, this.baseLanguage);
         this.ui.splashScreen?.classList.add('hidden');
-        this.ui.showLanguageGate();
+        if (!this.startupReady) {
+            this.ui.showLanguageGate();
+        }
     }
 
     chooseAppLanguage(language) {
@@ -142,6 +145,13 @@ class App {
         if (this.startupReady) return;
         this.startupReady = true;
         this.enterApp();
+    }
+
+    applyAppLanguageFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+        const appLang = params.get('appLang');
+        if (!appLang || !LANGUAGES.some(language => language.code === appLang)) return;
+        this.chooseAppLanguage(appLang);
     }
 
     enterApp() {
