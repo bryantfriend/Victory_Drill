@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Русская Победа</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="css/style.css?v=20260407c">
+    <link rel="stylesheet" href="css/style.css?v=20260407d">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -25,7 +25,11 @@
                 <p class="language-gate-subtitle">English · Francais · Русский · Кыргызча · 中文</p>
             </div>
             <div id="app-language-list" class="language-gate-list">
-                <!-- App language buttons will be inserted here by JavaScript -->
+                <button type="button" class="app-language-btn btn-3d bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 px-3 rounded-xl text-sm border-b-4 border-slate-300" data-language="en" style="--shadow-color: #cbd5e1;">English</button>
+                <button type="button" class="app-language-btn btn-3d bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 px-3 rounded-xl text-sm border-b-4 border-slate-300" data-language="fr" style="--shadow-color: #cbd5e1;">Francais</button>
+                <button type="button" class="app-language-btn btn-3d bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 px-3 rounded-xl text-sm border-b-4 border-slate-300" data-language="ru" style="--shadow-color: #cbd5e1;">Русский</button>
+                <button type="button" class="app-language-btn btn-3d bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 px-3 rounded-xl text-sm border-b-4 border-slate-300" data-language="ky" style="--shadow-color: #cbd5e1;">Кыргызча</button>
+                <button type="button" class="app-language-btn btn-3d bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 px-3 rounded-xl text-sm border-b-4 border-slate-300" data-language="zh" style="--shadow-color: #cbd5e1;">中文</button>
             </div>
         </div>
     </div>
@@ -89,7 +93,7 @@
                     <span id="teacher-trigger-label">Teacher</span>
                 </button>
             </div>
-                <p id="app-version" class="text-xs font-bold uppercase tracking-[0.2em] text-indigo-400">Build 2026.04.07c</p>
+                <p id="app-version" class="text-xs font-bold uppercase tracking-[0.2em] text-indigo-400">Build 2026.04.07d</p>
 
             <div class="setup-section">
                 <p id="setup-step-languages" class="setup-step-label">Step 1 · Languages</p>
@@ -705,7 +709,7 @@
 
       </div>
 
-    <script type="module" src="js/app.js?v=20260407c"></script>
+    <script type="module" src="js/app.js?v=20260407d"></script>
 </body>
 
 </html>

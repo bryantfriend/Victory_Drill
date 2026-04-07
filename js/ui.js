@@ -266,6 +266,20 @@ export class UIManager {
         if (this.closeVisualGuideBtn) this.closeVisualGuideBtn.onclick = () => this.closeVisualGuide();
         if (this.visualGuideDoneBtn) this.visualGuideDoneBtn.onclick = () => this.closeVisualGuide();
         if (this.visualGuideBackdrop) this.visualGuideBackdrop.onclick = () => this.closeVisualGuide();
+        const bindLanguageGate = (container, callback) => {
+            if (!container || !callback) return;
+            const handle = (event) => {
+                const btn = event.target?.closest?.('button[data-language]');
+                if (!btn) return;
+                if (event.cancelable) event.preventDefault();
+                callback(btn.dataset.language);
+            };
+            container.addEventListener('click', handle);
+            container.addEventListener('touchend', handle, { passive: false });
+        };
+        bindLanguageGate(this.appLanguageList, (code) => this.callbacks.onChooseAppLanguage?.(code));
+        bindLanguageGate(this.languageList, (code) => this.callbacks.onChangeLanguage?.(code));
+        bindLanguageGate(this.targetLanguageList, (code) => this.callbacks.onChangeTargetLanguage?.(code));
         this.practiceStyleButtons.forEach(btn => {
             btn.onclick = () => this.callbacks.onChangePracticeStyle(btn.id.replace('style-', ''));
         });
@@ -295,7 +309,7 @@ export class UIManager {
         if (this.skipSplashLabel) this.skipSplashLabel.innerText = text.skip || 'Skip';
         const versionEl = document.getElementById('app-version');
         if (versionEl) {
-            versionEl.innerText = 'Build 2026.04.07c';
+            versionEl.innerText = 'Build 2026.04.07d';
         }
         document.getElementById('language-prompt').innerText = text.languagePrompt;
         document.getElementById('target-language-prompt').innerText = text.targetLanguagePrompt;
