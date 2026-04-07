@@ -269,9 +269,8 @@ export class UIManager {
         const bindLanguageGate = (container, callback) => {
             if (!container || !callback) return;
             const handle = (event) => {
-                const btn = event.target?.closest?.('button[data-language]');
+                const btn = event.target?.closest?.('[data-language]');
                 if (!btn) return;
-                if (event.cancelable) event.preventDefault();
                 callback(btn.dataset.language);
             };
             container.addEventListener('click', handle);
@@ -309,7 +308,7 @@ export class UIManager {
         if (this.skipSplashLabel) this.skipSplashLabel.innerText = text.skip || 'Skip';
         const versionEl = document.getElementById('app-version');
         if (versionEl) {
-            versionEl.innerText = 'Build 2026.04.07e';
+            versionEl.innerText = 'Build 2026.04.07f';
         }
         document.getElementById('language-prompt').innerText = text.languagePrompt;
         document.getElementById('target-language-prompt').innerText = text.targetLanguagePrompt;
@@ -498,7 +497,16 @@ export class UIManager {
     }
 
     renderAppLanguages(languages, selectedLanguage) {
-        this.renderLanguageSelector(this.appLanguageList, 'app-language-btn', languages, selectedLanguage, (code) => this.callbacks.onChooseAppLanguage?.(code));
+        if (this.appLanguageList?.children.length) {
+            const labelMap = Object.fromEntries(languages.map(language => [language.code, language.label]));
+            this.appLanguageList.querySelectorAll('[data-language]').forEach(btn => {
+                const code = btn.dataset.language;
+                if (labelMap[code]) btn.textContent = labelMap[code];
+                if (btn.tagName === 'A') btn.setAttribute('href', `?appLang=${code}`);
+            });
+        } else {
+            this.renderLanguageSelector(this.appLanguageList, 'app-language-btn', languages, selectedLanguage, (code) => this.callbacks.onChooseAppLanguage?.(code));
+        }
         this.updateSelectorButtons(this.appLanguageList, selectedLanguage);
     }
 
