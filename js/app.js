@@ -172,27 +172,26 @@ class App {
             clearTimeout(playbackTimeout);
             clearTimeout(autoBypassTimeout);
         };
-
-        const bindPress = (element, handler, options = {}) => {
+        const bindSimplePress = (element, handler) => {
             if (!element) return;
-            let lastTouch = 0;
+            let fired = false;
+
             const wrapped = (event) => {
-                if (options.stopPropagation) event.stopPropagation();
-                if (options.preventDefault !== false && event.cancelable) {
-                    event.preventDefault();
-                }
-                if (event.type === 'click' && Date.now() - lastTouch < 700) {
-                    return;
-                }
-                if (event.type === 'touchend' || event.type === 'pointerup') {
-                    lastTouch = Date.now();
-                }
+                if (hasEnded || fired) return;
+                fired = true;
+                if (event?.cancelable) event.preventDefault();
+                if (typeof event?.stopPropagation === 'function') event.stopPropagation();
                 handler(event);
+                setTimeout(() => {
+                    fired = false;
+                }, 400);
             };
 
-            ['pointerup', 'touchend', 'click'].forEach(type => {
-                element.addEventListener(type, wrapped, { passive: false });
-                removeListeners.push(() => element.removeEventListener(type, wrapped, { passive: false }));
+            element.onclick = wrapped;
+            element.ontouchend = wrapped;
+            removeListeners.push(() => {
+                element.onclick = null;
+                element.ontouchend = null;
             });
         };
 
@@ -249,14 +248,10 @@ class App {
             }
         };
 
-        bindPress(skipBtn, () => endSplash(), { stopPropagation: true });
-        bindPress(startBtn, () => startIntro(), { stopPropagation: true });
-        bindPress(overlay, (event) => {
-            if (event.target === skipBtn || event.target === startBtn) return;
-            startIntro();
-        });
-        bindPress(splash, (event) => {
-            if (event.target === skipBtn || event.target === startBtn || overlay.contains(event.target)) return;
+        bindSimplePress(skipBtn, () => endSplash());
+        bindSimplePress(startBtn, () => startIntro());
+        bindSimplePress(overlay, (event) => {
+            if (event?.target === skipBtn || event?.target === startBtn) return;
             startIntro();
         });
 
@@ -264,7 +259,7 @@ class App {
             if (!hasStarted && !hasEnded) {
                 endSplash();
             }
-        }, 6500);
+        }, 4000);
     }
 
     init() {

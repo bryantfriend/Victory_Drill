@@ -604,6 +604,7 @@ body {
         linear-gradient(180deg, rgba(6, 17, 31, 0.12) 0%, rgba(6, 17, 31, 0.62) 100%);
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
+    pointer-events: auto;
 }
 
 #splash-screen.intro-playing #splash-overlay {
@@ -616,12 +617,14 @@ body {
     z-index: 1003;
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
+    pointer-events: auto;
 }
 
 #skip-splash {
     z-index: 1003;
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
+    pointer-events: auto;
 }
 
 .splash-action-hint {

@@ -295,7 +295,7 @@ export class UIManager {
         if (this.skipSplashLabel) this.skipSplashLabel.innerText = text.skip || 'Skip';
         const versionEl = document.getElementById('app-version');
         if (versionEl) {
-            versionEl.innerText = 'Build 2026.04.07a';
+            versionEl.innerText = 'Build 2026.04.07b';
         }
         document.getElementById('language-prompt').innerText = text.languagePrompt;
         document.getElementById('target-language-prompt').innerText = text.targetLanguagePrompt;
