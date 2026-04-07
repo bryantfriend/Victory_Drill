@@ -308,7 +308,7 @@ export class UIManager {
         if (this.skipSplashLabel) this.skipSplashLabel.innerText = text.skip || 'Skip';
         const versionEl = document.getElementById('app-version');
         if (versionEl) {
-            versionEl.innerText = 'Build 2026.04.07f';
+            versionEl.innerText = 'Build 2026.04.07g';
         }
         document.getElementById('language-prompt').innerText = text.languagePrompt;
         document.getElementById('target-language-prompt').innerText = text.targetLanguagePrompt;
@@ -551,12 +551,14 @@ export class UIManager {
 
     showLanguageGate() {
         if (!this.languageGateScreen) return;
+        this.languageGateScreen.style.display = 'flex';
         this.languageGateScreen.classList.remove('hidden');
     }
 
     hideLanguageGate() {
         if (!this.languageGateScreen) return;
         this.languageGateScreen.classList.add('hidden');
+        this.languageGateScreen.style.display = 'none';
     }
 
     showScreen(name) {

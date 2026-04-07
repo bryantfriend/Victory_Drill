@@ -132,7 +132,11 @@ class App {
         this.applyAssignmentFromUrl();
         this.applyAppLanguageFromUrl();
         this.ui.renderAppLanguages(LANGUAGES, this.baseLanguage);
-        this.ui.splashScreen?.classList.add('hidden');
+        if (this.ui.splashScreen) {
+            this.ui.splashScreen.classList.add('hidden');
+            this.ui.splashScreen.style.display = 'none';
+        }
+        this.ui.hideLanguageGate();
         if (!this.startupReady) {
             this.ui.showLanguageGate();
         }
@@ -155,10 +159,17 @@ class App {
     }
 
     enterApp() {
-        this.ui.splashScreen?.classList.add('hidden');
+        if (this.ui.splashScreen) {
+            this.ui.splashScreen.classList.add('hidden');
+            this.ui.splashScreen.style.display = 'none';
+        }
+        this.ui.hideLanguageGate();
         this.ui.appContainer?.classList.remove('opacity-0');
         this.ui.appContainer?.classList.add('opacity-100');
-        if (this.ui.appContainer) this.ui.appContainer.style.pointerEvents = 'auto';
+        if (this.ui.appContainer) {
+            this.ui.appContainer.style.pointerEvents = 'auto';
+            this.ui.appContainer.style.display = 'block';
+        }
         this.ui.showScreen('start');
     }
 
